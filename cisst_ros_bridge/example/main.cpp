@@ -76,12 +76,12 @@ int main(int argc, char ** argv)
     manager->AddComponent(&testComponent);
 
     mtsROSBridge publisher("publisher", 20.0 * cmn_ms);
-    publisher.AddPublisherFromReadCommand<vctDoubleVec, cisst_ros_bridge::vctDoubleVec>("required",
-                                                                                        "GetValue1",
-                                                                                        "/sawROSExample/get_value_1");
-    publisher.AddPublisherFromReadCommand<vctDoubleVec, cisst_ros_bridge::vctDoubleVec>("required",
-                                                                                        "GetValue2",
-                                                                                        "/sawROSExample/get_value_2");
+    publisher.AddPublisherFromReadCommand<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
+                                                                                  "GetValue1",
+                                                                                  "/sawROSExample/get_value_1");
+    publisher.AddPublisherFromReadCommand<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
+                                                                                  "GetValue2",
+                                                                                  "/sawROSExample/get_value_2");
     manager->AddComponent(&publisher);
     manager->Connect(publisher.GetName(), "required",
                      testComponent.GetName(), "provided");
@@ -89,17 +89,17 @@ int main(int argc, char ** argv)
                      testComponent.GetName(), "ExecOut");
 
     mtsROSBridge sub1("sub1", 1 * cmn_ms);
-    sub1.AddSubscriberToWriteCommand<vctDoubleVec, cisst_ros_bridge::vctDoubleVec>("required",
-                                                                                   "SetValue1",
-                                                                                   "/sawROSExample/set_value_1");
+    sub1.AddSubscriberToWriteCommand<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
+                                                                             "SetValue1",
+                                                                             "/sawROSExample/set_value_1");
     manager->AddComponent(&sub1);
     manager->Connect(sub1.GetName(), "required",
                      testComponent.GetName(), "provided");
 
     mtsROSBridge sub2("sub2", 1 * cmn_ms);
-    sub2.AddSubscriberToWriteCommand<vctDoubleVec, cisst_ros_bridge::vctDoubleVec>("required",
-                                                                                   "SetValue2",
-                                                                                   "/sawROSExample/set_value_2");
+    sub2.AddSubscriberToWriteCommand<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
+                                                                             "SetValue2",
+                                                                             "/sawROSExample/set_value_2");
     manager->AddComponent(&sub2);
     manager->Connect(sub2.GetName(), "required",
                      testComponent.GetName(), "provided");

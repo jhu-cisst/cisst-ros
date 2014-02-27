@@ -81,7 +81,7 @@ void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointStat
     }
 }
 
-void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_ros_bridge::vctDoubleVec & rosData)
+void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & rosData)
 {
     rosData.data.resize(cisstData.size());
     for (size_t i = 0; i < cisstData.size(); ++i) {

@@ -10,7 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
   std_msgs
-  message_generation
+  cisst_msgs
   )
 
 set (REQUIRED_CISST_LIBRARIES 
@@ -27,20 +27,10 @@ include (${CISST_USE_FILE})
 
 # catkin_python_setup()
 
-################################################
-## Declare ROS messages, services and actions ##
-################################################
-
-## Generate msg
-add_message_files(FILES vctDoubleVec.msg)
-
-## Generate added messages and services with any dependencies listed here
-generate_messages(DEPENDENCIES std_msgs)
-
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES cisst_ros_bridge
-  CATKIN_DEPENDS geometry_msgs roscpp rospy sensor_msgs std_msgs message_runtime
+  CATKIN_DEPENDS geometry_msgs roscpp rospy sensor_msgs std_msgs cisst_msgs
 #  DEPENDS system_lib
 )
 
@@ -49,9 +39,7 @@ catkin_package(
 ###########
 
 include_directories(include)
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories(${catkin_INCLUDE_DIRS})
 
 # header
 set (HEADER_FILES
@@ -87,15 +75,3 @@ install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   )
 
-#############
-## Testing ##
-#############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_cisst_ros_bridge.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)

@@ -80,7 +80,7 @@ void mtsROSToCISST(const geometry_msgs::Transform & rosData, prmPositionCartesia
     cisstData.Position().Rotation().Assign(rotation);
 }
 
-void mtsROSToCISST(const cisst_ros_bridge::vctDoubleVec & rosData, vctDoubleVec & cisstData)
+void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & cisstData)
 {
     cisstData.resize(rosData.data.size());
     for (size_t i = 0; i < cisstData.size(); ++i) {
