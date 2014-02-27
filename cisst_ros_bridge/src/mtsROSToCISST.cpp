@@ -32,6 +32,11 @@ void mtsROSToCISST(const std_msgs::Bool &rosData, bool &cisstData)
     cisstData = rosData.data;
 }
 
+void mtsROSToCISST(const std_msgs::String &rosData, std::string &cisstData)
+{
+    cisstData = rosData.data;
+}
+
 
 void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianGet &cisstData)
 {

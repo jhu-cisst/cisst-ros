@@ -32,6 +32,11 @@ void mtsCISSTToROS(const bool &cisstData, std_msgs::Bool &rosData)
     rosData.data = cisstData;
 }
 
+void mtsCISSTToROS(const std::string &cisstData, std_msgs::String &rosData)
+{
+    rosData.data = cisstData;
+}
+
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Transform & rosData)
 {
     vctQuatRot3 quat(cisstData.Position().Rotation(), VCT_NORMALIZE);

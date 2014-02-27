@@ -26,8 +26,9 @@ http://www.cisst.org/cisst/license.txt.
 
 CMN_IMPLEMENT_SERVICES(mtsROSBridge);
 
-mtsROSBridge::mtsROSBridge(const std::string & componentName, double periodInSeconds):
-    mtsTaskPeriodic(componentName, periodInSeconds)
+mtsROSBridge::mtsROSBridge(const std::string & componentName, double periodInSeconds, bool spin):
+    mtsTaskPeriodic(componentName, periodInSeconds),
+    mSpin(spin)
 {
     typedef char * char_pointer;
     char_pointer * argv = new char_pointer[1];
@@ -62,4 +63,6 @@ void mtsROSBridge::Run(void)
          ++iter) {
         (*iter)->Execute();
     }
+
+    if (mSpin) ros::spinOnce();
 }

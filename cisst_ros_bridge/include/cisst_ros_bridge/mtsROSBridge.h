@@ -58,6 +58,7 @@ public:
 
     bool Execute(void) {
         mtsExecutionResult result = Function(CISSTData);
+
         if (result) {
             mtsCISSTToROS(CISSTData, ROSData);
             Publisher.publish(ROSData);
@@ -88,6 +89,8 @@ public:
     typedef mtsROSSubscriber<_mtsType, _rosType> ThisType;
     mtsROSSubscriber(const std::string & rosTopicName, ros::NodeHandle & node) {
         Subscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
+
+        std::cout << "topic: " << rosTopicName << std::endl;
     }
     ~mtsROSSubscriber() {
         // \todo, how to remove the subscriber from the node?
@@ -95,6 +98,9 @@ public:
 
     void Callback(const _rosType & rosData) {
         mtsROSToCISST(rosData, CISSTData);
+
+        std::cout << "cisstdata = " << CISSTData << std::endl;
+
         mtsExecutionResult result = Function(CISSTData);
         if (!result) {
             std::cerr << result << std::endl;
@@ -112,7 +118,7 @@ class mtsROSBridge: public mtsTaskPeriodic
     CMN_DECLARE_SERVICES(CMN_NO_DYNAMIC_CREATION, CMN_LOG_ALLOW_DEFAULT);
 
 public:
-    mtsROSBridge(const std::string & componentName, double periodInSeconds);
+    mtsROSBridge(const std::string & componentName, double periodInSeconds, bool spin = false);
     inline ~mtsROSBridge() {}
 
     // taskPeriodic
@@ -142,6 +148,9 @@ protected:
 
     //! ros node
     ros::NodeHandle * Node;
+
+    //! spin flag, if set call spinOnce() in run
+    bool mSpin;
 };
 
 template <typename _mtsType, typename _rosType>

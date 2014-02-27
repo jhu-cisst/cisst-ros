@@ -32,6 +32,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/String.h>
 #include <geometry_msgs/Transform.h>
 #include <geometry_msgs/Pose.h>
 #include <sensor_msgs/JointState.h>
@@ -43,6 +44,7 @@ http://www.cisst.org/cisst/license.txt.
 // std_msgs
 void mtsCISSTToROS(const double & cisstData, std_msgs::Float32 & rosData);
 void mtsCISSTToROS(const bool &cisstData, std_msgs::Bool &rosData);
+void mtsCISSTToROS(const std::string &cisstData, std_msgs::String &rosData);
 
 // geometry_msgs
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Transform & rosData);
