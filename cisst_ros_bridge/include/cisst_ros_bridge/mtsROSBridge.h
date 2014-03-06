@@ -127,7 +127,7 @@ class mtsROSSubscriberBase
 {
 public:
     //! Function used to pull data from the cisst component
-    mtsFunctionWrite Function;
+    mtsFunctionWrite Function;        
     //! ROS publisher to publish the converted data
     ros::Subscriber Subscriber;
 };
@@ -163,6 +163,33 @@ protected:
 };
 
 
+class mtsROSSubscriberVoid: public mtsROSSubscriberBase
+{
+public:
+  mtsROSSubscriberVoid(const std::string & rosTopicName, ros::NodeHandle & node){
+    Subscriber = node.subscribe(rosTopicName, 1, &mtsROSSubscriberVoid::Callback, this);
+    std::cout << "topic: " << rosTopicName << std::endl;
+  }
+  ~mtsROSSubscriberVoid(){}
+
+  void Callback(const std_msgs::Empty & rosData) {
+    std::cout << "empty msg received" << std::endl;
+
+    mtsExecutionResult result = FunctionVoid();
+    if (!result) {
+      std::cerr << result << std::endl;
+    }
+  }
+
+  //! Function used to trigger void command
+  mtsFunctionVoid FunctionVoid;
+};
+
+
+// ----------------------------------------------------
+// Bridge
+// ----------------------------------------------------
+
 class mtsROSBridge: public mtsTaskPeriodic
 {
     CMN_DECLARE_SERVICES(CMN_NO_DYNAMIC_CREATION, CMN_LOG_ALLOW_DEFAULT);
@@ -177,13 +204,9 @@ public:
     void Run(void);
     void Cleanup(void);
 
+    // --------- Publisher ------------------
     template <typename _mtsType, typename _rosType>
     bool AddPublisherFromReadCommand(const std::string & interfaceRequiredName,
-                                     const std::string & functionName,
-                                     const std::string & topicName);
-
-    template <typename _mtsType, typename _rosType>
-    bool AddSubscriberToWriteCommand(const std::string & interfaceRequiredName,
                                      const std::string & functionName,
                                      const std::string & topicName);
 
@@ -194,6 +217,17 @@ public:
     template <typename _mtsType, typename _rosType>
     bool AddPublisherFromEventWrite(const std::string & interfaceRequiredName,
                                     const std::string & eventName,
+                                    const std::string & topicName);
+
+
+    // --------- Subscriber ------------------
+    template <typename _mtsType, typename _rosType>
+    bool AddSubscriberToWriteCommand(const std::string & interfaceRequiredName,
+                                     const std::string & functionName,
+                                     const std::string & topicName);
+
+    bool AddSubscriberToVoidCommand(const std::string & interfaceRequiredName,
+                                    const std::string & functionName,
                                     const std::string & topicName);
 
 protected:
