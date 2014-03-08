@@ -26,6 +26,7 @@ http://www.cisst.org/cisst/license.txt.
 // cisst include
 #include <cisstVector/vctDynamicVectorTypes.h>
 #include <cisstParameterTypes/prmPositionCartesianGet.h>
+#include <cisstParameterTypes/prmPositionCartesianSet.h>
 #include <cisstParameterTypes/prmPositionJointGet.h>
 
 // ros include
@@ -47,6 +48,7 @@ void mtsROSToCISST(const std_msgs::String &rosData, std::string &cisstData);
 
 // geometry_msgs
 void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianGet &cisstData);
+void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianSet &cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose &rosData, vctFrm4x4 &cisstData);
 void mtsROSToCISST(const geometry_msgs::Transform & rosData, prmPositionCartesianGet & cisstData);
 

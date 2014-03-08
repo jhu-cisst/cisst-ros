@@ -52,6 +52,20 @@ void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianGet &
     cisstData.Position().Rotation().Assign(rotation);
 }
 
+void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianSet &cisstData)
+{
+    cisstData.Goal().Translation().X() = rosData.position.x;
+    cisstData.Goal().Translation().Y() = rosData.position.y;
+    cisstData.Goal().Translation().Z() = rosData.position.z;
+    vctQuatRot3 quat;
+    quat.X() = rosData.orientation.x;
+    quat.Y() = rosData.orientation.y;
+    quat.Z() = rosData.orientation.z;
+    quat.W() = rosData.orientation.w;
+    vctMatRot3 rotation(quat, VCT_NORMALIZE);
+    cisstData.Goal().Rotation().FromNormalized(rotation);
+}
+
 void mtsROSToCISST(const geometry_msgs::Pose &rosData, vctFrm4x4 &cisstData)
 {
     cisstData.Translation().X() = rosData.position.x;
