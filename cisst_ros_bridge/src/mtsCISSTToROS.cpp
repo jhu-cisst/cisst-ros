@@ -81,6 +81,22 @@ void mtsCISSTToROS(const vctFrm4x4 &cisstData, geometry_msgs::Pose &rosData)
     rosData.position.z = cisstData.Translation().Z();
 }
 
+void mtsCISSTToROS(const vct3 &cisstData, geometry_msgs::Vector3 &rosData)
+{
+  rosData.x = cisstData[0];
+  rosData.y = cisstData[1];
+  rosData.z = cisstData[2];
+}
+
+void mtsCISSTToROS(const vctMatRot3 &cisstData, geometry_msgs::Quaternion &rosData)
+{
+  vctQuatRot3 quat(cisstData, VCT_NORMALIZE);
+  rosData.x = quat.X();
+  rosData.y = quat.Y();
+  rosData.z = quat.Z();
+  rosData.w = quat.W();
+}
+
 
 // ---------------------------------------------
 // sensor_msgs

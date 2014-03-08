@@ -35,7 +35,7 @@ mtsROSBridge::mtsROSBridge(const std::string & componentName, double periodInSec
     argv[0]= new char[strlen("mtsROSBridge") + 1];
     strcpy(argv[0], "mtsROSBridge");
     int argc = 1;
-    ros::init(argc, argv, "mtsROSBridge");
+    ros::init(argc, argv, componentName);
     Node = new ros::NodeHandle;
 }
 
