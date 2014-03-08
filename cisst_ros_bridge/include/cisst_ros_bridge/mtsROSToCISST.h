@@ -28,6 +28,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmPositionCartesianGet.h>
 #include <cisstParameterTypes/prmPositionCartesianSet.h>
 #include <cisstParameterTypes/prmPositionJointGet.h>
+#include <cisstParameterTypes/prmFixtureGainCartesianSet.h>
 
 // ros include
 #include <ros/ros.h>
@@ -39,7 +40,8 @@ http://www.cisst.org/cisst/license.txt.
 #include <sensor_msgs/JointState.h>
 
 // non standard messages
-#include "cisst_msgs/vctDoubleVec.h"
+#include <cisst_msgs/vctDoubleVec.h>
+#include <cisst_msgs/prmFixtureGainCartesianSet.h>
 
 // std_msgs
 void mtsROSToCISST(const std_msgs::Float32 & rosData, double & cisstData);
@@ -47,6 +49,8 @@ void mtsROSToCISST(const std_msgs::Bool & rosData, bool & cisstData);
 void mtsROSToCISST(const std_msgs::String &rosData, std::string &cisstData);
 
 // geometry_msgs
+void mtsROSToCISST(const geometry_msgs::Vector3 &rosData, vct3 &cisstData);
+void mtsROSToCISST(const geometry_msgs::Quaternion &rosData, vctMatRot3 &cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianGet &cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianSet &cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose &rosData, vctFrm4x4 &cisstData);
@@ -56,5 +60,6 @@ void mtsROSToCISST(const geometry_msgs::Transform & rosData, prmPositionCartesia
 
 // vctDoubleVec
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & cisstData);
+void mtsROSToCISST(const cisst_msgs::prmFixtureGainCartesianSet & rosData, prmFixtureGainCartesianSet & cisstData);
 
 #endif // _mtsROSToCISST_h

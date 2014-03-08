@@ -81,6 +81,10 @@ void mtsCISSTToROS(const vctFrm4x4 &cisstData, geometry_msgs::Pose &rosData)
     rosData.position.z = cisstData.Translation().Z();
 }
 
+
+// ---------------------------------------------
+// sensor_msgs
+// ---------------------------------------------
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData)
 {
     rosData.position.resize(cisstData.Position().size());
@@ -89,6 +93,10 @@ void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointStat
     }
 }
 
+
+// ---------------------------------------------
+// cisst_msgs
+// ---------------------------------------------
 void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & rosData)
 {
     rosData.data.resize(cisstData.size());
@@ -96,3 +104,5 @@ void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & ro
         rosData.data[i] = cisstData.Element(i);
     }
 }
+
+

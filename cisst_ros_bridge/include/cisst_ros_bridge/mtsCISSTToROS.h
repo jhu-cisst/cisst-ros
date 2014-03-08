@@ -39,7 +39,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <sensor_msgs/JointState.h>
 
 // non standard messages
-#include "cisst_msgs/vctDoubleVec.h"
+#include <cisst_msgs/vctDoubleVec.h>
 
 
 // std_msgs
@@ -58,7 +58,6 @@ void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointStat
 
 // cisst_msgs
 void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & rosData);
-
 
 
 #endif // _mtsCISSTToROS_h
