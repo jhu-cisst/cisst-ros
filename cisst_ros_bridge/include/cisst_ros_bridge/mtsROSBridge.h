@@ -139,8 +139,6 @@ public:
     typedef mtsROSSubscriber<_mtsType, _rosType> ThisType;
     mtsROSSubscriber(const std::string & rosTopicName, ros::NodeHandle & node) {
         Subscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
-
-        std::cout << "topic: " << rosTopicName << std::endl;
     }
     ~mtsROSSubscriber() {
         // \todo, how to remove the subscriber from the node?
@@ -168,7 +166,6 @@ class mtsROSSubscriberVoid: public mtsROSSubscriberBase
 public:
   mtsROSSubscriberVoid(const std::string & rosTopicName, ros::NodeHandle & node){
     Subscriber = node.subscribe(rosTopicName, 1, &mtsROSSubscriberVoid::Callback, this);
-    std::cout << "topic: " << rosTopicName << std::endl;
   }
   ~mtsROSSubscriberVoid(){}
 
@@ -194,8 +191,21 @@ class mtsROSBridge: public mtsTaskPeriodic
 {
     CMN_DECLARE_SERVICES(CMN_NO_DYNAMIC_CREATION, CMN_LOG_ALLOW_DEFAULT);
 
-public:
-    mtsROSBridge(const std::string & componentName, double periodInSeconds, bool spin = false);
+public:      
+    /*!
+     \brief Constructor
+
+     \param componentName component name
+     \param periodInSeconds thread period
+     \param spin call spinOnce() in run() is set to true
+     \param sig true to install default signal handler, if
+            set to false, either install your own handler or
+            rely on cisst cleanup()
+    */
+    mtsROSBridge(const std::string & componentName,
+                 double periodInSeconds,
+                 bool spin = false,
+                 bool sig = true);
     inline ~mtsROSBridge() {}
 
     // taskPeriodic
@@ -244,6 +254,9 @@ protected:
 
     //! spin flag, if set call spinOnce() in run
     bool mSpin;
+
+    //! signal flag, if set use default signal handler from ros nodehandle
+    bool mSignal;
 };
 
 template <typename _mtsType, typename _rosType>

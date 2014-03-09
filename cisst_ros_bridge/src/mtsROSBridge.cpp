@@ -21,21 +21,24 @@ http://www.cisst.org/cisst/license.txt.
 
 #include <cisstMultiTask/mtsInterfaceRequired.h>
 #include <cisstMultiTask/mtsInterfaceProvided.h>
-
+#include <signal.h>   // ROS only supports Linux
 #include "cisst_ros_bridge/mtsROSBridge.h"
 
 CMN_IMPLEMENT_SERVICES(mtsROSBridge);
 
-mtsROSBridge::mtsROSBridge(const std::string & componentName, double periodInSeconds, bool spin):
+
+mtsROSBridge::mtsROSBridge(const std::string & componentName, double periodInSeconds, bool spin, bool sig):
     mtsTaskPeriodic(componentName, periodInSeconds),
-    mSpin(spin)
+  mSpin(spin), mSignal(sig)
 {
     typedef char * char_pointer;
     char_pointer * argv = new char_pointer[1];
     argv[0]= new char[strlen("mtsROSBridge") + 1];
     strcpy(argv[0], "mtsROSBridge");
     int argc = 1;
-    ros::init(argc, argv, componentName);
+    if (mSignal) ros::init(argc, argv, componentName);
+    else ros::init(argc, argv, componentName, ros::init_options::NoSigintHandler);
+
     Node = new ros::NodeHandle;
 }
 
@@ -49,6 +52,7 @@ void mtsROSBridge::Startup(void)
 
 void mtsROSBridge::Cleanup(void)
 {
+  if (!mSignal) ros::requestShutdown();
 }
 
 void mtsROSBridge::Run(void)
