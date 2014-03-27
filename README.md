@@ -1,8 +1,8 @@
 # About
-Cisst ROS integration packages 
+cisst ROS integration packages 
 
 # Dependencies:
- * cisst libaray 
+ * cisst libraries and ROS 
  
 # Install
 
@@ -19,11 +19,7 @@ $ catkin_make    # you may need to specify cisst build path using cmake
 ```
 
 # Package Description
-* cisst_msgs: ros messages for cisst data type
+* cisst_msgs: ros messages for cisst data types
 * cisst_ros_bridge:
    * bridge component for cisst to ros
    * data type conversion methods 
-
-# Todo 
-* rename mtsROSTOCISST is necessary
-
