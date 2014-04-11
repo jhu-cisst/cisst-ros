@@ -4,7 +4,7 @@
 /*
   $Id: mtsROSBridge.h 4367 2013-07-17 02:47:21Z zchen24 $
 
-  Author(s):  Anton Deguet, Zihan Chen
+  Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
   (C) Copyright 2013 Johns Hopkins University (JHU), All Rights
