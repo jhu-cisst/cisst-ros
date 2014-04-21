@@ -4,7 +4,7 @@
   <version>0.0.1</version>
   <description>The cisst_ros_bridge package</description>
 
-  <maintainer email="zihan@jhu.edu">Zihan Chen</maintainer>
+  <maintainer email="zihan.chen@jhu.edu">Zihan Chen</maintainer>
   <license>CISST</license>
 
   <author email="anton.deguet@jhu.edu">Anton Deguet</author>

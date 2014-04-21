@@ -146,9 +146,6 @@ public:
 
     void Callback(const _rosType & rosData) {
         mtsROSToCISST(rosData, CISSTData);
-
-        std::cout << "cisstdata = " << CISSTData << std::endl;
-
         mtsExecutionResult result = Function(CISSTData);
         if (!result) {
             std::cerr << result << std::endl;
