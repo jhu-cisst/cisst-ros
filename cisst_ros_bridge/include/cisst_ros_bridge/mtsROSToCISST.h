@@ -30,6 +30,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmPositionJointGet.h>
 #include <cisstParameterTypes/prmPositionJointSet.h>
 #include <cisstParameterTypes/prmForceTorqueJointSet.h>
+#include <cisstParameterTypes/prmForceCartesianSet.h>
 #include <cisstParameterTypes/prmFixtureGainCartesianSet.h>
 
 // ros include
@@ -37,8 +38,11 @@ http://www.cisst.org/cisst/license.txt.
 #include <std_msgs/Float32.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
+
 #include <geometry_msgs/Transform.h>
 #include <geometry_msgs/Pose.h>
+#include <geometry_msgs/Wrench.h>
+
 #include <sensor_msgs/JointState.h>
 
 // non standard messages
@@ -56,14 +60,16 @@ void mtsROSToCISST(const geometry_msgs::Quaternion &rosData, vctMatRot3 &cisstDa
 void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianGet &cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianSet &cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose &rosData, vctFrm4x4 &cisstData);
-void mtsROSToCISST(const geometry_msgs::Transform & rosData, prmPositionCartesianGet & cisstData);
+void mtsROSToCISST(const geometry_msgs::Transform &rosData, prmPositionCartesianGet &cisstData);
+void mtsROSToCISST(const geometry_msgs::Wrench &rosData, prmForceCartesianSet &cisstData);
 
 // This Function has been implemented as a Test by Adnan Munawar
 // This Functions works for the PSM now, however still under work for working
 // on the MTMs
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet & cisstData);
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmForceTorqueJointSet & cisstData);
-// vctDoubleVec
+
+// cisst_msgs
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & cisstData);
 void mtsROSToCISST(const cisst_msgs::prmFixtureGainCartesianSet & rosData, prmFixtureGainCartesianSet & cisstData);
 

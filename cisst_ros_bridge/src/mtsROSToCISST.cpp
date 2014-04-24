@@ -97,7 +97,7 @@ void mtsROSToCISST(const geometry_msgs::Pose &rosData, vctFrm4x4 &cisstData)
     cisstData.Rotation().Assign(rotation);
 }
 
-void mtsROSToCISST(const geometry_msgs::Transform & rosData, prmPositionCartesianGet & cisstData)
+void mtsROSToCISST(const geometry_msgs::Transform &rosData, prmPositionCartesianGet &cisstData)
 {
     cisstData.Position().Translation().X() = rosData.translation.x;
     cisstData.Position().Translation().Y() = rosData.translation.y;
@@ -110,6 +110,17 @@ void mtsROSToCISST(const geometry_msgs::Transform & rosData, prmPositionCartesia
     vctMatRot3 rotation(quat, VCT_NORMALIZE);
     cisstData.Position().Rotation().Assign(rotation);
 }
+
+void mtsROSToCISST(const geometry_msgs::Wrench &rosData, prmForceCartesianSet &cisstData)
+{
+    vctFixedSizeVector<double,6> vctFT(
+                rosData.force.x, rosData.force.y, rosData.force.z,
+                rosData.torque.x, rosData.torque.y, rosData.torque.z);
+    cisstData.SetForce(vctFT);
+    cisstData.SetValid(true);
+}
+
+
 
 // This function has been implemented as a TEST BY ADNAN MUNAWAR
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet &cisstData)
