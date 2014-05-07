@@ -121,4 +121,56 @@ void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & ro
     }
 }
 
+void mtsCISSTToROS(const prmFixtureGainCartesianSet &cisstData, cisst_msgs::prmFixtureGainCartesianSet &rosData)
+{
+    geometry_msgs::Vector3 vector;    // holder for vector data
+    geometry_msgs::Quaternion quaternion;   // holder for rotation data
+
+    // vf pos/rot
+    mtsCISSTToROS(cisstData.ForcePosition(), vector);
+    rosData.ForcePosition = vector;
+    mtsCISSTToROS(cisstData.ForceOrientation(), quaternion);
+    rosData.ForceOrientation = quaternion;
+    mtsCISSTToROS(cisstData.TorqueOrientation(), quaternion);
+    rosData.TorqueOrientation = quaternion;
+
+    // force gains
+    mtsCISSTToROS(cisstData.PositionStiffnessPos(), vector);
+    rosData.PosStiffPos = vector;
+
+    mtsCISSTToROS(cisstData.PositionStiffnessNeg(), vector);
+    rosData.PosStiffNeg = vector;
+
+    mtsCISSTToROS(cisstData.PositionDampingPos(), vector);
+    rosData.PosDampingPos = vector;
+
+    mtsCISSTToROS(cisstData.PositionDampingNeg(), vector);
+    rosData.PosDampingNeg = vector;
+
+    mtsCISSTToROS(cisstData.ForceBiasPos(), vector);
+    rosData.ForceBiasPos = vector;
+
+    mtsCISSTToROS(cisstData.ForceBiasNeg(), vector);
+    rosData.ForceBiasNeg = vector;
+
+    // toqrue gains
+    mtsCISSTToROS(cisstData.OrientationStiffnessPos(), vector);
+    rosData.OriStiffPos = vector;
+
+    mtsCISSTToROS(cisstData.OrientationStiffnessNeg(), vector);
+    rosData.OriStiffNeg = vector;
+
+    mtsCISSTToROS(cisstData.OrientationDampingPos(), vector);
+    rosData.OriDampingPos = vector;
+
+    mtsCISSTToROS(cisstData.OrientationDampingNeg(), vector);
+    rosData.OriDampingNeg = vector;
+
+    mtsCISSTToROS(cisstData.TorqueBiasPos(), vector);
+    rosData.TorqueBiasPos = vector;
+
+    mtsCISSTToROS(cisstData.TorqueBiasNeg(), vector);
+    rosData.TorqueBiasNeg = vector;
+}
+
 

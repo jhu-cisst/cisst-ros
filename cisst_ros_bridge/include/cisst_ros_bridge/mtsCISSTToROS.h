@@ -28,6 +28,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmPositionCartesianGet.h>
 #include <cisstParameterTypes/prmPositionJointGet.h>
 #include <cisstParameterTypes/prmEventButton.h>
+#include <cisstParameterTypes/prmFixtureGainCartesianSet.h>
 
 // ros include
 #include <ros/ros.h>
@@ -40,6 +41,7 @@ http://www.cisst.org/cisst/license.txt.
 
 // non standard messages
 #include <cisst_msgs/vctDoubleVec.h>
+#include <cisst_msgs/prmFixtureGainCartesianSet.h>
 
 
 // std_msgs
@@ -60,6 +62,7 @@ void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointStat
 
 // cisst_msgs
 void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & rosData);
+void mtsCISSTToROS(const prmFixtureGainCartesianSet & cisstData, cisst_msgs::prmFixtureGainCartesianSet & rosData);
 
 
 #endif // _mtsCISSTToROS_h
