@@ -9,7 +9,7 @@ cisst ROS integration packages
 ```sh
 # clone cisst-ros 
 $ cd /PATH/TO/CATKIN_WS/src  
-$ git clone git@github.com:jhu-cisst/cisst-ros.git
+$ git clone http://github.com/jhu-cisst/cisst-ros.git
 
 # catkin make 
 $ cd ..
