@@ -98,6 +98,33 @@ void mtsCISSTToROS(const vctMatRot3 &cisstData, geometry_msgs::Quaternion &rosDa
 }
 
 
+void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::WrenchStamped &rosData)
+{
+    if (cisstData.size() != 6) {
+        rosData.wrench.force = geometry_msgs::Vector3();
+        rosData.wrench.torque = geometry_msgs::Vector3();
+        return;
+    }
+
+
+    // HACK
+    rosData.header.stamp = ros::Time::now();
+    rosData.header.frame_id = "/three_ati_force_finger_tip_link";
+
+    rosData.wrench.force.x = cisstData[0];
+    rosData.wrench.force.y = cisstData[1];
+    rosData.wrench.force.z = cisstData[2];
+
+//    rosData.wrench.torque.x = cisstData[3];
+//    rosData.wrench.torque.y = cisstData[4];
+//    rosData.wrench.torque.z = cisstData[5];
+
+    rosData.wrench.torque.x = 0.0;
+    rosData.wrench.torque.y = 0.0;
+    rosData.wrench.torque.z = 0.0;
+}
+
+
 // ---------------------------------------------
 // sensor_msgs
 // ---------------------------------------------
