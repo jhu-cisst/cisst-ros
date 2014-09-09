@@ -97,6 +97,25 @@ void mtsCISSTToROS(const vctMatRot3 &cisstData, geometry_msgs::Quaternion &rosDa
   rosData.w = quat.W();
 }
 
+void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::WrenchStamped &rosData)
+{
+    if (cisstData.size() != 6) {
+        ROS_ERROR("Wrench data size error, should be 6");
+        return;
+    }
+
+    rosData.header.stamp = ros::Time::now();
+    rosData.header.frame_id = "/cisst/wrench";
+
+    rosData.wrench.force.x = cisstData.at(0);
+    rosData.wrench.force.y = cisstData.at(1);
+    rosData.wrench.force.z = cisstData.at(2);
+
+    rosData.wrench.torque.x = cisstData.at(3);
+    rosData.wrench.torque.y = cisstData.at(4);
+    rosData.wrench.torque.z = cisstData.at(5);
+}
+
 
 // ---------------------------------------------
 // sensor_msgs
