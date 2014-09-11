@@ -81,6 +81,18 @@ void mtsCISSTToROS(const vctFrm4x4 &cisstData, geometry_msgs::Pose &rosData)
     rosData.position.z = cisstData.Translation().Z();
 }
 
+void mtsCISSTToROS(const vctFrm3 &cisstData, geometry_msgs::Pose &rosData)
+{
+    vctQuatRot3 quat(cisstData.Rotation(), VCT_NORMALIZE);
+    rosData.orientation.x = quat.X();
+    rosData.orientation.y = quat.Y();
+    rosData.orientation.z = quat.Z();
+    rosData.orientation.w = quat.W();
+    rosData.position.x = cisstData.Translation().X();
+    rosData.position.y = cisstData.Translation().Y();
+    rosData.position.z = cisstData.Translation().Z();
+}
+
 void mtsCISSTToROS(const vct3 &cisstData, geometry_msgs::Vector3 &rosData)
 {
   rosData.x = cisstData[0];
@@ -105,7 +117,7 @@ void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::WrenchStamped &
     }
 
     rosData.header.stamp = ros::Time::now();
-    rosData.header.frame_id = "/cisst/wrench";
+    rosData.header.frame_id = "/three_ati_force_finger_tip_link";
 
     rosData.wrench.force.x = cisstData.at(0);
     rosData.wrench.force.y = cisstData.at(1);

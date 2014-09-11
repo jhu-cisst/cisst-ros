@@ -56,6 +56,7 @@ void mtsCISSTToROS(const prmEventButton &cisstData, std_msgs::Bool &rosData);
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Transform & rosData);
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pose & rosData);
 void mtsCISSTToROS(const vctFrm4x4 &cisstData, geometry_msgs::Pose &rosData);
+void mtsCISSTToROS(const vctFrm3 &cisstData, geometry_msgs::Pose &rosData);
 void mtsCISSTToROS(const vct3 &cisstData, geometry_msgs::Vector3 &rosData);
 void mtsCISSTToROS(const vctMatRot3 &cisstData, geometry_msgs::Quaternion &rosData);
 void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::WrenchStamped &rosData);
