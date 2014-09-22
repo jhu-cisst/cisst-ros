@@ -109,6 +109,22 @@ void mtsCISSTToROS(const vctMatRot3 &cisstData, geometry_msgs::Quaternion &rosDa
   rosData.w = quat.W();
 }
 
+void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::Wrench &rosData)
+{
+    if (cisstData.size() != 6) {
+        ROS_ERROR("Wrench data size error, should be 6");
+        return;
+    }
+
+    rosData.force.x = cisstData.at(0);
+    rosData.force.y = cisstData.at(1);
+    rosData.force.z = cisstData.at(2);
+
+    rosData.torque.x = cisstData.at(3);
+    rosData.torque.y = cisstData.at(4);
+    rosData.torque.z = cisstData.at(5);
+}
+
 void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::WrenchStamped &rosData)
 {
     if (cisstData.size() != 6) {
@@ -117,7 +133,8 @@ void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::WrenchStamped &
     }
 
     rosData.header.stamp = ros::Time::now();
-    rosData.header.frame_id = "/three_ati_force_finger_tip_link";
+//    rosData.header.frame_id = "/one_ati_force_finger_tip_link";
+    rosData.header.frame_id = "/one_tool_wrist_caudier_link_shaft";
 
     rosData.wrench.force.x = cisstData.at(0);
     rosData.wrench.force.y = cisstData.at(1);
@@ -128,6 +145,20 @@ void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::WrenchStamped &
     rosData.wrench.torque.z = cisstData.at(5);
 }
 
+void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::Vector3Stamped &rosData)
+{
+    if (cisstData.size() != 4) {
+        ROS_ERROR("Vector data size error, should be 3");
+        return;
+    }
+
+    rosData.header.stamp.sec = cisstData.at(3);
+    rosData.header.frame_id = "/one_psm_base_link";
+
+    rosData.vector.x = cisstData.at(0);
+    rosData.vector.y = cisstData.at(1);
+    rosData.vector.z = cisstData.at(2);
+}
 
 // ---------------------------------------------
 // sensor_msgs

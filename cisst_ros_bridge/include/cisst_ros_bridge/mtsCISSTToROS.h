@@ -38,7 +38,9 @@ http://www.cisst.org/cisst/license.txt.
 #include <std_msgs/String.h>
 #include <geometry_msgs/Transform.h>
 #include <geometry_msgs/Pose.h>
+#include <geometry_msgs/Wrench.h>
 #include <geometry_msgs/WrenchStamped.h>
+#include <geometry_msgs/Vector3Stamped.h>
 #include <sensor_msgs/JointState.h>
 
 // non standard messages
@@ -59,7 +61,9 @@ void mtsCISSTToROS(const vctFrm4x4 &cisstData, geometry_msgs::Pose &rosData);
 void mtsCISSTToROS(const vctFrm3 &cisstData, geometry_msgs::Pose &rosData);
 void mtsCISSTToROS(const vct3 &cisstData, geometry_msgs::Vector3 &rosData);
 void mtsCISSTToROS(const vctMatRot3 &cisstData, geometry_msgs::Quaternion &rosData);
+void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::Wrench &rosData);
 void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::WrenchStamped &rosData);
+void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::Vector3Stamped &rosData);
 
 // sensor_msgs
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData);
