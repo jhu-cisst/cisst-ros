@@ -61,6 +61,7 @@ void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianGet &
 void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianSet &cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose &rosData, vctFrm4x4 &cisstData);
 void mtsROSToCISST(const geometry_msgs::Transform &rosData, prmPositionCartesianGet &cisstData);
+void mtsROSToCISST(const geometry_msgs::Transform &rosData, vctFrm4x4 &cisstData);
 void mtsROSToCISST(const geometry_msgs::Wrench &rosData, prmForceCartesianSet &cisstData);
 
 // This Function has been implemented as a Test by Adnan Munawar

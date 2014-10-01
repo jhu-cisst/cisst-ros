@@ -111,6 +111,20 @@ void mtsROSToCISST(const geometry_msgs::Transform &rosData, prmPositionCartesian
     cisstData.Position().Rotation().Assign(rotation);
 }
 
+void mtsROSToCISST(const geometry_msgs::Transform &rosData, vctFrm4x4 &cisstData)
+{
+    cisstData.Translation().X() = rosData.translation.x;
+    cisstData.Translation().Y() = rosData.translation.y;
+    cisstData.Translation().Z() = rosData.translation.z;
+    vctQuatRot3 quat;
+    quat.X() = rosData.rotation.x;
+    quat.Y() = rosData.rotation.y;
+    quat.Z() = rosData.rotation.z;
+    quat.W() = rosData.rotation.w;
+    vctMatRot3 rotation(quat, VCT_NORMALIZE);
+    cisstData.Rotation().FromNormalized(rotation);
+}
+
 void mtsROSToCISST(const geometry_msgs::Wrench &rosData, prmForceCartesianSet &cisstData)
 {
     vctFixedSizeVector<double,6> vctFT(
