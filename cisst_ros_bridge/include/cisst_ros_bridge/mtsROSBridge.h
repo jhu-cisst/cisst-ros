@@ -202,7 +202,8 @@ public:
     mtsROSBridge(const std::string & componentName,
                  double periodInSeconds,
                  bool spin = false,
-                 bool sig = true);
+                 bool sig = true,
+                 ros::NodeHandle* nh = NULL);
     inline ~mtsROSBridge() {}
 
     // taskPeriodic
