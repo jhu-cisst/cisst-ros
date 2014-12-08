@@ -171,6 +171,17 @@ void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointStat
     }
 }
 
+void mtsCISSTToROS(const vctDoubleMat &cisstData, sensor_msgs::PointCloud &rosData)
+{
+    rosData.header.stamp = ros::Time::now();
+    rosData.points.resize(cisstData.rows());
+
+    for (unsigned int i = 0; i < cisstData.rows(); ++i) {
+        rosData.points[i].x = cisstData.at(i,0);
+        rosData.points[i].y = cisstData.at(i,1);
+        rosData.points[i].z = cisstData.at(i,2);
+    }
+}
 
 // ---------------------------------------------
 // cisst_msgs
