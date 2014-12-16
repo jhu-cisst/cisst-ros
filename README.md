@@ -31,7 +31,7 @@ To setup your path and find the ROS commands easily:
 source ~/catkin_ws/devel/setup.bash
 ```
 
-# Install
+# Install cisst/ROS
 
 Get the sources:
 ```sh
@@ -56,7 +56,7 @@ ccmake .
 ```
 In CMake, set `cisst_DIR` to PATH/TO/CISST/build/cisst/
 
-# Package Description
+# Package Description for cisst/ROS
 * cisst_msgs: ros messages for cisst data types
 * cisst_ros_bridge:
    * bridge component for cisst to ros
