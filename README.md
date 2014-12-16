@@ -8,6 +8,11 @@ cisst/ROS integration packages
 
 # Initialize your catkin ROS workspace
 
+Make sure ROS is in your path.  You can also "source" the setup script that comes with your ROS distribution (example for ROS hydro):
+```sh
+source /opt/ros/hydro/setup.bash
+```
+
 Create the main directories for ROS and initialize the workspace:
 ```sh
 mkdir -p ~/catkin_ws/src
