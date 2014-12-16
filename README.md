@@ -28,7 +28,7 @@ catkin_make
 
 To setup your path and find the ROS commands easily:
 ```sh
-source devel/setup.bash
+source ~/catkin_ws/devel/setup.bash
 ```
 
 # Install
