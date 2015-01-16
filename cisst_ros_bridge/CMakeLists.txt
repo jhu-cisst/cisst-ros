@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   cisst_msgs
   )
 
-set (REQUIRED_CISST_LIBRARIES 
+set (REQUIRED_CISST_LIBRARIES
   cisstCommon
   cisstVector
   cisstOSAbstraction
@@ -74,4 +74,3 @@ install(TARGETS cisst_ros_bridge example_bridge
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   )
-
