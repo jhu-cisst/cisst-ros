@@ -8,12 +8,16 @@
   <license>CISST</license>
 
   <buildtool_depend>catkin</buildtool_depend>
+
   <build_depend>roscpp</build_depend>
   <build_depend>kdl_conversions</build_depend>
   <build_depend>tf</build_depend>
+  <build_depend>cisst</build_depend>
+
   <run_depend>roscpp</run_depend>
   <run_depend>kdl_conversions</run_depend>
   <run_depend>tf</run_depend>
+  <run_depend>cisst</run_depend>
 
   <export>
   </export>
