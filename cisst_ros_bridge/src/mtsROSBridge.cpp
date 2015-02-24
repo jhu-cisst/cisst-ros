@@ -27,7 +27,7 @@ http://www.cisst.org/cisst/license.txt.
 CMN_IMPLEMENT_SERVICES(mtsROSBridge);
 
 
-mtsROSBridge::mtsROSBridge(const std::string & componentName, double periodInSeconds, bool spin, bool sig):
+mtsROSBridge::mtsROSBridge(const std::string & componentName, double periodInSeconds, bool spin, bool sig, ros::NodeHandle *nh):
     mtsTaskPeriodic(componentName, periodInSeconds),
   mSpin(spin), mSignal(sig)
 {
@@ -36,10 +36,14 @@ mtsROSBridge::mtsROSBridge(const std::string & componentName, double periodInSec
     argv[0]= new char[strlen("mtsROSBridge") + 1];
     strcpy(argv[0], "mtsROSBridge");
     int argc = 1;
-    if (mSignal) ros::init(argc, argv, componentName);
-    else ros::init(argc, argv, componentName, ros::init_options::NoSigintHandler);
 
-    Node = new ros::NodeHandle;
+    if (nh != NULL) {
+        Node = nh;
+    } else {
+        if (mSignal) ros::init(argc, argv, componentName);
+        else ros::init(argc, argv, componentName, ros::init_options::NoSigintHandler);
+        Node = new ros::NodeHandle;
+    }
 }
 
 void mtsROSBridge::Configure(const std::string & CMN_UNUSED(filename))
