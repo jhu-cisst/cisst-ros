@@ -2,13 +2,10 @@
 /* ex: set filetype=cpp softtabstop=4 shiftwidth=4 tabstop=4 cindent expandtab: */
 
 /*
-  $Id: mtsROSToCISST.cpp 4375 2013-07-26 16:13:06Z zchen24 $
-
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013 Johns Hopkins University (JHU), All Rights
-  Reserved.
+  (C) Copyright 2013-2015 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -22,29 +19,29 @@ http://www.cisst.org/cisst/license.txt.
 
 #include "cisst_ros_bridge/mtsROSToCISST.h"
 
-void mtsROSToCISST(const std_msgs::Float32 &rosData, double &cisstData)
+void mtsROSToCISST(const std_msgs::Float32 & rosData, double & cisstData)
 {
     cisstData = rosData.data;
 }
 
-void mtsROSToCISST(const std_msgs::Bool &rosData, bool &cisstData)
+void mtsROSToCISST(const std_msgs::Bool & rosData, bool & cisstData)
 {
     cisstData = rosData.data;
 }
 
-void mtsROSToCISST(const std_msgs::String &rosData, std::string &cisstData)
+void mtsROSToCISST(const std_msgs::String & rosData, std::string & cisstData)
 {
     cisstData = rosData.data;
 }
 
-void mtsROSToCISST(const geometry_msgs::Vector3 &rosData, vct3 &cisstData)
+void mtsROSToCISST(const geometry_msgs::Vector3 & rosData, vct3 & cisstData)
 {
   cisstData[0] = rosData.x;
   cisstData[1] = rosData.y;
   cisstData[2] = rosData.z;
 }
 
-void mtsROSToCISST(const geometry_msgs::Quaternion &rosData, vctMatRot3 &cisstData)
+void mtsROSToCISST(const geometry_msgs::Quaternion & rosData, vctMatRot3 & cisstData)
 {
   vctQuatRot3 quat;
   quat.X() = rosData.x;
@@ -55,7 +52,7 @@ void mtsROSToCISST(const geometry_msgs::Quaternion &rosData, vctMatRot3 &cisstDa
 }
 
 
-void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianGet &cisstData)
+void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianGet & cisstData)
 {
     cisstData.Position().Translation().X() = rosData.position.x;
     cisstData.Position().Translation().Y() = rosData.position.y;
@@ -69,7 +66,7 @@ void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianGet &
     cisstData.Position().Rotation().Assign(rotation);
 }
 
-void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianSet &cisstData)
+void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianSet & cisstData)
 {
     cisstData.Goal().Translation().X() = rosData.position.x;
     cisstData.Goal().Translation().Y() = rosData.position.y;
@@ -83,7 +80,7 @@ void mtsROSToCISST(const geometry_msgs::Pose &rosData, prmPositionCartesianSet &
     cisstData.Goal().Rotation().FromNormalized(rotation);
 }
 
-void mtsROSToCISST(const geometry_msgs::Pose &rosData, vctFrm4x4 &cisstData)
+void mtsROSToCISST(const geometry_msgs::Pose & rosData, vctFrm4x4 & cisstData)
 {
     cisstData.Translation().X() = rosData.position.x;
     cisstData.Translation().Y() = rosData.position.y;
@@ -97,7 +94,7 @@ void mtsROSToCISST(const geometry_msgs::Pose &rosData, vctFrm4x4 &cisstData)
     cisstData.Rotation().Assign(rotation);
 }
 
-void mtsROSToCISST(const geometry_msgs::Transform &rosData, prmPositionCartesianGet &cisstData)
+void mtsROSToCISST(const geometry_msgs::Transform & rosData, prmPositionCartesianGet & cisstData)
 {
     cisstData.Position().Translation().X() = rosData.translation.x;
     cisstData.Position().Translation().Y() = rosData.translation.y;
@@ -111,7 +108,7 @@ void mtsROSToCISST(const geometry_msgs::Transform &rosData, prmPositionCartesian
     cisstData.Position().Rotation().Assign(rotation);
 }
 
-void mtsROSToCISST(const geometry_msgs::Transform &rosData, vctFrm4x4 &cisstData)
+void mtsROSToCISST(const geometry_msgs::Transform & rosData, vctFrm4x4 & cisstData)
 {
     cisstData.Translation().X() = rosData.translation.x;
     cisstData.Translation().Y() = rosData.translation.y;
@@ -125,7 +122,7 @@ void mtsROSToCISST(const geometry_msgs::Transform &rosData, vctFrm4x4 &cisstData
     cisstData.Rotation().FromNormalized(rotation);
 }
 
-void mtsROSToCISST(const geometry_msgs::Wrench &rosData, prmForceCartesianSet &cisstData)
+void mtsROSToCISST(const geometry_msgs::Wrench & rosData, prmForceCartesianSet & cisstData)
 {
     vctFixedSizeVector<double,6> vctFT(
                 rosData.force.x, rosData.force.y, rosData.force.z,
@@ -134,10 +131,7 @@ void mtsROSToCISST(const geometry_msgs::Wrench &rosData, prmForceCartesianSet &c
     cisstData.SetValid(true);
 }
 
-
-
-// This function has been implemented as a TEST BY ADNAN MUNAWAR
-void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet &cisstData)
+void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet & cisstData)
 {
     vctDoubleVec DesiredPosition;
     DesiredPosition.SetSize(rosData.position.size());
@@ -147,8 +141,8 @@ void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet 
     }
     cisstData.SetGoal(DesiredPosition);
 }
-// This function has been implemented as a TEST BY ADNAN MUNAWAR to apply torques to Individual Joints
-void mtsROSToCISST(const sensor_msgs::JointState &rosData, prmForceTorqueJointSet &cisstData)
+
+void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmForceTorqueJointSet & cisstData)
 {
     vctDoubleVec newVec;
     newVec.SetSize(rosData.effort.size());
@@ -158,15 +152,25 @@ void mtsROSToCISST(const sensor_msgs::JointState &rosData, prmForceTorqueJointSe
     cisstData.SetForceTorque(newVec);
 }
 
-void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & cisstData)
+void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, prmPositionJointSet & cisstData)
 {
-    cisstData.resize(rosData.data.size());
-    for (size_t i = 0; i < cisstData.size(); ++i) {
-        cisstData.Element(i) = rosData.data[i];
-    }    
+    const size_t size = rosData.data.size();
+    cisstData.Goal().resize(size);
+    for (size_t i = 0; i < size; ++i) {
+        cisstData.Goal().Element(i) = rosData.data[i];
+    }
 }
 
-void mtsROSToCISST(const cisst_msgs::prmFixtureGainCartesianSet &rosData, prmFixtureGainCartesianSet &cisstData)
+void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & cisstData)
+{
+    const size_t size = rosData.data.size();
+    cisstData.resize(size);
+    for (size_t i = 0; i < size; ++i) {
+        cisstData.Element(i) = rosData.data[i];
+    }
+}
+
+void mtsROSToCISST(const cisst_msgs::prmFixtureGainCartesianSet & rosData, prmFixtureGainCartesianSet & cisstData)
 {
   vct3 vct3Data;   // holder for vct3 data
   vctMatRot3 rotationData;   // holder for rotation data

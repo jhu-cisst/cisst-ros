@@ -2,13 +2,10 @@
 /* ex: set filetype=cpp softtabstop=4 shiftwidth=4 tabstop=4 cindent expandtab: */
 
 /*
-  $Id: mtsCISSTToROS.h 4375 2013-07-26 16:13:06Z zchen24 $
-
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013 Johns Hopkins University (JHU), All Rights
-  Reserved.
+  (C) Copyright 2013-2015 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -51,26 +48,27 @@ http://www.cisst.org/cisst/license.txt.
 
 // std_msgs
 void mtsCISSTToROS(const double & cisstData, std_msgs::Float32 & rosData);
-void mtsCISSTToROS(const bool &cisstData, std_msgs::Bool &rosData);
-void mtsCISSTToROS(const std::string &cisstData, std_msgs::String &rosData);
-void mtsCISSTToROS(const prmEventButton &cisstData, std_msgs::Bool &rosData);
+void mtsCISSTToROS(const bool & cisstData, std_msgs::Bool & rosData);
+void mtsCISSTToROS(const std::string & cisstData, std_msgs::String & rosData);
+void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData);
 
 // geometry_msgs
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Transform & rosData);
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pose & rosData);
-void mtsCISSTToROS(const vctFrm4x4 &cisstData, geometry_msgs::Pose &rosData);
-void mtsCISSTToROS(const vctFrm3 &cisstData, geometry_msgs::Pose &rosData);
-void mtsCISSTToROS(const vct3 &cisstData, geometry_msgs::Vector3 &rosData);
-void mtsCISSTToROS(const vctMatRot3 &cisstData, geometry_msgs::Quaternion &rosData);
-void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::Wrench &rosData);
-void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::WrenchStamped &rosData);
-void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::Vector3Stamped &rosData);
+void mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Pose & rosData);
+void mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Pose & rosData);
+void mtsCISSTToROS(const vct3 & cisstData, geometry_msgs::Vector3 & rosData);
+void mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::Quaternion & rosData);
+void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Wrench & rosData);
+void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::WrenchStamped & rosData);
+void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Vector3Stamped & rosData);
 
 // sensor_msgs
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData);
 void mtsCISSTToROS(const vctDoubleMat & cisstData, sensor_msgs::PointCloud & rosData);
 
 // cisst_msgs
+void mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::vctDoubleVec & rosData);
 void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & rosData);
 void mtsCISSTToROS(const prmFixtureGainCartesianSet & cisstData, cisst_msgs::prmFixtureGainCartesianSet & rosData);
 
