@@ -160,6 +160,29 @@ void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::Vector3Stamped 
     rosData.vector.z = cisstData.at(2);
 }
 
+void mtsCISSTToROS(const prmVelocityCartesianGet &cisstData, geometry_msgs::Twist &rosData)
+{
+  if (cisstData.Valid()) {
+    rosData.linear.x = cisstData.VelocityLinear().X();
+    rosData.linear.y = cisstData.VelocityLinear().Y();
+    rosData.linear.z = cisstData.VelocityLinear().Z();
+
+    rosData.angular.x = cisstData.VelocityAngular().X();
+    rosData.angular.y = cisstData.VelocityAngular().Y();
+    rosData.angular.z = cisstData.VelocityAngular().Z();
+  }
+  else {
+    rosData.linear.x = 0.0;
+    rosData.linear.y = 0.0;
+    rosData.linear.z = 0.0;
+
+    rosData.angular.x = 0.0;
+    rosData.angular.y = 0.0;
+    rosData.angular.z = 0.0;
+  }
+}
+
+
 // ---------------------------------------------
 // sensor_msgs
 // ---------------------------------------------

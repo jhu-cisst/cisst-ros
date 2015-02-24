@@ -29,6 +29,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmPositionJointGet.h>
 #include <cisstParameterTypes/prmEventButton.h>
 #include <cisstParameterTypes/prmFixtureGainCartesianSet.h>
+#include <cisstParameterTypes/prmVelocityCartesianGet.h>
 #include <cisstMultiTask/mtsVector.h>
 
 // ros include
@@ -41,6 +42,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <geometry_msgs/Wrench.h>
 #include <geometry_msgs/WrenchStamped.h>
 #include <geometry_msgs/Vector3Stamped.h>
+#include <geometry_msgs/Twist.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/PointCloud.h>
 
@@ -65,6 +67,7 @@ void mtsCISSTToROS(const vctMatRot3 &cisstData, geometry_msgs::Quaternion &rosDa
 void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::Wrench &rosData);
 void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::WrenchStamped &rosData);
 void mtsCISSTToROS(const mtsDoubleVec &cisstData, geometry_msgs::Vector3Stamped &rosData);
+void mtsCISSTToROS(const prmVelocityCartesianGet &cisstData, geometry_msgs::Twist &rosData);
 
 // sensor_msgs
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData);
