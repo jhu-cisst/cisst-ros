@@ -80,6 +80,11 @@ void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianSet 
     cisstData.Goal().Rotation().FromNormalized(rotation);
 }
 
+void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartesianSet & cisstData)
+{
+    mtsROSToCISST(rosData.pose, cisstData);
+}
+
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, vctFrm4x4 & cisstData)
 {
     cisstData.Translation().X() = rosData.position.x;
@@ -129,6 +134,11 @@ void mtsROSToCISST(const geometry_msgs::Wrench & rosData, prmForceCartesianSet &
                 rosData.torque.x, rosData.torque.y, rosData.torque.z);
     cisstData.SetForce(vctFT);
     cisstData.SetValid(true);
+}
+
+void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, prmForceCartesianSet & cisstData)
+{
+    mtsROSToCISST(rosData.wrench, cisstData);
 }
 
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet & cisstData)

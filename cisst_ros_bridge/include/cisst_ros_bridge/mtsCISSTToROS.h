@@ -34,13 +34,12 @@ http://www.cisst.org/cisst/license.txt.
 #include <std_msgs/Float32.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
-#include <geometry_msgs/Transform.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/WrenchStamped.h>
-#include <geometry_msgs/Pose.h>
-#include <geometry_msgs/Wrench.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/WrenchStamped.h>
 #include <geometry_msgs/Vector3Stamped.h>
-#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/TwistStamped.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/PointCloud.h>
 
@@ -58,6 +57,7 @@ void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData);
 // geometry_msgs
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Transform & rosData);
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pose & rosData);
+void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::PoseStamped & rosData);
 void mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Pose & rosData);
 void mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Pose & rosData);
 void mtsCISSTToROS(const vct3 & cisstData, geometry_msgs::Vector3 & rosData);
@@ -66,6 +66,7 @@ void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Wrench & rosDa
 void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::WrenchStamped & rosData);
 void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Vector3Stamped & rosData);
 void mtsCISSTToROS(const prmVelocityCartesianGet &cisstData, geometry_msgs::Twist &rosData);
+void mtsCISSTToROS(const prmVelocityCartesianGet &cisstData, geometry_msgs::TwistStamped &rosData);
 
 // sensor_msgs
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData);

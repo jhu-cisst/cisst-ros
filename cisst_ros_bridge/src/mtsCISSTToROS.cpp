@@ -66,6 +66,13 @@ void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pos
     rosData.position.z = cisstData.Position().Translation().Z();
 }
 
+void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::PoseStamped & rosData)
+{
+    rosData.header.stamp = ros::Time::now();
+    mtsCISSTToROS(cisstData, rosData.pose);
+}
+
+
 void mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Pose & rosData)
 {
     vctQuatRot3 quat(cisstData.Rotation(), VCT_NORMALIZE);
@@ -179,12 +186,19 @@ void mtsCISSTToROS(const prmVelocityCartesianGet &cisstData, geometry_msgs::Twis
   }
 }
 
+void mtsCISSTToROS(const prmVelocityCartesianGet &cisstData, geometry_msgs::TwistStamped &rosData)
+{
+    rosData.header.stamp = ros::Time::now();
+    mtsCISSTToROS(cisstData, rosData.twist);
+}
+
 
 // ---------------------------------------------
 // sensor_msgs
 // ---------------------------------------------
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData)
 {
+    rosData.header.stamp = ros::Time::now();
     rosData.position.resize(cisstData.Position().size());
     for (size_t i = 0; i < cisstData.Position().size(); ++i) {
         rosData.position[i] = cisstData.Position().Element(i);
