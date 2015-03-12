@@ -2,13 +2,10 @@
 /* ex: set filetype=cpp softtabstop=4 shiftwidth=4 tabstop=4 cindent expandtab: */
 
 /*
-  $Id: mtsROSBridge.h 4367 2013-07-17 02:47:21Z zchen24 $
-
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013 Johns Hopkins University (JHU), All Rights
-  Reserved.
+  (C) Copyright 2013-2015 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -64,12 +61,12 @@ public:
 
     bool Execute(void) {
         mtsExecutionResult result = Function(CISSTData);
-
         if (result) {
             mtsCISSTToROS(CISSTData, ROSData);
             Publisher.publish(ROSData);
             return true;
         }
+        return false;
     }
 
 protected:
@@ -127,7 +124,7 @@ class mtsROSSubscriberBase
 {
 public:
     //! Function used to pull data from the cisst component
-    mtsFunctionWrite Function;        
+    mtsFunctionWrite Function;
     //! ROS publisher to publish the converted data
     ros::Subscriber Subscriber;
 };
@@ -161,22 +158,22 @@ protected:
 class mtsROSSubscriberVoid: public mtsROSSubscriberBase
 {
 public:
-  mtsROSSubscriberVoid(const std::string & rosTopicName, ros::NodeHandle & node){
-    Subscriber = node.subscribe(rosTopicName, 1, &mtsROSSubscriberVoid::Callback, this);
-  }
-  ~mtsROSSubscriberVoid(){}
-
-  void Callback(const std_msgs::Empty & rosData) {
-    std::cout << "empty msg received" << std::endl;
-
-    mtsExecutionResult result = FunctionVoid();
-    if (!result) {
-      std::cerr << result << std::endl;
+    mtsROSSubscriberVoid(const std::string & rosTopicName, ros::NodeHandle & node){
+        Subscriber = node.subscribe(rosTopicName, 1, &mtsROSSubscriberVoid::Callback, this);
     }
-  }
+    ~mtsROSSubscriberVoid(){}
 
-  //! Function used to trigger void command
-  mtsFunctionVoid FunctionVoid;
+    void Callback(const std_msgs::Empty & CMN_UNUSED(rosData)) {
+        std::cout << "empty msg received" << std::endl;
+
+        mtsExecutionResult result = FunctionVoid();
+        if (!result) {
+            std::cerr << result << std::endl;
+        }
+    }
+
+    //! Function used to trigger void command
+    mtsFunctionVoid FunctionVoid;
 };
 
 
@@ -188,7 +185,7 @@ class mtsROSBridge: public mtsTaskPeriodic
 {
     CMN_DECLARE_SERVICES(CMN_NO_DYNAMIC_CREATION, CMN_LOG_ALLOW_DEFAULT);
 
-public:      
+public:
     /*!
      \brief Constructor
 
