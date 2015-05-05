@@ -2,13 +2,10 @@
 /* ex: set filetype=cpp softtabstop=4 shiftwidth=4 tabstop=4 cindent expandtab: */
 
 /*
-  $Id: main.cpp 4363 2013-07-16 20:32:30Z zchen24 $
-
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013 Johns Hopkins University (JHU), All Rights
-  Reserved.
+  (C) Copyright 2013-2015 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -19,8 +16,23 @@ http://www.cisst.org/cisst/license.txt.
 --- end cisst license ---
 */
 
+
+/* usage:
+  rosrun cisst_ros_bridge example_bridge
+
+  Then in different terminals:
+
+  [1] rostopic echo /sawROSExample/sum_of_elements_1
+
+  [2] rostopic pub /sawROSExample/set_value_1 cisst_msgs/vctDoubleVec "data: [0, 1, 2, 4]" -1
+  >> result in sum_of_elements_1 should be 7
+
+
+*/
+
 #include <cisstMultiTask/mtsTaskPeriodic.h>
 #include <cisstMultiTask/mtsInterfaceProvided.h>
+#include <cisstMultiTask/mtsInterfaceRequired.h>
 
 #include "cisst_ros_bridge/mtsROSBridge.h"
 
@@ -40,6 +52,10 @@ public:
                                            "SetValue1", Value1);
         interfaceProvided->AddCommandWrite(&TestComponent::SetValue2, this,
                                            "SetValue2", Value2);
+
+        mtsInterfaceRequired * InterfacesRequired = AddInterfaceRequired("required");
+        InterfacesRequired->AddFunction("SumOfElements1", SumOfElements1);
+        InterfacesRequired->AddFunction("ValueChanged2", ValueChanged2);
     }
 
     void Configure(const std::string &) {
@@ -58,14 +74,19 @@ public:
 protected:
     void SetValue1(const vctDoubleVec & newValue) {
         Value1.ForceAssign(newValue);
+        SumOfElements1(Value1.SumOfElements());
     }
 
     void SetValue2(const vctDoubleVec & newValue) {
         Value2.ForceAssign(newValue);
+        ValueChanged2();
     }
 
     vctDoubleVec Value1;
     vctDoubleVec Value2;
+
+    mtsFunctionWrite SumOfElements1;
+    mtsFunctionVoid ValueChanged2;
 };
 
 int main(int argc, char ** argv)
@@ -75,35 +96,38 @@ int main(int argc, char ** argv)
     TestComponent testComponent;
     manager->AddComponent(&testComponent);
 
-    mtsROSBridge publisher("publisher", 20.0 * cmn_ms);
-    publisher.AddPublisherFromReadCommand<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
-                                                                                  "GetValue1",
-                                                                                  "/sawROSExample/get_value_1");
-    publisher.AddPublisherFromReadCommand<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
-                                                                                  "GetValue2",
-                                                                                  "/sawROSExample/get_value_2");
-    manager->AddComponent(&publisher);
-    manager->Connect(publisher.GetName(), "required",
-                     testComponent.GetName(), "provided");
-    manager->Connect(publisher.GetName(), "ExecIn",
-                     testComponent.GetName(), "ExecOut");
+    mtsROSBridge bridge("publisher", 5.0 * cmn_ms);
+    bridge.AddPublisherFromCommandRead<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
+                                                                               "GetValue1",
+                                                                               "/sawROSExample/get_value_1");
 
-    mtsROSBridge sub1("sub1", 1 * cmn_ms);
-    sub1.AddSubscriberToWriteCommand<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
-                                                                             "SetValue1",
-                                                                             "/sawROSExample/set_value_1");
-    manager->AddComponent(&sub1);
-    manager->Connect(sub1.GetName(), "required",
+    bridge.AddPublisherFromCommandRead<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
+                                                                               "GetValue2",
+                                                                               "/sawROSExample/get_value_2");
+
+    bridge.AddSubscriberToCommandWrite<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
+                                                                               "SetValue1",
+                                                                               "/sawROSExample/set_value_1");
+
+    bridge.AddSubscriberToCommandWrite<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
+                                                                               "SetValue2",
+                                                                               "/sawROSExample/set_value_2");
+
+    bridge.AddPublisherFromCommandWrite<double, std_msgs::Float32>("provided",
+                                                                   "SumOfElements1",
+                                                                   "/sawROSExample/sum_of_elements_1");
+
+    bridge.AddPublisherFromCommandVoid("provided",
+                                       "ValueChanged2",
+                                       "/sawROSExample/value_changed_2");
+
+    manager->AddComponent(&bridge);
+
+    manager->Connect(bridge.GetName(), "required",
                      testComponent.GetName(), "provided");
 
-    mtsROSBridge sub2("sub2", 1 * cmn_ms);
-    sub2.AddSubscriberToWriteCommand<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
-                                                                             "SetValue2",
-                                                                             "/sawROSExample/set_value_2");
-    manager->AddComponent(&sub2);
-    manager->Connect(sub2.GetName(), "required",
-                     testComponent.GetName(), "provided");
-
+    manager->Connect(testComponent.GetName(), "required",
+                     bridge.GetName(), "provided");
 
     manager->CreateAllAndWait(2.0 * cmn_s);
     manager->StartAllAndWait(2.0 * cmn_s);

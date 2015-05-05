@@ -23,6 +23,7 @@ http://www.cisst.org/cisst/license.txt.
 // cisst include
 #include <cisstMultiTask/mtsTaskPeriodic.h>
 #include <cisstMultiTask/mtsInterfaceRequired.h>
+#include <cisstMultiTask/mtsInterfaceProvided.h>
 
 // ros include
 #include <ros/ros.h>
@@ -99,7 +100,7 @@ class mtsROSEventWritePublisher: public mtsROSPublisherBase
 {
 public:
     mtsROSEventWritePublisher(const std::string & rosTopicName, ros::NodeHandle & node){
-      Publisher = node.advertise<_rosType>(rosTopicName, 5);
+        Publisher = node.advertise<_rosType>(rosTopicName, 5);
     }
     ~mtsROSEventWritePublisher(){}
 
@@ -177,6 +178,45 @@ public:
 };
 
 
+template <typename _mtsType, typename _rosType>
+class mtsROSCommandWritePublisher
+{
+public:
+    mtsROSCommandWritePublisher(const std::string & rosTopicName, ros::NodeHandle & node) {
+        Publisher = node.advertise<_rosType>(rosTopicName, 5);
+    }
+    ~mtsROSCommandWritePublisher() {}
+
+    void Command(const _mtsType & CISSTData)
+    {
+        mtsCISSTToROS(CISSTData, ROSData);
+        Publisher.publish(ROSData);
+    }
+
+protected:
+    ros::Publisher Publisher;
+    _rosType ROSData;
+};
+
+
+class mtsROSCommandVoidPublisher
+{
+public:
+    mtsROSCommandVoidPublisher(const std::string & rosTopicName, ros::NodeHandle & node) {
+        Publisher = node.advertise<std_msgs::Empty>(rosTopicName, 5);
+    }
+    ~mtsROSCommandVoidPublisher() {}
+
+    void Command(void)
+    {
+        Publisher.publish(mEmptyMsg);
+    }
+
+protected:
+    ros::Publisher Publisher;
+    std_msgs::Empty mEmptyMsg;
+};
+
 // ----------------------------------------------------
 // Bridge
 // ----------------------------------------------------
@@ -209,11 +249,20 @@ public:
     void Run(void);
     void Cleanup(void);
 
+    // --------- Required interface
+
     // --------- Publisher ------------------
     template <typename _mtsType, typename _rosType>
-    bool AddPublisherFromReadCommand(const std::string & interfaceRequiredName,
+    bool AddPublisherFromCommandRead(const std::string & interfaceRequiredName,
                                      const std::string & functionName,
                                      const std::string & topicName);
+
+    template <typename _mtsType, typename _rosType>
+    bool CISST_DEPRECATED AddPublisherFromReadCommand(const std::string & interfaceRequiredName,
+                                                      const std::string & functionName,
+                                                      const std::string & topicName) {
+        return AddPublisherFromCommandRead<_mtsType, _rosType>(interfaceRequiredName, functionName, topicName);
+    }
 
     bool AddPublisherFromEventVoid(const std::string & interfaceRequiredName,
                                    const std::string & eventName,
@@ -224,16 +273,55 @@ public:
                                     const std::string & eventName,
                                     const std::string & topicName);
 
-
     // --------- Subscriber ------------------
     template <typename _mtsType, typename _rosType>
-    bool AddSubscriberToWriteCommand(const std::string & interfaceRequiredName,
+    bool AddSubscriberToCommandWrite(const std::string & interfaceRequiredName,
                                      const std::string & functionName,
                                      const std::string & topicName);
 
-    bool AddSubscriberToVoidCommand(const std::string & interfaceRequiredName,
+    template <typename _mtsType, typename _rosType>
+    bool CISST_DEPRECATED AddSubscriberToWriteCommand(const std::string & interfaceRequiredName,
+                                                      const std::string & functionName,
+                                                      const std::string & topicName) {
+        return AddSubscriberToCommandWrite<_mtsType, _rosType>(interfaceRequiredName, functionName, topicName);
+    }
+
+    bool AddSubscriberToCommandVoid(const std::string & interfaceRequiredName,
                                     const std::string & functionName,
                                     const std::string & topicName);
+
+    bool CISST_DEPRECATED AddSubscriberToVoidCommand(const std::string & interfaceRequiredName,
+                                                     const std::string & functionName,
+                                                     const std::string & topicName) {
+        return AddSubscriberToCommandVoid(interfaceRequiredName, functionName, topicName);
+    }
+
+    // --------- Provided interface
+
+    // --------- Publisher ------------------
+    template <typename _mtsType, typename _rosType>
+    bool AddPublisherFromCommandWrite(const std::string & interfaceProvidedName,
+                                      const std::string & commandName,
+                                      const std::string & topicName);
+
+    bool AddPublisherFromCommandVoid(const std::string & interfaceProvidedName,
+                                     const std::string & commandName,
+                                     const std::string & topicName);
+
+    // --------- Subscriber ------------------
+    template <typename _mtsType, typename _rosType>
+    bool AddSubscriberToCommandRead(const std::string & interfaceProvidedName,
+                                    const std::string & functionName,
+                                    const std::string & topicName);
+
+    bool AddSubscriberToEventVoid(const std::string & interfaceProvidedName,
+                                  const std::string & eventName,
+                                  const std::string & topicName);
+
+    template <typename _mtsType, typename _rosType>
+    bool AddSubscriberToEventWrite(const std::string & interfaceProvidedName,
+                                   const std::string & eventName,
+                                   const std::string & topicName);
 
 protected:
     //! list of publishers
@@ -255,7 +343,7 @@ protected:
 };
 
 template <typename _mtsType, typename _rosType>
-bool mtsROSBridge::AddPublisherFromReadCommand(const std::string & interfaceRequiredName,
+bool mtsROSBridge::AddPublisherFromCommandRead(const std::string & interfaceRequiredName,
                                                const std::string & functionName,
                                                const std::string & topicName)
 {
@@ -265,8 +353,8 @@ bool mtsROSBridge::AddPublisherFromReadCommand(const std::string & interfaceRequ
         interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
     }
     if (!interfaceRequired) {
-        ROS_ERROR("mtsROS::AddPublisherFromReadCommand: failed to create required interface.");
-        CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromReadCommand: faild to create required interface \""
+        ROS_ERROR("mtsROSBridge::AddPublisherFromCommandRead: failed to create required interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "mtsROSBridge::AddPublisherFromCommandRead: failed to create required interface \""
                                  << interfaceRequiredName << "\"" << std::endl;
         return false;
     }
@@ -284,7 +372,7 @@ bool mtsROSBridge::AddPublisherFromReadCommand(const std::string & interfaceRequ
 
 
 template <typename _mtsType, typename _rosType>
-bool mtsROSBridge::AddSubscriberToWriteCommand(const std::string & interfaceRequiredName,
+bool mtsROSBridge::AddSubscriberToCommandWrite(const std::string & interfaceRequiredName,
                                                const std::string & functionName,
                                                const std::string & topicName)
 {
@@ -302,7 +390,7 @@ bool mtsROSBridge::AddSubscriberToWriteCommand(const std::string & interfaceRequ
     mtsROSSubscriberBase * newSubscriber = new mtsROSSubscriber<_mtsType, _rosType>(topicName, *(this->Node));
     if (!interfaceRequired->AddFunction(functionName, newSubscriber->Function)) {
         ROS_ERROR("mtsROS::AddSubscriberToWriteCommand: failed to create function.");
-        CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToWriteCommand: faild to create function \""
+        CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToWriteCommand: failed to create function \""
                                  << functionName << "\"" << std::endl;
         delete newSubscriber;
         return false;
@@ -327,12 +415,37 @@ bool mtsROSBridge::AddPublisherFromEventWrite(const std::string &interfaceRequir
     if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWritePublisher<_mtsType, _rosType>::EventHandler, newPublisher, eventName))
     {
         ROS_ERROR("mtsROS::mtsROSEventWritePublisher: failed to create required interface.");
-        CMN_LOG_CLASS_INIT_ERROR << "mtsROSEventWritePublisher: faild to create required interface \""
+        CMN_LOG_CLASS_INIT_ERROR << "mtsROSEventWritePublisher: failed to create required interface \""
                                  << interfaceRequiredName << "\"" << std::endl;
         delete newPublisher;
         return false;
     }
     Publishers.push_back(newPublisher);
+    return true;
+}
+
+
+template <typename _mtsType, typename _rosType>
+bool mtsROSBridge::AddPublisherFromCommandWrite(const std::string & interfaceProvidedName,
+                                                const std::string & commandName,
+                                                const std::string & topicName)
+{
+    // check if the interface exists of try to create one
+    mtsInterfaceProvided * interfaceProvided = this->GetInterfaceProvided(interfaceProvidedName);
+    if (!interfaceProvided) {
+        interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
+    }
+
+    mtsROSCommandWritePublisher<_mtsType, _rosType>* newPublisher = new mtsROSCommandWritePublisher<_mtsType, _rosType>(topicName, *(this->Node));
+    if (!interfaceProvided->AddCommandWrite(&mtsROSCommandWritePublisher<_mtsType, _rosType>::Command,
+                                            newPublisher, commandName))
+    {
+        ROS_ERROR("mtsROSBridge::AddPublisherFromCommandWrite: failed to create provided interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "mtsROSBridge::AddPublisherFromCommandWrite: failed to create provided interface \""
+                                 << interfaceProvidedName << "\"" << std::endl;
+        delete newPublisher;
+        return false;
+    }
     return true;
 }
 
