@@ -1,13 +1,11 @@
 /* -*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-    */
 /* ex: set filetype=cpp softtabstop=4 shiftwidth=4 tabstop=4 cindent expandtab: */
 
-/*
-  $Id: mtsROSBridge.cpp 4363 2013-07-16 20:32:30Z zchen24 $
-
+/*  
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2014 Johns Hopkins University (JHU), All Rights
+  (C) Copyright 2013-2015 Johns Hopkins University (JHU), All Rights
   Reserved.
 
 --- begin cisst license - do not edit ---

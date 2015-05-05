@@ -173,6 +173,37 @@ protected:
 
 
 template <typename _mtsType, typename _rosType>
+class mtsROSSubscriberStateTable
+{
+public:
+    typedef mtsROSSubscriberStateTable<_mtsType, _rosType> ThisType;
+    mtsROSSubscriberStateTable(const std::string & rosTopicName,
+                               ros::NodeHandle & node,
+                               const size_t & tableSize):
+        StateTable(tableSize, rosTopicName)
+    {
+        Subscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
+        StateTable.AddData(CISSTData, rosTopicName);
+    }
+    ~mtsROSSubscriberStateTable() {
+        // \todo, how to remove the subscriber from the node?
+    }
+
+    void Callback(const _rosType & rosData) {
+        StateTable.Start();
+        mtsROSToCISST(rosData, CISSTData);
+        StateTable.Advance();
+    }
+
+    mtsStateTable StateTable;
+    _mtsType CISSTData;
+
+protected:
+    ros::Subscriber Subscriber;
+};
+
+
+template <typename _mtsType, typename _rosType>
 class mtsROSCommandWritePublisher
 {
 public:
@@ -305,8 +336,9 @@ public:
     // --------- Subscriber ------------------
     template <typename _mtsType, typename _rosType>
     bool AddSubscriberToCommandRead(const std::string & interfaceProvidedName,
-                                    const std::string & functionName,
-                                    const std::string & topicName);
+                                    const std::string & commandName,
+                                    const std::string & topicName,
+                                    const size_t & tableSize = 500);
 
     bool AddSubscriberToEventVoid(const std::string & interfaceProvidedName,
                                   const std::string & eventName,
@@ -463,6 +495,32 @@ bool mtsROSBridge::AddSubscriberToEventWrite(const std::string & interfaceProvid
     return true;
 }
 
+
+template <typename _mtsType, typename _rosType>
+bool mtsROSBridge::AddSubscriberToCommandRead(const std::string & interfaceProvidedName,
+                                              const std::string & commandName,
+                                              const std::string & topicName,
+                                              const size_t & tableSize)
+{
+    // check if the interface exists of try to create one
+    mtsInterfaceProvided * interfaceProvided = this->GetInterfaceProvided(interfaceProvidedName);
+    if (!interfaceProvided) {
+        interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
+    }
+
+    mtsROSSubscriberStateTable<_mtsType, _rosType> * newSubscriber = new mtsROSSubscriberStateTable<_mtsType, _rosType>(topicName, *(this->Node), tableSize);
+    if (!interfaceProvided->AddCommandReadState(newSubscriber->StateTable,
+                                                newSubscriber->CISSTData,
+                                                commandName)) {
+        ROS_ERROR("mtsROSBridge::AddSubscriberToCommandRead: failed to add command read to provided interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "mtsROSBridge::AddSubscriberToCommandRead: failed to add command read \""
+                                 << commandName << "\" to provided interface \""
+                                 << interfaceProvidedName << "\"" << std::endl;
+        delete newSubscriber;
+        return false;
+    }
+    return true;
+}
 
 CMN_DECLARE_SERVICES_INSTANTIATION(mtsROSBridge);
 

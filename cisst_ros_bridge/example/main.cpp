@@ -42,12 +42,17 @@ public:
     TestComponent(void):
         mtsTaskPeriodic("testComponent", 5.0 * cmn_ms, 256),
         Value1(4, 0.0),
-        Value2(4, 0.0) {
+        Value2(4, 0.0),
+        Value3(4, 0.0),
+        OldValue3(4, 0.0)
+    {
         StateTable.AddData(Value1, "value1");
         StateTable.AddData(Value2, "value2");
+        StateTable.AddData(Value3, "value3");
         mtsInterfaceProvided * interfaceProvided = AddInterfaceProvided("provided");
         interfaceProvided->AddCommandReadState(StateTable, Value1, "GetValue1");
         interfaceProvided->AddCommandReadState(StateTable, Value2, "GetValue2");
+        interfaceProvided->AddCommandReadState(StateTable, Value3, "GetValue3");
         interfaceProvided->AddCommandWrite(&TestComponent::SetValue1, this,
                                            "SetValue1", Value1);
         interfaceProvided->AddCommandWrite(&TestComponent::SetValue2, this,
@@ -58,6 +63,7 @@ public:
         InterfacesRequired->AddFunction("ValueChanged2", ValueChanged2);
         InterfacesRequired->AddEventHandlerWrite(&TestComponent::SetValue1, this, "EventValue1");
         InterfacesRequired->AddEventHandlerVoid(&TestComponent::Reset, this, "EventReset");
+        InterfacesRequired->AddFunction("GetValue3", GetValue3);
     }
 
     void Configure(const std::string &) {
@@ -69,6 +75,13 @@ public:
     void Run(void) {
         ProcessQueuedCommands();
         ProcessQueuedEvents();
+
+        GetValue3(Value3);
+        Value3.resize(4);
+        if (Value3.NotEqual(OldValue3)) {
+            std::cout << "Value3 " << Value3 << std::endl;
+            OldValue3.ForceAssign(Value3);
+        }
     }
 
     void Cleanup(void) {
@@ -93,7 +106,10 @@ protected:
 
     vctDoubleVec Value1;
     vctDoubleVec Value2;
+    vctDoubleVec Value3;
+    vctDoubleVec OldValue3;
 
+    mtsFunctionRead GetValue3;
     mtsFunctionWrite SumOfElements1;
     mtsFunctionVoid ValueChanged2;
 };
@@ -137,6 +153,10 @@ int main(int argc, char ** argv)
     bridge.AddSubscriberToEventVoid("provided",
                                     "EventReset",
                                     "/sawROSExample/reset_event");
+
+    bridge.AddSubscriberToCommandRead<vctDoubleVec, cisst_msgs::vctDoubleVec>("provided",
+                                                                              "GetValue3",
+                                                                              "/sawROSExample/set_value_3");
 
     manager->AddComponent(&bridge);
 
