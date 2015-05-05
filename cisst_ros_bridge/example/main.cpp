@@ -56,6 +56,8 @@ public:
         mtsInterfaceRequired * InterfacesRequired = AddInterfaceRequired("required");
         InterfacesRequired->AddFunction("SumOfElements1", SumOfElements1);
         InterfacesRequired->AddFunction("ValueChanged2", ValueChanged2);
+        InterfacesRequired->AddEventHandlerWrite(&TestComponent::SetValue1, this, "EventValue1");
+        InterfacesRequired->AddEventHandlerVoid(&TestComponent::Reset, this, "EventReset");
     }
 
     void Configure(const std::string &) {
@@ -66,6 +68,7 @@ public:
 
     void Run(void) {
         ProcessQueuedCommands();
+        ProcessQueuedEvents();
     }
 
     void Cleanup(void) {
@@ -79,6 +82,12 @@ protected:
 
     void SetValue2(const vctDoubleVec & newValue) {
         Value2.ForceAssign(newValue);
+        ValueChanged2();
+    }
+
+    void Reset(void) {
+        Value1.Zeros();
+        Value2.Zeros();
         ValueChanged2();
     }
 
@@ -120,6 +129,14 @@ int main(int argc, char ** argv)
     bridge.AddPublisherFromCommandVoid("provided",
                                        "ValueChanged2",
                                        "/sawROSExample/value_changed_2");
+
+    bridge.AddSubscriberToEventWrite<vctDoubleVec, cisst_msgs::vctDoubleVec>("provided",
+                                                                             "EventValue1",
+                                                                             "/sawROSExample/set_value_1_event");
+
+    bridge.AddSubscriberToEventVoid("provided",
+                                    "EventReset",
+                                    "/sawROSExample/reset_event");
 
     manager->AddComponent(&bridge);
 

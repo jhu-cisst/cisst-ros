@@ -121,24 +121,16 @@ protected:
 // Subscriber
 // ----------------------------------------------------
 
-class mtsROSSubscriberBase
-{
-public:
-    //! Function used to pull data from the cisst component
-    mtsFunctionWrite Function;
-    //! ROS publisher to publish the converted data
-    ros::Subscriber Subscriber;
-};
 
 template <typename _mtsType, typename _rosType>
-class mtsROSSubscriber: public mtsROSSubscriberBase
+class mtsROSSubscriberWrite
 {
 public:
-    typedef mtsROSSubscriber<_mtsType, _rosType> ThisType;
-    mtsROSSubscriber(const std::string & rosTopicName, ros::NodeHandle & node) {
+    typedef mtsROSSubscriberWrite<_mtsType, _rosType> ThisType;
+    mtsROSSubscriberWrite(const std::string & rosTopicName, ros::NodeHandle & node) {
         Subscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
     }
-    ~mtsROSSubscriber() {
+    ~mtsROSSubscriberWrite() {
         // \todo, how to remove the subscriber from the node?
     }
 
@@ -150,13 +142,15 @@ public:
         }
     }
 
+    mtsFunctionWrite Function;
+
 protected:
+    ros::Subscriber Subscriber;
     _mtsType CISSTData;
-    _rosType ROSData;
 };
 
 
-class mtsROSSubscriberVoid: public mtsROSSubscriberBase
+class mtsROSSubscriberVoid
 {
 public:
     mtsROSSubscriberVoid(const std::string & rosTopicName, ros::NodeHandle & node){
@@ -165,16 +159,16 @@ public:
     ~mtsROSSubscriberVoid(){}
 
     void Callback(const std_msgs::Empty & CMN_UNUSED(rosData)) {
-        std::cout << "empty msg received" << std::endl;
-
-        mtsExecutionResult result = FunctionVoid();
+        mtsExecutionResult result = Function();
         if (!result) {
             std::cerr << result << std::endl;
         }
     }
 
-    //! Function used to trigger void command
-    mtsFunctionVoid FunctionVoid;
+    mtsFunctionVoid Function;
+
+protected:
+    ros::Subscriber Subscriber;
 };
 
 
@@ -328,10 +322,6 @@ protected:
     typedef std::list<mtsROSPublisherBase*> PublishersType;
     PublishersType Publishers;
 
-    //! list of subscribers
-    typedef std::list<mtsROSSubscriberBase*> SubscribersType;
-    SubscribersType Subscribers;
-
     //! ros node
     ros::NodeHandle * Node;
 
@@ -387,7 +377,7 @@ bool mtsROSBridge::AddSubscriberToCommandWrite(const std::string & interfaceRequ
                                  << interfaceRequiredName << "\"" << std::endl;
         return false;
     }
-    mtsROSSubscriberBase * newSubscriber = new mtsROSSubscriber<_mtsType, _rosType>(topicName, *(this->Node));
+    mtsROSSubscriberWrite<_mtsType, _rosType> * newSubscriber = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->Node));
     if (!interfaceRequired->AddFunction(functionName, newSubscriber->Function)) {
         ROS_ERROR("mtsROS::AddSubscriberToWriteCommand: failed to create function.");
         CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToWriteCommand: failed to create function \""
@@ -395,15 +385,14 @@ bool mtsROSBridge::AddSubscriberToCommandWrite(const std::string & interfaceRequ
         delete newSubscriber;
         return false;
     }
-    Subscribers.push_back(newSubscriber);
     return true;
 }
 
 
 template <typename _mtsType, typename _rosType>
-bool mtsROSBridge::AddPublisherFromEventWrite(const std::string &interfaceRequiredName,
-                                              const std::string &eventName,
-                                              const std::string &topicName)
+bool mtsROSBridge::AddPublisherFromEventWrite(const std::string & interfaceRequiredName,
+                                              const std::string & eventName,
+                                              const std::string & topicName)
 {
     // check if the interface exists of try to create one
     mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
@@ -444,6 +433,31 @@ bool mtsROSBridge::AddPublisherFromCommandWrite(const std::string & interfacePro
         CMN_LOG_CLASS_INIT_ERROR << "mtsROSBridge::AddPublisherFromCommandWrite: failed to create provided interface \""
                                  << interfaceProvidedName << "\"" << std::endl;
         delete newPublisher;
+        return false;
+    }
+    return true;
+}
+
+
+template <typename _mtsType, typename _rosType>
+bool mtsROSBridge::AddSubscriberToEventWrite(const std::string & interfaceProvidedName,
+                                             const std::string & eventName,
+                                             const std::string & topicName)
+{
+    // check if the interface exists of try to create one
+    mtsInterfaceProvided * interfaceProvided = this->GetInterfaceProvided(interfaceProvidedName);
+    if (!interfaceProvided) {
+        interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
+    }
+
+    mtsROSSubscriberWrite<_mtsType, _rosType> * newSubscriber = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->Node));
+    if (!interfaceProvided->AddEventWrite(newSubscriber->Function,
+                                          eventName, _mtsType())) {
+        ROS_ERROR("mtsROSBridge::AddSubscriberToEventWrite: failed to add event to provided interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "mtsROSBridge::AddSubscriberToEventWrite: failed to add event \""
+                                 << eventName << "\" to provided interface \""
+                                 << interfaceProvidedName << "\"" << std::endl;
+        delete newSubscriber;
         return false;
     }
     return true;

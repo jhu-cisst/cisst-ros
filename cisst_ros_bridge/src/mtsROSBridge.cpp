@@ -114,15 +114,14 @@ bool mtsROSBridge::AddSubscriberToCommandVoid(const std::string &interfaceRequir
         return false;
     }
 
-    mtsROSSubscriberVoid* newSubscriber = new mtsROSSubscriberVoid(topicName, *(this->Node));
-    if (!interfaceRequired->AddFunction(functionName, newSubscriber->FunctionVoid)) {
+    mtsROSSubscriberVoid * newSubscriber = new mtsROSSubscriberVoid(topicName, *(this->Node));
+    if (!interfaceRequired->AddFunction(functionName, newSubscriber->Function)) {
         ROS_ERROR("mtsROS::AddSubscriberToCommandVoid: failed to create function.");
         CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandVoid: failed to create function \""
                                  << functionName << "\"" << std::endl;
         delete newSubscriber;
         return false;
     }
-    Subscribers.push_back(newSubscriber);
     return true;
 }
 
@@ -149,6 +148,25 @@ bool mtsROSBridge::AddPublisherFromCommandVoid(const std::string &interfaceProvi
     return true;
 }
 
+bool mtsROSBridge::AddSubscriberToEventVoid(const std::string & interfaceProvidedName,
+                                             const std::string & eventName,
+                                             const std::string & topicName)
+{
+    // check if the interface exists of try to create one
+    mtsInterfaceProvided * interfaceProvided = this->GetInterfaceProvided(interfaceProvidedName);
+    if (!interfaceProvided) {
+        interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
+    }
 
-
-
+    mtsROSSubscriberVoid * newSubscriber = new mtsROSSubscriberVoid(topicName, *(this->Node));
+    if (!interfaceProvided->AddEventVoid(newSubscriber->Function,
+                                          eventName)) {
+        ROS_ERROR("mtsROSBridge::AddSubscriberToEventVoid: failed to add event to provided interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "mtsROSBridge::AddSubscriberToEventVoid: failed to add event \""
+                                 << eventName << "\" to provided interface \""
+                                 << interfaceProvidedName << "\"" << std::endl;
+        delete newSubscriber;
+        return false;
+    }
+    return true;
+}
