@@ -96,6 +96,28 @@ bool mtsROSBridge::AddPublisherFromEventVoid(const std::string &interfaceRequire
     return true;
 }
 
+bool mtsROSBridge::AddLogErrorFromEventWrite(const std::string & interfaceRequiredName,
+                                             const std::string & eventName)
+{
+    // check if the interface exists of try to create one
+    mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
+    if (!interfaceRequired) {
+        interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
+    }
+
+    mtsROSEventWriteLogError * newPublisher = new mtsROSEventWriteLogError();
+    if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWriteLogError::EventHandler, newPublisher, eventName))
+    {
+        ROS_ERROR("mtsROSBridge::AddLogErrorFromEventWrite: failed to create required interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "mtsROSBridge::AddLogErrorFromEventWrite: failed to create required interface \""
+                                 << interfaceRequiredName << "\"" << std::endl;
+        delete newPublisher;
+        return false;
+    }
+    Publishers.push_back(newPublisher);
+    return true;
+}
+
 bool mtsROSBridge::AddSubscriberToCommandVoid(const std::string &interfaceRequiredName,
                                               const std::string &functionName,
                                               const std::string &topicName)

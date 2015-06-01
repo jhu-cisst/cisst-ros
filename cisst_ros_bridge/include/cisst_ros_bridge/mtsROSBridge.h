@@ -82,12 +82,14 @@ public:
     {
         Publisher = node.advertise<std_msgs::Empty>(rosTopicName, 5);
     }
-    ~mtsROSEventVoidPublisher(){
+    ~mtsROSEventVoidPublisher() {
         //! \todo remove the topic from the node
     }
-    bool Execute(void){return true;}
+    bool Execute(void) {
+        return true;
+    }
 
-    void EventHandler(){
+    void EventHandler() {
         Publisher.publish(mEmptyMsg);
     }
 private:
@@ -102,12 +104,13 @@ public:
     mtsROSEventWritePublisher(const std::string & rosTopicName, ros::NodeHandle & node){
         Publisher = node.advertise<_rosType>(rosTopicName, 5);
     }
-    ~mtsROSEventWritePublisher(){}
+    ~mtsROSEventWritePublisher() {}
 
-    bool Execute(void){return true;}
+    bool Execute(void) {
+        return true;
+    }
 
-    void EventHandler(const _mtsType& CISSTData)
-    {
+    void EventHandler(const _mtsType & CISSTData) {
         mtsCISSTToROS(CISSTData, ROSData);
         Publisher.publish(ROSData);
     }
@@ -116,6 +119,20 @@ protected:
     _rosType ROSData;
 };
 
+class mtsROSEventWriteLogError: public mtsROSPublisherBase
+{
+public:
+    mtsROSEventWriteLogError(void) {}
+    ~mtsROSEventWriteLogError() {}
+
+    bool Execute(void) {
+        return true;
+    }
+
+    void EventHandler(const std::string & message) {
+        ROS_ERROR("cisst-ros error: %s", message.c_str());
+    }
+};
 
 // ----------------------------------------------------
 // Subscriber
@@ -320,6 +337,10 @@ public:
                                                      const std::string & topicName) {
         return AddSubscriberToCommandVoid(interfaceRequiredName, functionName, topicName);
     }
+
+    // --------- Events to ROS log
+    bool AddLogErrorFromEventWrite(const std::string & interfaceRequiredName,
+                                   const std::string & eventName);
 
     // --------- Provided interface
 
