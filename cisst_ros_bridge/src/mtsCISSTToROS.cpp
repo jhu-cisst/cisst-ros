@@ -243,6 +243,12 @@ void mtsCISSTToROS(const prmFixtureGainCartesianSet & cisstData, cisst_msgs::prm
     geometry_msgs::Vector3 vector;    // holder for vector data
     geometry_msgs::Quaternion quaternion;   // holder for rotation data
 
+    // reference frame/point
+    mtsCISSTToROS(cisstData.RefPoint(), vector);
+    rosData.RefPoint = vector;
+    mtsCISSTToROS(cisstData.RotationRefToMaster(), quaternion);
+    rosData.RotationRefToMaster = quaternion;
+
     // vf pos/rot
     mtsCISSTToROS(cisstData.ForcePosition(), vector);
     rosData.ForcePosition = vector;

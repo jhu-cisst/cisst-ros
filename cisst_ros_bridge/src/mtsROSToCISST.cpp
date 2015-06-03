@@ -185,6 +185,12 @@ void mtsROSToCISST(const cisst_msgs::prmFixtureGainCartesianSet & rosData, prmFi
   vct3 vct3Data;   // holder for vct3 data
   vctMatRot3 rotationData;   // holder for rotation data
 
+  // reference frame/point
+  mtsROSToCISST(rosData.RefPoint, vct3Data);
+  cisstData.SetRefPoint(vct3Data);
+  mtsROSToCISST(rosData.RotationRefToMaster, rotationData);
+  cisstData.SetRotationRefToMaster(rotationData);
+
   // vf pos/rot
   mtsROSToCISST(rosData.ForcePosition, vct3Data);
   cisstData.SetForcePosition(vct3Data);
