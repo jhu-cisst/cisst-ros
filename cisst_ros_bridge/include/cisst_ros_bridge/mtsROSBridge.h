@@ -156,7 +156,7 @@ public:
     }
 
 protected:
-    LogLevel mLevel;
+    const LogLevel mLevel;
 };
 
 // ----------------------------------------------------
