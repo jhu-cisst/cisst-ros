@@ -14,7 +14,6 @@ no warranty.  The complete license can be found in license.txt and
 http://www.cisst.org/cisst/license.txt.
 
 --- end cisst license ---
-
 */
 
 #include "cisst_ros_bridge/mtsCISSTToROS.h"
@@ -36,10 +35,10 @@ void mtsCISSTToROS(const std::string & cisstData, std_msgs::String & rosData)
 
 void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData)
 {
-  if (cisstData.Type() == prmEventButton::PRESSED)
-      rosData.data = true;
-  else if (cisstData.Type() == prmEventButton::RELEASED)
-      rosData.data = false;
+    if (cisstData.Type() == prmEventButton::PRESSED)
+        rosData.data = true;
+    else if (cisstData.Type() == prmEventButton::RELEASED)
+        rosData.data = false;
 }
 
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Transform & rosData)
@@ -99,18 +98,18 @@ void mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Pose & rosData)
 
 void mtsCISSTToROS(const vct3 & cisstData, geometry_msgs::Vector3 & rosData)
 {
-  rosData.x = cisstData[0];
-  rosData.y = cisstData[1];
-  rosData.z = cisstData[2];
+    rosData.x = cisstData[0];
+    rosData.y = cisstData[1];
+    rosData.z = cisstData[2];
 }
 
 void mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::Quaternion & rosData)
 {
-  vctQuatRot3 quat(cisstData, VCT_NORMALIZE);
-  rosData.x = quat.X();
-  rosData.y = quat.Y();
-  rosData.z = quat.Z();
-  rosData.w = quat.W();
+    vctQuatRot3 quat(cisstData, VCT_NORMALIZE);
+    rosData.x = quat.X();
+    rosData.y = quat.Y();
+    rosData.z = quat.Z();
+    rosData.w = quat.W();
 }
 
 void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Wrench & rosData)
@@ -137,7 +136,7 @@ void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::WrenchStamped 
     }
 
     rosData.header.stamp = ros::Time::now();
-//    rosData.header.frame_id = "/one_ati_force_finger_tip_link";
+    //    rosData.header.frame_id = "/one_ati_force_finger_tip_link";
     rosData.header.frame_id = "/one_tool_wrist_caudier_link_shaft";
 
     rosData.wrench.force.x = cisstData.at(0);
@@ -164,29 +163,29 @@ void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Vector3Stamped
     rosData.vector.z = cisstData.at(2);
 }
 
-void mtsCISSTToROS(const prmVelocityCartesianGet &cisstData, geometry_msgs::Twist &rosData)
+void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData, geometry_msgs::Twist & rosData)
 {
-  if (cisstData.Valid()) {
-    rosData.linear.x = cisstData.VelocityLinear().X();
-    rosData.linear.y = cisstData.VelocityLinear().Y();
-    rosData.linear.z = cisstData.VelocityLinear().Z();
+    if (cisstData.Valid()) {
+        rosData.linear.x = cisstData.VelocityLinear().X();
+        rosData.linear.y = cisstData.VelocityLinear().Y();
+        rosData.linear.z = cisstData.VelocityLinear().Z();
 
-    rosData.angular.x = cisstData.VelocityAngular().X();
-    rosData.angular.y = cisstData.VelocityAngular().Y();
-    rosData.angular.z = cisstData.VelocityAngular().Z();
-  }
-  else {
-    rosData.linear.x = 0.0;
-    rosData.linear.y = 0.0;
-    rosData.linear.z = 0.0;
+        rosData.angular.x = cisstData.VelocityAngular().X();
+        rosData.angular.y = cisstData.VelocityAngular().Y();
+        rosData.angular.z = cisstData.VelocityAngular().Z();
+    }
+    else {
+        rosData.linear.x = 0.0;
+        rosData.linear.y = 0.0;
+        rosData.linear.z = 0.0;
 
-    rosData.angular.x = 0.0;
-    rosData.angular.y = 0.0;
-    rosData.angular.z = 0.0;
-  }
+        rosData.angular.x = 0.0;
+        rosData.angular.y = 0.0;
+        rosData.angular.z = 0.0;
+    }
 }
 
-void mtsCISSTToROS(const prmVelocityCartesianGet &cisstData, geometry_msgs::TwistStamped &rosData)
+void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData, geometry_msgs::TwistStamped & rosData)
 {
     rosData.header.stamp = ros::Time::now();
     mtsCISSTToROS(cisstData, rosData.twist);
@@ -199,9 +198,58 @@ void mtsCISSTToROS(const prmVelocityCartesianGet &cisstData, geometry_msgs::Twis
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData)
 {
     rosData.header.stamp = ros::Time::now();
+    rosData.name.resize(0);
+    rosData.velocity.resize(0);
+    rosData.effort.resize(0);
     rosData.position.resize(cisstData.Position().size());
     for (size_t i = 0; i < cisstData.Position().size(); ++i) {
         rosData.position[i] = cisstData.Position().Element(i);
+    }
+}
+
+void mtsCISSTToROS(const prmVelocityJointGet & cisstData, sensor_msgs::JointState & rosData)
+{
+    rosData.header.stamp = ros::Time::now();
+    rosData.velocity.resize(cisstData.Velocity().size());
+    for (size_t i = 0; i < cisstData.Velocity().size(); ++i) {
+        rosData.velocity[i] = cisstData.Velocity().Element(i);
+    }
+}
+
+void mtsCISSTToROS(const prmStateJoint & cisstData, sensor_msgs::JointState & rosData)
+{
+    rosData.header.stamp = ros::Time::now();
+    { // names
+        const size_t size = cisstData.Name().size();
+        if (size != 0) {
+            rosData.name.resize(size);
+            std::copy(cisstData.Name().begin(), cisstData.Name().end(),
+                      rosData.name.begin());
+        }
+    }
+    { // positions
+        const size_t size = cisstData.Position().size();
+        if (size != 0) {
+            rosData.position.resize(size);
+            std::copy(cisstData.Position().begin(), cisstData.Position().end(),
+                      rosData.position.begin());
+        }
+    }
+    { // velocities
+        const size_t size = cisstData.Velocity().size();
+        if (size != 0) {
+            rosData.velocity.resize(size);
+            std::copy(cisstData.Velocity().begin(), cisstData.Velocity().end(),
+                      rosData.velocity.begin());
+        }
+    }
+    { // efforts
+        const size_t size = cisstData.Effort().size();
+        if (size != 0) {
+            rosData.effort.resize(size);
+            std::copy(cisstData.Effort().begin(), cisstData.Effort().end(),
+                      rosData.effort.begin());
+        }
     }
 }
 

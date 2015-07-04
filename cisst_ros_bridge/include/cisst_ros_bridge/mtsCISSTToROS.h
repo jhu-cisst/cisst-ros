@@ -22,11 +22,14 @@ http://www.cisst.org/cisst/license.txt.
 
 // cisst include
 #include <cisstVector/vctDynamicVectorTypes.h>
-#include <cisstParameterTypes/prmPositionCartesianGet.h>
 #include <cisstParameterTypes/prmPositionJointGet.h>
+#include <cisstParameterTypes/prmVelocityJointGet.h>
+#include <cisstParameterTypes/prmStateJoint.h>
+#include <cisstParameterTypes/prmPositionCartesianGet.h>
+#include <cisstParameterTypes/prmVelocityCartesianGet.h>
 #include <cisstParameterTypes/prmEventButton.h>
 #include <cisstParameterTypes/prmFixtureGainCartesianSet.h>
-#include <cisstParameterTypes/prmVelocityCartesianGet.h>
+
 #include <cisstMultiTask/mtsVector.h>
 
 // ros include
@@ -70,6 +73,8 @@ void mtsCISSTToROS(const prmVelocityCartesianGet &cisstData, geometry_msgs::Twis
 
 // sensor_msgs
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData);
+void mtsCISSTToROS(const prmVelocityJointGet & cisstData, sensor_msgs::JointState & rosData);
+void mtsCISSTToROS(const prmStateJoint & cisstData, sensor_msgs::JointState & rosData);
 void mtsCISSTToROS(const vctDoubleMat & cisstData, sensor_msgs::PointCloud & rosData);
 
 // cisst_msgs
