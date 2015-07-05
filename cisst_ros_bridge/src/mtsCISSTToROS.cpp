@@ -195,24 +195,45 @@ void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData, geometry_msgs::Twi
 // ---------------------------------------------
 // sensor_msgs
 // ---------------------------------------------
+void mtsCISSTToROS(const vctDoubleVec & cisstData, sensor_msgs::JointState & rosData)
+{
+    rosData.header.stamp = ros::Time::now();
+    rosData.name.resize(0);
+    rosData.velocity.resize(0);
+    rosData.effort.resize(0);
+    const size_t size = cisstData.size();
+    if (size != 0) {
+        rosData.position.resize(size);
+        std::copy(cisstData.begin(), cisstData.end(),
+                  rosData.position.begin());
+    }
+}
+
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData)
 {
     rosData.header.stamp = ros::Time::now();
     rosData.name.resize(0);
     rosData.velocity.resize(0);
     rosData.effort.resize(0);
-    rosData.position.resize(cisstData.Position().size());
-    for (size_t i = 0; i < cisstData.Position().size(); ++i) {
-        rosData.position[i] = cisstData.Position().Element(i);
+    const size_t size = cisstData.Position().size();
+    if (size != 0) {
+        rosData.position.resize(size);
+        std::copy(cisstData.Position().begin(), cisstData.Position().end(),
+                  rosData.position.begin());
     }
 }
 
 void mtsCISSTToROS(const prmVelocityJointGet & cisstData, sensor_msgs::JointState & rosData)
 {
     rosData.header.stamp = ros::Time::now();
-    rosData.velocity.resize(cisstData.Velocity().size());
-    for (size_t i = 0; i < cisstData.Velocity().size(); ++i) {
-        rosData.velocity[i] = cisstData.Velocity().Element(i);
+    rosData.name.resize(0);
+    rosData.position.resize(0);
+    rosData.effort.resize(0);
+    const size_t size = cisstData.Velocity().size();
+    if (size != 0) {
+        rosData.velocity.resize(size);
+        std::copy(cisstData.Velocity().begin(), cisstData.Velocity().end(),
+                  rosData.velocity.begin());
     }
 }
 
@@ -259,9 +280,9 @@ void mtsCISSTToROS(const vctDoubleMat & cisstData, sensor_msgs::PointCloud & ros
     rosData.points.resize(cisstData.rows());
 
     for (size_t i = 0; i < cisstData.rows(); ++i) {
-        rosData.points[i].x = cisstData.at(i,0);
-        rosData.points[i].y = cisstData.at(i,1);
-        rosData.points[i].z = cisstData.at(i,2);
+        rosData.points[i].x = cisstData.at(i, 0);
+        rosData.points[i].y = cisstData.at(i, 1);
+        rosData.points[i].z = cisstData.at(i, 2);
     }
 }
 

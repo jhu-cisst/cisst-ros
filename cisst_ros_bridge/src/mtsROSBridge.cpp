@@ -1,12 +1,11 @@
 /* -*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-    */
 /* ex: set filetype=cpp softtabstop=4 shiftwidth=4 tabstop=4 cindent expandtab: */
 
-/*  
+/*
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2015 Johns Hopkins University (JHU), All Rights
-  Reserved.
+  (C) Copyright 2013-2015 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -25,9 +24,14 @@ http://www.cisst.org/cisst/license.txt.
 CMN_IMPLEMENT_SERVICES(mtsROSBridge);
 
 
-mtsROSBridge::mtsROSBridge(const std::string & componentName, double periodInSeconds, bool spin, bool sig, ros::NodeHandle *nh):
+mtsROSBridge::mtsROSBridge(const std::string & componentName,
+                           const double periodInSeconds,
+                           const bool spin,
+                           const bool sig,
+                           ros::NodeHandle * nh):
     mtsTaskPeriodic(componentName, periodInSeconds),
-    mSpin(spin), mSignal(sig)
+    mSpin(spin),
+    mSignal(sig)
 {
     typedef char * char_pointer;
     char_pointer * argv = new char_pointer[1];
@@ -38,8 +42,11 @@ mtsROSBridge::mtsROSBridge(const std::string & componentName, double periodInSec
     if (nh != NULL) {
         Node = nh;
     } else {
-        if (mSignal) ros::init(argc, argv, componentName);
-        else ros::init(argc, argv, componentName, ros::init_options::NoSigintHandler);
+        if (mSignal) {
+            ros::init(argc, argv, componentName);
+        } else {
+            ros::init(argc, argv, componentName, ros::init_options::NoSigintHandler);
+        }
         Node = new ros::NodeHandle;
     }
 }

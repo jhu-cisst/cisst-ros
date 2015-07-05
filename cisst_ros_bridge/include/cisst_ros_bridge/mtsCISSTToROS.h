@@ -72,6 +72,7 @@ void mtsCISSTToROS(const prmVelocityCartesianGet &cisstData, geometry_msgs::Twis
 void mtsCISSTToROS(const prmVelocityCartesianGet &cisstData, geometry_msgs::TwistStamped &rosData);
 
 // sensor_msgs
+void mtsCISSTToROS(const vctDoubleVec & cisstData, sensor_msgs::JointState & rosData);
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData);
 void mtsCISSTToROS(const prmVelocityJointGet & cisstData, sensor_msgs::JointState & rosData);
 void mtsCISSTToROS(const prmStateJoint & cisstData, sensor_msgs::JointState & rosData);

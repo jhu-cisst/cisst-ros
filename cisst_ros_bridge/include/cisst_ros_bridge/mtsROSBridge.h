@@ -61,6 +61,9 @@ public:
     }
 
     bool Execute(void) {
+        if (Publisher.getNumSubscribers() == 0) {
+            return true;
+        }
         mtsExecutionResult result = Function(CISSTData);
         if (result) {
             mtsCISSTToROS(CISSTData, ROSData);
@@ -111,6 +114,9 @@ public:
     }
 
     void EventHandler(const _mtsType & CISSTData) {
+        if (Publisher.getNumSubscribers() == 0) {
+            return;
+        }
         mtsCISSTToROS(CISSTData, ROSData);
         Publisher.publish(ROSData);
     }
@@ -254,8 +260,10 @@ public:
     }
     ~mtsROSCommandWritePublisher() {}
 
-    void Command(const _mtsType & CISSTData)
-    {
+    void Command(const _mtsType & CISSTData) {
+        if (Publisher.getNumSubscribers() == 0) {
+            return;
+        }
         mtsCISSTToROS(CISSTData, ROSData);
         Publisher.publish(ROSData);
     }
@@ -363,9 +371,9 @@ public:
             rely on cisst cleanup()
     */
     mtsROSBridge(const std::string & componentName,
-                 double periodInSeconds,
-                 bool spin = false,
-                 bool sig = true,
+                 const double periodInSeconds,
+                 const bool spin = false,
+                 const bool sig = true,
                  ros::NodeHandle* nh = NULL);
     inline ~mtsROSBridge() {}
 

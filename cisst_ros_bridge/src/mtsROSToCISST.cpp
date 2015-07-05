@@ -143,13 +143,10 @@ void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, prmForceCartesi
 
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet & cisstData)
 {
-    vctDoubleVec DesiredPosition;
-    DesiredPosition.SetSize(rosData.position.size());
-    DesiredPosition.SetAll(0.0);
-    for (unsigned int i = 0; i < rosData.position.size(); ++i) {
-        DesiredPosition.at(i) = rosData.position[i];
-    }
-    cisstData.SetGoal(DesiredPosition);
+    cisstData.Goal().SetSize(rosData.position.size());
+    std::copy(rosData.position.begin(), rosData.position.end(),
+              cisstData.Goal().begin());
+    std::cerr << "got: " << cisstData.Goal() << std::endl;
 }
 
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmForceTorqueJointSet & cisstData)
