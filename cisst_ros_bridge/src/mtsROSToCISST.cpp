@@ -146,7 +146,6 @@ void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet 
     cisstData.Goal().SetSize(rosData.position.size());
     std::copy(rosData.position.begin(), rosData.position.end(),
               cisstData.Goal().begin());
-    std::cerr << "got: " << cisstData.Goal() << std::endl;
 }
 
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmForceTorqueJointSet & cisstData)
