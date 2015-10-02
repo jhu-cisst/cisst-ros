@@ -1,8 +1,3 @@
-# reference frame
-geometry_msgs/Pose        RefFrame
-geometry_msgs/Vector3     RefVelocity
-geometry_msgs/Quaternion  RotationRefToMaster
-
 # vf pos & ori
 geometry_msgs/Quaternion  ForceOrientation
 geometry_msgs/Vector3     ForcePosition
