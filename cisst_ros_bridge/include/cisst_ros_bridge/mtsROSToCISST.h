@@ -22,6 +22,7 @@ http://www.cisst.org/cisst/license.txt.
 
 // cisst include
 #include <cisstVector/vctDynamicVectorTypes.h>
+#include <cisstMultiTask/mtsTransformationTypes.h>
 #include <cisstParameterTypes/prmPositionCartesianGet.h>
 #include <cisstParameterTypes/prmPositionCartesianSet.h>
 #include <cisstParameterTypes/prmPositionJointGet.h>
@@ -34,6 +35,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Int32.h>
 #include <std_msgs/String.h>
 
 #include <geometry_msgs/TransformStamped.h>
@@ -48,6 +50,7 @@ http://www.cisst.org/cisst/license.txt.
 
 // std_msgs
 void mtsROSToCISST(const std_msgs::Float32 & rosData, double & cisstData);
+void mtsROSToCISST(const std_msgs::Int32 & rosData, int & cisstData);
 void mtsROSToCISST(const std_msgs::Bool & rosData, bool & cisstData);
 void mtsROSToCISST(const std_msgs::String & rosData, std::string & cisstData);
 
@@ -57,9 +60,13 @@ void mtsROSToCISST(const geometry_msgs::Quaternion & rosData, vctMatRot3 & cisst
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianGet & cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartesianSet & cisstData);
+void mtsROSToCISST(const geometry_msgs::Pose & rosData, vctFrm3 & cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, vctFrm4x4 & cisstData);
+void mtsROSToCISST(const geometry_msgs::Pose & rosData, mtsFrm4x4 & cisstData);
 void mtsROSToCISST(const geometry_msgs::Transform & rosData, prmPositionCartesianGet & cisstData);
+void mtsROSToCISST(const geometry_msgs::Transform & rosData, vctFrm3 & cisstData);
 void mtsROSToCISST(const geometry_msgs::Transform & rosData, vctFrm4x4 & cisstData);
+void mtsROSToCISST(const geometry_msgs::Transform & rosData, mtsFrm4x4 & cisstData);
 void mtsROSToCISST(const geometry_msgs::Wrench & rosData, prmForceCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, prmForceCartesianSet & cisstData);
 
