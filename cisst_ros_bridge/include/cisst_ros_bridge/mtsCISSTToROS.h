@@ -31,11 +31,13 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmFixtureGainCartesianSet.h>
 
 #include <cisstMultiTask/mtsVector.h>
+#include <cisstMultiTask/mtsTransformationTypes.h>
 
 // ros include
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Int32.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/WrenchStamped.h>
@@ -53,6 +55,7 @@ http://www.cisst.org/cisst/license.txt.
 
 // std_msgs
 void mtsCISSTToROS(const double & cisstData, std_msgs::Float32 & rosData);
+void mtsCISSTToROS(const int & cisstData, std_msgs::Int32 & rosData);
 void mtsCISSTToROS(const bool & cisstData, std_msgs::Bool & rosData);
 void mtsCISSTToROS(const std::string & cisstData, std_msgs::String & rosData);
 void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData);
@@ -62,7 +65,11 @@ void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Tra
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pose & rosData);
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::PoseStamped & rosData);
 void mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Pose & rosData);
+void mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::Pose & rosData);
 void mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Pose & rosData);
+void mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Transform & rosData);
+void mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::Transform & rosData);
+void mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Transform & rosData);
 void mtsCISSTToROS(const vct3 & cisstData, geometry_msgs::Vector3 & rosData);
 void mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::Quaternion & rosData);
 void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Wrench & rosData);
