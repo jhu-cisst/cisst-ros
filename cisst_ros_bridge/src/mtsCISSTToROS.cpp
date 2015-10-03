@@ -46,28 +46,40 @@ void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData)
         rosData.data = false;
 }
 
+template <typename _cisstFrame>
+void mtsCISSTToROSTransform(const _cisstFrame & cisstFrame, geometry_msgs::Transform & rosTransform)
+{
+    vctQuatRot3 quat(cisstFrame.Rotation(), VCT_NORMALIZE);
+    rosTransform.rotation.x = quat.X();
+    rosTransform.rotation.y = quat.Y();
+    rosTransform.rotation.z = quat.Z();
+    rosTransform.rotation.w = quat.W();
+    rosTransform.translation.x = cisstFrame.Translation().X();
+    rosTransform.translation.y = cisstFrame.Translation().Y();
+    rosTransform.translation.z = cisstFrame.Translation().Z();
+}
+
+template <typename _cisstFrame>
+void mtsCISSTToROSPose(const _cisstFrame & cisstFrame, geometry_msgs::Pose & rosPose)
+{
+    vctQuatRot3 quat(cisstFrame.Rotation(), VCT_NORMALIZE);
+    rosPose.orientation.x = quat.X();
+    rosPose.orientation.y = quat.Y();
+    rosPose.orientation.z = quat.Z();
+    rosPose.orientation.w = quat.W();
+    rosPose.position.x = cisstFrame.Translation().X();
+    rosPose.position.y = cisstFrame.Translation().Y();
+    rosPose.position.z = cisstFrame.Translation().Z();
+}
+
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Transform & rosData)
 {
-    vctQuatRot3 quat(cisstData.Position().Rotation(), VCT_NORMALIZE);
-    rosData.rotation.x = quat.X();
-    rosData.rotation.y = quat.Y();
-    rosData.rotation.z = quat.Z();
-    rosData.rotation.w = quat.W();
-    rosData.translation.x = cisstData.Position().Translation().X();
-    rosData.translation.y = cisstData.Position().Translation().Y();
-    rosData.translation.z = cisstData.Position().Translation().Z();
+    mtsCISSTToROSTransform(cisstData.Position(), rosData);
 }
 
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pose & rosData)
 {
-    vctQuatRot3 quat(cisstData.Position().Rotation(), VCT_NORMALIZE);
-    rosData.orientation.x = quat.X();
-    rosData.orientation.y = quat.Y();
-    rosData.orientation.z = quat.Z();
-    rosData.orientation.w = quat.W();
-    rosData.position.x = cisstData.Position().Translation().X();
-    rosData.position.y = cisstData.Position().Translation().Y();
-    rosData.position.z = cisstData.Position().Translation().Z();
+    mtsCISSTToROSPose(cisstData.Position(), rosData);
 }
 
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::PoseStamped & rosData)
@@ -79,73 +91,33 @@ void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pos
 
 void mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Pose & rosData)
 {
-    vctQuatRot3 quat(cisstData.Rotation(), VCT_NORMALIZE);
-    rosData.orientation.x = quat.X();
-    rosData.orientation.y = quat.Y();
-    rosData.orientation.z = quat.Z();
-    rosData.orientation.w = quat.W();
-    rosData.position.x = cisstData.Translation().X();
-    rosData.position.y = cisstData.Translation().Y();
-    rosData.position.z = cisstData.Translation().Z();
+    mtsCISSTToROSPose(cisstData, rosData);
 }
 
 void mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::Pose & rosData)
 {
-    vctQuatRot3 quat(cisstData.Rotation(), VCT_NORMALIZE);
-    rosData.orientation.x = quat.X();
-    rosData.orientation.y = quat.Y();
-    rosData.orientation.z = quat.Z();
-    rosData.orientation.w = quat.W();
-    rosData.position.x = cisstData.Translation().X();
-    rosData.position.y = cisstData.Translation().Y();
-    rosData.position.z = cisstData.Translation().Z();
+    mtsCISSTToROSPose(cisstData, rosData);
 }
 
 
 void mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Pose & rosData)
 {
-    vctQuatRot3 quat(cisstData.Rotation(), VCT_NORMALIZE);
-    rosData.orientation.x = quat.X();
-    rosData.orientation.y = quat.Y();
-    rosData.orientation.z = quat.Z();
-    rosData.orientation.w = quat.W();
-    rosData.position.x = cisstData.Translation().X();
-    rosData.position.y = cisstData.Translation().Y();
-    rosData.position.z = cisstData.Translation().Z();
+    mtsCISSTToROSPose(cisstData, rosData);
 }
 
 void mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Transform & rosData)
 {
-    vctQuatRot3 quat(cisstData.Rotation(), VCT_NORMALIZE);
-    rosData.rotation.x = quat.X();
-    rosData.rotation.y = quat.Y();
-    rosData.rotation.z = quat.Z();
-    rosData.rotation.w = quat.W();
-    rosData.translation.x = cisstData.Translation().X();
-    rosData.translation.y = cisstData.Translation().Y();
-    rosData.translation.z = cisstData.Translation().Z();
+    mtsCISSTToROSTransform(cisstData, rosData);
 }
+
 void mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::Transform & rosData)
 {
-    vctQuatRot3 quat(cisstData.Rotation(), VCT_NORMALIZE);
-    rosData.rotation.x = quat.X();
-    rosData.rotation.y = quat.Y();
-    rosData.rotation.z = quat.Z();
-    rosData.rotation.w = quat.W();
-    rosData.translation.x = cisstData.Translation().X();
-    rosData.translation.y = cisstData.Translation().Y();
-    rosData.translation.z = cisstData.Translation().Z();
+    mtsCISSTToROSTransform(cisstData, rosData);
 }
+
 void mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Transform & rosData)
 {
-    vctQuatRot3 quat(cisstData.Rotation(), VCT_NORMALIZE);
-    rosData.rotation.x = quat.X();
-    rosData.rotation.y = quat.Y();
-    rosData.rotation.z = quat.Z();
-    rosData.rotation.w = quat.W();
-    rosData.translation.x = cisstData.Translation().X();
-    rosData.translation.y = cisstData.Translation().Y();
-    rosData.translation.z = cisstData.Translation().Z();
+    mtsCISSTToROSTransform(cisstData, rosData);
 }
 
 void mtsCISSTToROS(const vct3 & cisstData, geometry_msgs::Vector3 & rosData)
@@ -171,13 +143,13 @@ void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Wrench & rosDa
         return;
     }
 
-    rosData.force.x = cisstData.at(0);
-    rosData.force.y = cisstData.at(1);
-    rosData.force.z = cisstData.at(2);
+    rosData.force.x = cisstData.Element(0);
+    rosData.force.y = cisstData.Element(1);
+    rosData.force.z = cisstData.Element(2);
 
-    rosData.torque.x = cisstData.at(3);
-    rosData.torque.y = cisstData.at(4);
-    rosData.torque.z = cisstData.at(5);
+    rosData.torque.x = cisstData.Element(3);
+    rosData.torque.y = cisstData.Element(4);
+    rosData.torque.z = cisstData.Element(5);
 }
 
 void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::WrenchStamped & rosData)
@@ -191,13 +163,13 @@ void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::WrenchStamped 
     //    rosData.header.frame_id = "/one_ati_force_finger_tip_link";
     rosData.header.frame_id = "/one_tool_wrist_caudier_link_shaft";
 
-    rosData.wrench.force.x = cisstData.at(0);
-    rosData.wrench.force.y = cisstData.at(1);
-    rosData.wrench.force.z = cisstData.at(2);
+    rosData.wrench.force.x = cisstData.Element(0);
+    rosData.wrench.force.y = cisstData.Element(1);
+    rosData.wrench.force.z = cisstData.Element(2);
 
-    rosData.wrench.torque.x = cisstData.at(3);
-    rosData.wrench.torque.y = cisstData.at(4);
-    rosData.wrench.torque.z = cisstData.at(5);
+    rosData.wrench.torque.x = cisstData.Element(3);
+    rosData.wrench.torque.y = cisstData.Element(4);
+    rosData.wrench.torque.z = cisstData.Element(5);
 }
 
 void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Vector3Stamped & rosData)
@@ -207,12 +179,12 @@ void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Vector3Stamped
         return;
     }
 
-    rosData.header.stamp.sec = cisstData.at(3);
+    rosData.header.stamp.sec = cisstData.Element(3);
     rosData.header.frame_id = "/one_psm_base_link";
 
-    rosData.vector.x = cisstData.at(0);
-    rosData.vector.y = cisstData.at(1);
-    rosData.vector.z = cisstData.at(2);
+    rosData.vector.x = cisstData.Element(0);
+    rosData.vector.y = cisstData.Element(1);
+    rosData.vector.z = cisstData.Element(2);
 }
 
 void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData, geometry_msgs::Twist & rosData)
@@ -411,5 +383,3 @@ void mtsCISSTToROS(const prmFixtureGainCartesianSet & cisstData, cisst_msgs::prm
     mtsCISSTToROS(cisstData.TorqueBiasNeg(), vector);
     rosData.TorqueBiasNeg = vector;
 }
-
-
