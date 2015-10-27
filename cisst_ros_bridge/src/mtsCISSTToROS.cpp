@@ -33,6 +33,12 @@ void mtsCISSTToROS(const bool & cisstData, std_msgs::Bool & rosData)
     rosData.data = cisstData;
 }
 
+void mtsCISSTToROS(const bool & cisstData, cisst_msgs::BoolStamped & rosData)
+{
+    rosData.header.stamp = ros::Time::now();
+    rosData.data = cisstData;
+}
+
 void mtsCISSTToROS(const std::string & cisstData, std_msgs::String & rosData)
 {
     rosData.data = cisstData;

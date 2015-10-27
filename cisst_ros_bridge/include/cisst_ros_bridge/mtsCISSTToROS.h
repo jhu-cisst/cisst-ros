@@ -58,6 +58,7 @@ http://www.cisst.org/cisst/license.txt.
 void mtsCISSTToROS(const double & cisstData, std_msgs::Float32 & rosData);
 void mtsCISSTToROS(const int & cisstData, std_msgs::Int32 & rosData);
 void mtsCISSTToROS(const bool & cisstData, std_msgs::Bool & rosData);
+void mtsCISSTToROS(const bool & cisstData, cisst_msgs::BoolStamped & rosData);
 void mtsCISSTToROS(const std::string & cisstData, std_msgs::String & rosData);
 void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData);
 void mtsCISSTToROS(const prmEventButton & cisstData, cisst_msgs::BoolStamped & rosData);
