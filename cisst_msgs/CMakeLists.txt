@@ -18,6 +18,7 @@ add_message_files(
   FILES
   vctDoubleVec.msg
   prmFixtureGainCartesianSet.msg
+  BoolStamped.msg
   )
 
 ## Generate added messages and services with any dependencies listed here

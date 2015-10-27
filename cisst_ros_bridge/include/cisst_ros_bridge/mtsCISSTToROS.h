@@ -51,6 +51,7 @@ http://www.cisst.org/cisst/license.txt.
 // non standard messages
 #include <cisst_msgs/vctDoubleVec.h>
 #include <cisst_msgs/prmFixtureGainCartesianSet.h>
+#include <cisst_msgs/BoolStamped.h>
 
 
 // std_msgs
@@ -59,6 +60,7 @@ void mtsCISSTToROS(const int & cisstData, std_msgs::Int32 & rosData);
 void mtsCISSTToROS(const bool & cisstData, std_msgs::Bool & rosData);
 void mtsCISSTToROS(const std::string & cisstData, std_msgs::String & rosData);
 void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData);
+void mtsCISSTToROS(const prmEventButton & cisstData, cisst_msgs::BoolStamped & rosData);
 
 // geometry_msgs
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Transform & rosData);

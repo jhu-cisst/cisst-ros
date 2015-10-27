@@ -46,6 +46,15 @@ void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData)
         rosData.data = false;
 }
 
+void mtsCISSTToROS(const prmEventButton & cisstData, cisst_msgs::BoolStamped & rosData)
+{
+    rosData.header.stamp = ros::Time::now();
+    if (cisstData.Type() == prmEventButton::PRESSED)
+        rosData.data = true;
+    else if (cisstData.Type() == prmEventButton::RELEASED)
+        rosData.data = false;
+}
+
 template <typename _cisstFrame>
 void mtsCISSTToROSTransform(const _cisstFrame & cisstFrame, geometry_msgs::Transform & rosTransform)
 {
