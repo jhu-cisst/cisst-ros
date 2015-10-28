@@ -34,7 +34,9 @@ To setup your path and find the ROS commands easily:
 source ~/catkin_ws/devel/setup.bash
 ```
 
-# Install cisst/ROS
+# Install cisst-ROS
+
+This part is not needed if you installed _cisst/SAW_ using the catkin build tools.   _cisst-ros_ comes with _cisst/SAW_.
 
 Get the sources:
 ```sh
