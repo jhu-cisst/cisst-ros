@@ -8,6 +8,9 @@ cisst/ROS integration packages
 
 # Initialize your catkin ROS workspace
 
+As of October 2015, we strongly recommend to install cisst/SAW using the ROS catkin build tools:
+https://github.com/jhu-cisst/cisst/wiki/Compiling-cisst-and-SAW-with-CMake#13-building-using-catkin-build-tools-for-ros
+
 Make sure ROS is in your path.  You can also "source" the setup script that comes with your ROS distribution (example for ROS hydro):
 ```sh
 source /opt/ros/hydro/setup.bash
@@ -17,13 +20,13 @@ Create the main directories for ROS and initialize the workspace:
 ```sh
 mkdir -p ~/catkin_ws/src
 cd ~/catkin_ws/src
-catkin_init_workspace
+catkin init
 ```
 
 First build to initialize the environment:
 ```sh
 cd ~/catkin_ws/
-catkin_make
+catkin build
 ```
 
 To setup your path and find the ROS commands easily:
@@ -42,7 +45,7 @@ git clone http://github.com/jhu-cisst/cisst-ros.git
 Build:
 ```sh 
 cd ~/catkin_ws
-catkin_make    # you may need to specify cisst build path using cmake 
+catkin build   # you may need to specify cisst build path using cmake 
                # default cisst\_DIR path: PATH/TO/CISST/build/cisst/
 ```
 **NOTE**   
