@@ -1,6 +1,19 @@
 Change log
 ==========
 
+1.1.0 (2016-01-08)
+==================
+
+* API changes:
+  * None
+* Deprecated features:
+  * None
+* New features:
+  * cisst_ros_bridge: Added more data conversion methods (BoolStamped)
+* Bug fixes:
+  * None
+
+
 1.0.1 (2015-10-18)
 ==================
 
