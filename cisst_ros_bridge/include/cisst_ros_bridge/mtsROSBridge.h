@@ -46,6 +46,8 @@ public:
     //! ROS publisher to publish the converted data
     ros::Publisher Publisher;
 
+    virtual ~mtsROSPublisherBase() {};
+
     virtual bool Execute(void) = 0;
 };
 
@@ -56,7 +58,7 @@ public:
     mtsROSPublisher(const std::string & rosTopicName, ros::NodeHandle & node) {
         Publisher = node.advertise<_rosType>(rosTopicName, 5);
     }
-    ~mtsROSPublisher() {
+    virtual ~mtsROSPublisher() {
         //! \todo, how to remove the topic from the node?
     }
 
@@ -85,7 +87,7 @@ public:
     {
         Publisher = node.advertise<std_msgs::Empty>(rosTopicName, 5);
     }
-    ~mtsROSEventVoidPublisher() {
+    virtual ~mtsROSEventVoidPublisher() {
         //! \todo remove the topic from the node
     }
     bool Execute(void) {
@@ -107,7 +109,7 @@ public:
     mtsROSEventWritePublisher(const std::string & rosTopicName, ros::NodeHandle & node){
         Publisher = node.advertise<_rosType>(rosTopicName, 5);
     }
-    ~mtsROSEventWritePublisher() {}
+    virtual ~mtsROSEventWritePublisher() {}
 
     bool Execute(void) {
         return true;
@@ -133,7 +135,7 @@ public:
     mtsROSEventWriteLog(const LogLevel level):
         mLevel(level)
     {}
-    ~mtsROSEventWriteLog() {}
+    virtual ~mtsROSEventWriteLog() {}
 
     bool Execute(void) {
         return true;
@@ -178,7 +180,7 @@ public:
     mtsROSSubscriberWrite(const std::string & rosTopicName, ros::NodeHandle & node) {
         Subscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
     }
-    ~mtsROSSubscriberWrite() {
+    virtual ~mtsROSSubscriberWrite() {
         // \todo, how to remove the subscriber from the node?
     }
 
@@ -204,7 +206,7 @@ public:
     mtsROSSubscriberVoid(const std::string & rosTopicName, ros::NodeHandle & node){
         Subscriber = node.subscribe(rosTopicName, 1, &mtsROSSubscriberVoid::Callback, this);
     }
-    ~mtsROSSubscriberVoid(){}
+    virtual ~mtsROSSubscriberVoid(){}
 
     void Callback(const std_msgs::Empty & CMN_UNUSED(rosData)) {
         mtsExecutionResult result = Function();
@@ -233,7 +235,7 @@ public:
         Subscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
         StateTable.AddData(CISSTData, rosTopicName);
     }
-    ~mtsROSSubscriberStateTable() {
+    virtual ~mtsROSSubscriberStateTable() {
         // \todo, how to remove the subscriber from the node?
     }
 
@@ -258,7 +260,7 @@ public:
     mtsROSCommandWritePublisher(const std::string & rosTopicName, ros::NodeHandle & node) {
         Publisher = node.advertise<_rosType>(rosTopicName, 5);
     }
-    ~mtsROSCommandWritePublisher() {}
+    virtual ~mtsROSCommandWritePublisher() {}
 
     void Command(const _mtsType & CISSTData) {
         if (Publisher.getNumSubscribers() == 0) {
@@ -280,7 +282,7 @@ public:
     mtsROSCommandVoidPublisher(const std::string & rosTopicName, ros::NodeHandle & node) {
         Publisher = node.advertise<std_msgs::Empty>(rosTopicName, 5);
     }
-    ~mtsROSCommandVoidPublisher() {}
+    virtual ~mtsROSCommandVoidPublisher() {}
 
     void Command(void)
     {

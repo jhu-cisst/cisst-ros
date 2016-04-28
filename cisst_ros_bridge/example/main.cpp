@@ -114,7 +114,7 @@ protected:
     mtsFunctionVoid ValueChanged2;
 };
 
-int main(int argc, char ** argv)
+int main(int CMN_UNUSED(argc), char ** CMN_UNUSED(argv))
 {
     mtsComponentManager * manager = mtsManagerLocal::GetInstance();
 
