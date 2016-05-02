@@ -46,19 +46,31 @@ void mtsCISSTToROS(const std::string & cisstData, std_msgs::String & rosData)
 
 void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData)
 {
-    if (cisstData.Type() == prmEventButton::PRESSED)
+    if (cisstData.Type() == prmEventButton::PRESSED) {
         rosData.data = true;
-    else if (cisstData.Type() == prmEventButton::RELEASED)
+    } else if (cisstData.Type() == prmEventButton::RELEASED) {
         rosData.data = false;
+    }
 }
 
 void mtsCISSTToROS(const prmEventButton & cisstData, cisst_msgs::BoolStamped & rosData)
 {
     rosData.header.stamp = ros::Time::now();
-    if (cisstData.Type() == prmEventButton::PRESSED)
+    if (cisstData.Type() == prmEventButton::PRESSED) {
         rosData.data = true;
-    else if (cisstData.Type() == prmEventButton::RELEASED)
+    } else if (cisstData.Type() == prmEventButton::RELEASED) {
         rosData.data = false;
+    }
+}
+
+void mtsCISSTToROS(const prmEventButton & cisstData, sensor_msgs::Joy & rosData)
+{
+    rosData.header.stamp = ros::Time::now();
+    if (cisstData.Type() == prmEventButton::PRESSED) {
+        rosData.buttons[0] = 1;
+    } else if (cisstData.Type() == prmEventButton::RELEASED) {
+        rosData.buttons[0] = 0;
+    }
 }
 
 template <typename _cisstFrame>

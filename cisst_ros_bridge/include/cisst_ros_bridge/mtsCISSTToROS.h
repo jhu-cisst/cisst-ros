@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2015 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2016 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -47,6 +47,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <geometry_msgs/TwistStamped.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/PointCloud.h>
+#include <sensor_msgs/Joy.h>
 
 // non standard messages
 #include <cisst_msgs/vctDoubleVec.h>
@@ -62,6 +63,7 @@ void mtsCISSTToROS(const bool & cisstData, cisst_msgs::BoolStamped & rosData);
 void mtsCISSTToROS(const std::string & cisstData, std_msgs::String & rosData);
 void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData);
 void mtsCISSTToROS(const prmEventButton & cisstData, cisst_msgs::BoolStamped & rosData);
+void mtsCISSTToROS(const prmEventButton & cisstData, sensor_msgs::Joy & rosData);
 
 // geometry_msgs
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Transform & rosData);
