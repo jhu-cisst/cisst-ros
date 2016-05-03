@@ -22,6 +22,11 @@ http://www.cisst.org/cisst/license.txt.
 
 // cisst include
 #include <cisstVector/vctDynamicVectorTypes.h>
+
+#include <cisstMultiTask/mtsManagerLocal.h>
+#include <cisstMultiTask/mtsVector.h>
+#include <cisstMultiTask/mtsTransformationTypes.h>
+
 #include <cisstParameterTypes/prmPositionJointGet.h>
 #include <cisstParameterTypes/prmVelocityJointGet.h>
 #include <cisstParameterTypes/prmStateJoint.h>
@@ -29,9 +34,6 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmVelocityCartesianGet.h>
 #include <cisstParameterTypes/prmEventButton.h>
 #include <cisstParameterTypes/prmFixtureGainCartesianSet.h>
-
-#include <cisstMultiTask/mtsVector.h>
-#include <cisstMultiTask/mtsTransformationTypes.h>
 
 // ros include
 #include <ros/ros.h>
@@ -79,6 +81,25 @@ void mtsCISSTToROSTransform(const _cisstFrame & cisstFrame, geometry_msgs::Trans
     rosTransform.translation.x = cisstFrame.Translation().X();
     rosTransform.translation.y = cisstFrame.Translation().Y();
     rosTransform.translation.z = cisstFrame.Translation().Z();
+}
+
+template <typename _cisstType, typename _rosType>
+void mtsCISSTToROSHeader(const _cisstType & cisstData, _rosType & rosData, const std::string & msgId)
+{
+    const double cisstDataTime = cisstData.Timestamp();
+    if (cisstDataTime > 0.0) {
+        const double age =
+            mtsManagerLocal::GetInstance()->GetTimeServer().GetRelativeTime()
+            - cisstDataTime;
+        if (age > 0.0) {
+            rosData.header.stamp = ros::Time::now() - ros::Duration(age);
+        } else {
+            rosData.header.stamp = ros::Time::now();
+        }
+    } else {
+        rosData.header.stamp = ros::Time::now();
+    }
+    rosData.header.frame_id = msgId;
 }
 
 template <typename _rosType>
