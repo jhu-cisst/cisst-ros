@@ -456,7 +456,8 @@ public:
     template <typename _mtsType, typename _rosType>
     bool AddPublisherFromEventWrite(const std::string & interfaceRequiredName,
                                     const std::string & eventName,
-                                    const std::string & topicName);
+                                    const std::string & topicName,
+                                    const std::string & msgId = "");
 
     // --------- Subscriber ------------------
 
@@ -677,7 +678,8 @@ bool mtsROSBridge::AddSubscriberToCommandWrite(const std::string & interfaceRequ
 template <typename _mtsType, typename _rosType>
 bool mtsROSBridge::AddPublisherFromEventWrite(const std::string & interfaceRequiredName,
                                               const std::string & eventName,
-                                              const std::string & topicName)
+                                              const std::string & topicName,
+                                              const std::string & msgId)
 {
     // check if the interface exists of try to create one
     mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
@@ -685,7 +687,7 @@ bool mtsROSBridge::AddPublisherFromEventWrite(const std::string & interfaceRequi
         interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
     }
 
-    mtsROSEventWritePublisher<_mtsType, _rosType>* newPublisher = new mtsROSEventWritePublisher<_mtsType, _rosType>(topicName, *(this->Node));
+    mtsROSEventWritePublisher<_mtsType, _rosType>* newPublisher = new mtsROSEventWritePublisher<_mtsType, _rosType>(topicName, *(this->Node), msgId);
     if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWritePublisher<_mtsType, _rosType>::EventHandler, newPublisher, eventName))
     {
         ROS_ERROR("mtsROS::mtsROSEventWritePublisher: failed to create required interface.");

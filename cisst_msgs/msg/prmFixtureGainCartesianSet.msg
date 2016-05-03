@@ -1,3 +1,5 @@
+Header header
+
 # vf pos & ori
 geometry_msgs/Quaternion  ForceOrientation
 geometry_msgs/Vector3     ForcePosition
@@ -18,6 +20,3 @@ geometry_msgs/Vector3     OriDampingPos
 geometry_msgs/Vector3     OriDampingNeg
 geometry_msgs/Vector3     TorqueBiasPos
 geometry_msgs/Vector3     TorqueBiasNeg
-
-
-
