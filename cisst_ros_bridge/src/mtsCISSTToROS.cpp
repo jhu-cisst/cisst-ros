@@ -66,6 +66,8 @@ void mtsCISSTToROS(const prmEventButton & cisstData, cisst_msgs::BoolStamped & r
 void mtsCISSTToROS(const prmEventButton & cisstData, sensor_msgs::Joy & rosData)
 {
     rosData.header.stamp = ros::Time::now();
+    rosData.buttons.resize(1);
+    rosData.axes.resize(0);
     if (cisstData.Type() == prmEventButton::PRESSED) {
         rosData.buttons[0] = 1;
     } else if (cisstData.Type() == prmEventButton::RELEASED) {

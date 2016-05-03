@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2015 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2016 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -43,41 +43,47 @@ class mtsROSPublisherBase
 public:
     //! Function used to pull data from the cisst component
     mtsFunctionRead Function;
-    //! ROS publisher to publish the converted data
-    ros::Publisher Publisher;
 
     virtual ~mtsROSPublisherBase() {};
 
     virtual bool Execute(void) = 0;
+
+protected:
+    ros::Publisher mPublisher;
 };
 
 template <typename _mtsType, typename _rosType>
 class mtsROSPublisher: public mtsROSPublisherBase
 {
 public:
-    mtsROSPublisher(const std::string & rosTopicName, ros::NodeHandle & node) {
-        Publisher = node.advertise<_rosType>(rosTopicName, 5);
+    mtsROSPublisher(const std::string & rosTopicName,
+                    ros::NodeHandle & node,
+                    const std::string & msgId):
+        mId(msgId)
+    {
+        mPublisher = node.advertise<_rosType>(rosTopicName, 5);
     }
     virtual ~mtsROSPublisher() {
         //! \todo, how to remove the topic from the node?
     }
 
     bool Execute(void) {
-        if (Publisher.getNumSubscribers() == 0) {
+        if (mPublisher.getNumSubscribers() == 0) {
             return true;
         }
-        mtsExecutionResult result = Function(CISSTData);
+        mtsExecutionResult result = Function(mCISSTData);
         if (result) {
-            mtsCISSTToROS(CISSTData, ROSData);
-            Publisher.publish(ROSData);
+            mtsCISSTToROS(mCISSTData, mROSData, mId);
+            mPublisher.publish(mROSData);
             return true;
         }
         return false;
     }
 
 protected:
-    _mtsType CISSTData;
-    _rosType ROSData;
+    _mtsType mCISSTData;
+    _rosType mROSData;
+    std::string mId;
 };
 
 class mtsROSEventVoidPublisher: public mtsROSPublisherBase
@@ -85,7 +91,7 @@ class mtsROSEventVoidPublisher: public mtsROSPublisherBase
 public:
     mtsROSEventVoidPublisher(const std::string & rosTopicName, ros::NodeHandle & node)
     {
-        Publisher = node.advertise<std_msgs::Empty>(rosTopicName, 5);
+        mPublisher = node.advertise<std_msgs::Empty>(rosTopicName, 5);
     }
     virtual ~mtsROSEventVoidPublisher() {
         //! \todo remove the topic from the node
@@ -94,8 +100,8 @@ public:
         return true;
     }
 
-    void EventHandler() {
-        Publisher.publish(mEmptyMsg);
+    void EventHandler(void) {
+        mPublisher.publish(mEmptyMsg);
     }
 private:
     std_msgs::Empty mEmptyMsg;
@@ -106,8 +112,12 @@ template <typename _mtsType, typename _rosType>
 class mtsROSEventWritePublisher: public mtsROSPublisherBase
 {
 public:
-    mtsROSEventWritePublisher(const std::string & rosTopicName, ros::NodeHandle & node){
-        Publisher = node.advertise<_rosType>(rosTopicName, 5);
+    mtsROSEventWritePublisher(const std::string & rosTopicName,
+                              ros::NodeHandle & node,
+                              const std::string & msgId):
+        mId(msgId)
+    {
+        mPublisher = node.advertise<_rosType>(rosTopicName, 5);
     }
     virtual ~mtsROSEventWritePublisher() {}
 
@@ -116,15 +126,16 @@ public:
     }
 
     void EventHandler(const _mtsType & CISSTData) {
-        if (Publisher.getNumSubscribers() == 0) {
+        if (mPublisher.getNumSubscribers() == 0) {
             return;
         }
-        mtsCISSTToROS(CISSTData, ROSData);
-        Publisher.publish(ROSData);
+        mtsCISSTToROS(CISSTData, mROSData, mId);
+        mPublisher.publish(mROSData);
     }
 
 protected:
-    _rosType ROSData;
+    _rosType mROSData;
+    std::string mId;
 };
 
 class mtsROSEventWriteLog: public mtsROSPublisherBase
@@ -178,15 +189,15 @@ class mtsROSSubscriberWrite
 public:
     typedef mtsROSSubscriberWrite<_mtsType, _rosType> ThisType;
     mtsROSSubscriberWrite(const std::string & rosTopicName, ros::NodeHandle & node) {
-        Subscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
+        mSubscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
     }
     virtual ~mtsROSSubscriberWrite() {
         // \todo, how to remove the subscriber from the node?
     }
 
     void Callback(const _rosType & rosData) {
-        mtsROSToCISST(rosData, CISSTData);
-        mtsExecutionResult result = Function(CISSTData);
+        mtsROSToCISST(rosData, mCISSTData);
+        mtsExecutionResult result = Function(mCISSTData);
         if (!result) {
             std::cerr << result << std::endl;
         }
@@ -195,8 +206,8 @@ public:
     mtsFunctionWrite Function;
 
 protected:
-    ros::Subscriber Subscriber;
-    _mtsType CISSTData;
+    ros::Subscriber mSubscriber;
+    _mtsType mCISSTData;
 };
 
 
@@ -204,7 +215,7 @@ class mtsROSSubscriberVoid
 {
 public:
     mtsROSSubscriberVoid(const std::string & rosTopicName, ros::NodeHandle & node){
-        Subscriber = node.subscribe(rosTopicName, 1, &mtsROSSubscriberVoid::Callback, this);
+        mSubscriber = node.subscribe(rosTopicName, 1, &mtsROSSubscriberVoid::Callback, this);
     }
     virtual ~mtsROSSubscriberVoid(){}
 
@@ -218,7 +229,7 @@ public:
     mtsFunctionVoid Function;
 
 protected:
-    ros::Subscriber Subscriber;
+    ros::Subscriber mSubscriber;
 };
 
 
@@ -257,22 +268,28 @@ template <typename _mtsType, typename _rosType>
 class mtsROSCommandWritePublisher
 {
 public:
-    mtsROSCommandWritePublisher(const std::string & rosTopicName, ros::NodeHandle & node) {
-        Publisher = node.advertise<_rosType>(rosTopicName, 5);
+    mtsROSCommandWritePublisher(const std::string & rosTopicName,
+                                ros::NodeHandle & node,
+                                const std::string & msgId):
+        mId(msgId)
+
+    {
+        mPublisher = node.advertise<_rosType>(rosTopicName, 5);
     }
     virtual ~mtsROSCommandWritePublisher() {}
 
     void Command(const _mtsType & CISSTData) {
-        if (Publisher.getNumSubscribers() == 0) {
+        if (mPublisher.getNumSubscribers() == 0) {
             return;
         }
-        mtsCISSTToROS(CISSTData, ROSData);
-        Publisher.publish(ROSData);
+        mtsCISSTToROS(CISSTData, mROSData, mId);
+        mPublisher.publish(mROSData);
     }
 
 protected:
-    ros::Publisher Publisher;
-    _rosType ROSData;
+    ros::Publisher mPublisher;
+    _rosType mROSData;
+    std::string mId;
 };
 
 
@@ -403,7 +420,8 @@ public:
     template <typename _mtsType, typename _rosType>
     bool AddPublisherFromCommandRead(const std::string & interfaceRequiredName,
                                      const std::string & functionName,
-                                     const std::string & topicName);
+                                     const std::string & topicName,
+                                     const std::string & msgId = "");
 
     template <typename _mtsType, typename _rosType>
     bool CISST_DEPRECATED AddPublisherFromReadCommand(const std::string & interfaceRequiredName,
@@ -517,7 +535,8 @@ public:
     template <typename _mtsType, typename _rosType>
     bool AddPublisherFromCommandWrite(const std::string & interfaceProvidedName,
                                       const std::string & commandName,
-                                      const std::string & topicName);
+                                      const std::string & topicName,
+                                      const std::string & msgId = "");
 
     /*! Add a command (void) to a cisstMultiTask provided interface.
         When connected to an existing required interface, this allows
@@ -600,7 +619,8 @@ protected:
 template <typename _mtsType, typename _rosType>
 bool mtsROSBridge::AddPublisherFromCommandRead(const std::string & interfaceRequiredName,
                                                const std::string & functionName,
-                                               const std::string & topicName)
+                                               const std::string & topicName,
+                                               const std::string & msgId)
 {
     // check if the interface exists of try to create one
     mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
@@ -613,7 +633,7 @@ bool mtsROSBridge::AddPublisherFromCommandRead(const std::string & interfaceRequ
                                  << interfaceRequiredName << "\"" << std::endl;
         return false;
     }
-    mtsROSPublisherBase * newPublisher = new mtsROSPublisher<_mtsType, _rosType>(topicName, *(this->Node));
+    mtsROSPublisherBase * newPublisher = new mtsROSPublisher<_mtsType, _rosType>(topicName, *(this->Node), msgId);
     if (!interfaceRequired->AddFunction(functionName, newPublisher->Function)) {
         ROS_ERROR("mtsROS::AddPublisherFromReadCommand: failed to create function.");
         CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromReadCommand: faild to create function \""
@@ -682,7 +702,8 @@ bool mtsROSBridge::AddPublisherFromEventWrite(const std::string & interfaceRequi
 template <typename _mtsType, typename _rosType>
 bool mtsROSBridge::AddPublisherFromCommandWrite(const std::string & interfaceProvidedName,
                                                 const std::string & commandName,
-                                                const std::string & topicName)
+                                                const std::string & topicName,
+                                                const std::string & msgId)
 {
     // check if the interface exists of try to create one
     mtsInterfaceProvided * interfaceProvided = this->GetInterfaceProvided(interfaceProvidedName);
@@ -690,7 +711,7 @@ bool mtsROSBridge::AddPublisherFromCommandWrite(const std::string & interfacePro
         interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
     }
 
-    mtsROSCommandWritePublisher<_mtsType, _rosType>* newPublisher = new mtsROSCommandWritePublisher<_mtsType, _rosType>(topicName, *(this->Node));
+    mtsROSCommandWritePublisher<_mtsType, _rosType>* newPublisher = new mtsROSCommandWritePublisher<_mtsType, _rosType>(topicName, *(this->Node), msgId);
     if (!interfaceProvided->AddCommandWrite(&mtsROSCommandWritePublisher<_mtsType, _rosType>::Command,
                                             newPublisher, commandName))
     {
