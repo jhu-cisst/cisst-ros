@@ -32,6 +32,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmStateJoint.h>
 #include <cisstParameterTypes/prmPositionCartesianGet.h>
 #include <cisstParameterTypes/prmVelocityCartesianGet.h>
+#include <cisstParameterTypes/prmForceCartesianGet.h>
 #include <cisstParameterTypes/prmEventButton.h>
 #include <cisstParameterTypes/prmFixtureGainCartesianSet.h>
 
@@ -41,12 +42,11 @@ http://www.cisst.org/cisst/license.txt.
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int32.h>
 #include <std_msgs/String.h>
-#include <geometry_msgs/TransformStamped.h>
-#include <geometry_msgs/WrenchStamped.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/WrenchStamped.h>
 #include <geometry_msgs/Vector3Stamped.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <geometry_msgs/WrenchStamped.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/Joy.h>
@@ -161,6 +161,10 @@ void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Vector3Stamped
 void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData, geometry_msgs::Twist & rosData,
                    const std::string & msgId = "");
 void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData, geometry_msgs::TwistStamped & rosData,
+                   const std::string & msgId = "");
+void mtsCISSTToROS(const prmForceCartesianGet & cisstData, geometry_msgs::Wrench & rosData,
+                   const std::string & msgId = "");
+void mtsCISSTToROS(const prmForceCartesianGet & cisstData, geometry_msgs::WrenchStamped & rosData,
                    const std::string & msgId = "");
 
 // sensor_msgs

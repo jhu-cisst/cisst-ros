@@ -237,6 +237,32 @@ void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData, geometry_msgs::Twi
     mtsCISSTToROS(cisstData, rosData.twist);
 }
 
+void mtsCISSTToROS(const prmForceCartesianGet & cisstData, geometry_msgs::Wrench & rosData,
+                   const std::string & CMN_UNUSED(msgId))
+{
+    if (cisstData.Valid()) {
+        rosData.force.x = cisstData.Force().Element(0);
+        rosData.force.y = cisstData.Force().Element(1);
+        rosData.force.z = cisstData.Force().Element(2);
+        rosData.torque.x = cisstData.Force().Element(3);
+        rosData.torque.y = cisstData.Force().Element(4);
+        rosData.torque.z = cisstData.Force().Element(5);
+    } else {
+        rosData.force.x = 0.0;
+        rosData.force.y = 0.0;
+        rosData.force.z = 0.0;
+        rosData.torque.x = 0.0;
+        rosData.torque.y = 0.0;
+        rosData.torque.z = 0.0;
+    }
+}
+
+void mtsCISSTToROS(const prmForceCartesianGet & cisstData, geometry_msgs::WrenchStamped & rosData,
+                   const std::string & msgId)
+{
+    mtsCISSTToROSHeader(cisstData, rosData, msgId);
+    mtsCISSTToROS(cisstData, rosData.wrench);
+}
 
 // ---------------------------------------------
 // sensor_msgs
