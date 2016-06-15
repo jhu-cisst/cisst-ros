@@ -178,6 +178,8 @@ void mtsCISSTToROS(const prmStateJoint & cisstData, sensor_msgs::JointState & ro
                    const std::string & msgId = "");
 void mtsCISSTToROS(const vctDoubleMat & cisstData, sensor_msgs::PointCloud & rosData,
                    const std::string & msgId = "");
+void mtsCISSTToROS(const std::vector<vct3> & cisstData, sensor_msgs::PointCloud & rosData,
+                   const std::string & msgId = "");
 
 // cisst_msgs
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::vctDoubleVec & rosData,

@@ -361,6 +361,24 @@ void mtsCISSTToROS(const vctDoubleMat & cisstData, sensor_msgs::PointCloud & ros
     }
 }
 
+void mtsCISSTToROS(const std::vector<vct3> & cisstData, sensor_msgs::PointCloud & rosData,
+                   const std::string & msgId)
+{
+    mtsCISSTToROSHeader(rosData, msgId);
+    rosData.points.resize(cisstData.size());
+    typedef std::vector<vct3>::const_iterator IteratorType;
+    const IteratorType end = cisstData.end();
+    IteratorType iter;
+    size_t index = 0;
+    for (iter = cisstData.begin();
+         iter != end;
+         ++iter, ++index) {
+        rosData.points[index].x = iter->X();
+        rosData.points[index].y = iter->Y();
+        rosData.points[index].z = iter->Z();
+    }
+}
+
 // ---------------------------------------------
 // cisst_msgs
 // ---------------------------------------------
