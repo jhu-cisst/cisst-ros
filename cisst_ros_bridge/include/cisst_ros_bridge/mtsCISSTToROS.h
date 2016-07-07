@@ -42,6 +42,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int32.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Float64MultiArray.h>
 #include <geometry_msgs/Vector3Stamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TransformStamped.h>
@@ -127,6 +128,8 @@ void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData,
 void mtsCISSTToROS(const prmEventButton & cisstData, cisst_msgs::BoolStamped & rosData,
                    const std::string & msgId = "");
 void mtsCISSTToROS(const prmEventButton & cisstData, sensor_msgs::Joy & rosData,
+                   const std::string & msgId = "");
+void mtsCISSTToROS(const vctDoubleMat & cisstData, std_msgs::Float64MultiArray & rosData,
                    const std::string & msgId = "");
 
 // geometry_msgs

@@ -92,6 +92,25 @@ void mtsCISSTToROS(const prmEventButton & cisstData, sensor_msgs::Joy & rosData,
     }
 }
 
+void mtsCISSTToROS(const vctDoubleMat & cisstData, std_msgs::Float64MultiArray & rosData,
+                   const std::string & msgId)
+{
+    rosData.layout.dim.resize(2);
+    rosData.layout.dim[0].label  = "rows";
+    rosData.layout.dim[0].size   = cisstData.rows();
+    rosData.layout.dim[0].stride = 1;
+    rosData.layout.dim[1].label  = "cols";
+    rosData.layout.dim[1].size   = cisstData.cols();
+    rosData.layout.dim[1].stride = cisstData.rows();
+    rosData.layout.data_offset = 0;
+    const size_t size = cisstData.size();
+    if (size != 0) {
+        rosData.data.resize(size);
+        std::copy(cisstData.begin(), cisstData.end(),
+                  rosData.data.begin());
+    }
+}
+
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Transform & rosData,
                    const std::string & CMN_UNUSED(msgId))
 {
