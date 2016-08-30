@@ -1,6 +1,24 @@
 Change log
 ==========
 
+1.2.0 (2016-08-30)
+==================
+
+* API changes:
+  * None
+* Deprecated features:
+  * None
+* New features:
+  * cisst_msgs: added StringStamped
+  * cisst_ros_bridge: added more data conversion methods:
+    * Joy from event button pressed
+    * Float64MultiArray from dynamic matrix
+    * PointCloud from std::vector<vct3>
+  * cisst_ros_bridge: use cisstMultiTask timestamp to set ROS time for messages with header
+* Bug fixes:
+  * gcc: minor fixes to avoid warnings
+
+
 1.1.0 (2016-01-08)
 ==================
 
