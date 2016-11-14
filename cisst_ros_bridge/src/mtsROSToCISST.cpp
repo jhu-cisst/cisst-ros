@@ -158,12 +158,9 @@ void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet 
 
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmForceTorqueJointSet & cisstData)
 {
-    vctDoubleVec newVec;
-    newVec.SetSize(rosData.effort.size());
-    for (std::size_t i = 0; i < rosData.effort.size(); ++i) {
-        newVec.Element(i) = rosData.effort[i];
-    }
-    cisstData.SetForceTorque(newVec);
+    cisstData.ForceTorque().SetSize(rosData.effort.size());
+    std::copy(rosData.effort.begin(), rosData.effort.end(),
+              cisstData.ForceTorque().begin());
 }
 
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, prmPositionJointSet & cisstData)
