@@ -35,6 +35,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmForceCartesianGet.h>
 #include <cisstParameterTypes/prmEventButton.h>
 #include <cisstParameterTypes/prmFixtureGainCartesianSet.h>
+#include <cisstParameterTypes/prmInputData.h>
 
 // ros include
 #include <ros/ros.h>
@@ -148,6 +149,7 @@ void mtsCISSTToROS(const prmVelocityJointGet & cisstData, sensor_msgs::JointStat
 void mtsCISSTToROS(const prmStateJoint & cisstData, sensor_msgs::JointState & rosData);
 void mtsCISSTToROS(const vctDoubleMat & cisstData, sensor_msgs::PointCloud & rosData);
 void mtsCISSTToROS(const std::vector<vct3> & cisstData, sensor_msgs::PointCloud & rosData);
+void mtsCISSTToROS(const prmInputData & cisstData, sensor_msgs::Joy & rosData);
 
 // cisst_msgs
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::vctDoubleVec & rosData);

@@ -370,6 +370,17 @@ void mtsCISSTToROS(const std::vector<vct3> & cisstData, sensor_msgs::PointCloud 
     }
 }
 
+void mtsCISSTToROS(const prmInputData & cisstData, sensor_msgs::Joy & rosData)
+{
+    mtsCISSTToROSHeader(rosData);
+    rosData.axes.resize(cisstData.AnalogInputs().size());
+    rosData.buttons.resize(cisstData.DigitalInputs().size());
+    std::copy(cisstData.AnalogInputs().begin(), cisstData.AnalogInputs().end(),
+              rosData.axes.begin());
+    std::copy(cisstData.DigitalInputs().begin(), cisstData.DigitalInputs().end(),
+              rosData.buttons.begin());
+}
+
 // ---------------------------------------------
 // cisst_msgs
 // ---------------------------------------------
