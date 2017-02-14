@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2016 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2017 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -116,6 +116,7 @@ void mtsCISSTToROS(const bool & cisstData, std_msgs::Bool & rosData);
 void mtsCISSTToROS(const bool & cisstData, cisst_msgs::BoolStamped & rosData);
 void mtsCISSTToROS(const bool & cisstData, sensor_msgs::Joy & rosData);
 void mtsCISSTToROS(const std::string & cisstData, std_msgs::String & rosData);
+void mtsCISSTToROS(const mtsMessage & cisstData, std_msgs::String & rosData);
 void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData);
 void mtsCISSTToROS(const prmEventButton & cisstData, cisst_msgs::BoolStamped & rosData);
 void mtsCISSTToROS(const prmEventButton & cisstData, sensor_msgs::Joy & rosData);

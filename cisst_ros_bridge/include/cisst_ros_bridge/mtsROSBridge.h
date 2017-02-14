@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2016 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2017 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -146,22 +146,22 @@ public:
         return true;
     }
 
-    void EventHandler(const std::string & message) {
+    void EventHandler(const mtsMessage & message) {
         switch (mLevel) {
         case ROS_LOG_DEBUG:
-            ROS_DEBUG("cisst-ros: %s", message.c_str());
+            ROS_DEBUG("cisst-ros: %zu %s", message.Counter, message.Message.c_str());
             break;
         case ROS_LOG_INFO:
-            ROS_INFO("cisst-ros: %s", message.c_str());
+            ROS_INFO("cisst-ros: %zu %s", message.Counter, message.Message.c_str());
             break;
         case ROS_LOG_WARN:
-            ROS_WARN("cisst-ros: %s", message.c_str());
+            ROS_WARN("cisst-ros: %zu %s", message.Counter, message.Message.c_str());
             break;
         case ROS_LOG_ERROR:
-            ROS_ERROR("cisst-ros: %s", message.c_str());
+            ROS_ERROR("cisst-ros: %zu %s", message.Counter, message.Message.c_str());
             break;
         case ROS_LOG_FATAL:
-            ROS_FATAL("cisst-ros: %s", message.c_str());
+            ROS_FATAL("cisst-ros: %zu %s", message.Counter, message.Message.c_str());
             break;
         default:
             break;

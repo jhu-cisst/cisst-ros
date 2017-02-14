@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2015 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2017 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -61,7 +61,9 @@ void mtsROSBridge::Startup(void)
 
 void mtsROSBridge::Cleanup(void)
 {
-    if (!mSignal) ros::requestShutdown();
+    if (!mSignal) {
+        ros::requestShutdown();
+    }
 }
 
 void mtsROSBridge::Run(void)
@@ -80,9 +82,9 @@ void mtsROSBridge::Run(void)
     if (mSpin) ros::spinOnce();
 }
 
-bool mtsROSBridge::AddPublisherFromEventVoid(const std::string &interfaceRequiredName,
-                                             const std::string &eventName,
-                                             const std::string &topicName)
+bool mtsROSBridge::AddPublisherFromEventVoid(const std::string & interfaceRequiredName,
+                                             const std::string & eventName,
+                                             const std::string & topicName)
 {
     // check if the interface exists of try to create one
     mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
@@ -126,9 +128,9 @@ bool mtsROSBridge::AddLogFromEventWrite(const std::string & interfaceRequiredNam
     return true;
 }
 
-bool mtsROSBridge::AddSubscriberToCommandVoid(const std::string &interfaceRequiredName,
-                                              const std::string &functionName,
-                                              const std::string &topicName)
+bool mtsROSBridge::AddSubscriberToCommandVoid(const std::string & interfaceRequiredName,
+                                              const std::string & functionName,
+                                              const std::string & topicName)
 {
     // check if the interface exists of try to create one
     mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
@@ -153,9 +155,9 @@ bool mtsROSBridge::AddSubscriberToCommandVoid(const std::string &interfaceRequir
     return true;
 }
 
-bool mtsROSBridge::AddPublisherFromCommandVoid(const std::string &interfaceProvidedName,
-                                               const std::string &commandName,
-                                               const std::string &topicName)
+bool mtsROSBridge::AddPublisherFromCommandVoid(const std::string & interfaceProvidedName,
+                                               const std::string & commandName,
+                                               const std::string & topicName)
 {
     // check if the interface exists of try to create one
     mtsInterfaceProvided * interfaceProvided = this->GetInterfaceProvided(interfaceProvidedName);
@@ -177,8 +179,8 @@ bool mtsROSBridge::AddPublisherFromCommandVoid(const std::string &interfaceProvi
 }
 
 bool mtsROSBridge::AddSubscriberToEventVoid(const std::string & interfaceProvidedName,
-                                             const std::string & eventName,
-                                             const std::string & topicName)
+                                            const std::string & eventName,
+                                            const std::string & topicName)
 {
     // check if the interface exists of try to create one
     mtsInterfaceProvided * interfaceProvided = this->GetInterfaceProvided(interfaceProvidedName);
