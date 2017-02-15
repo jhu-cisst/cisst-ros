@@ -149,19 +149,19 @@ public:
     void EventHandler(const mtsMessage & message) {
         switch (mLevel) {
         case ROS_LOG_DEBUG:
-            ROS_DEBUG("cisst-ros: %zu %s", message.Counter, message.Message.c_str());
+            ROS_DEBUG("%fs, #%zu: %s", message.Timestamp, message.Counter, message.Message.c_str());
             break;
         case ROS_LOG_INFO:
-            ROS_INFO("cisst-ros: %zu %s", message.Counter, message.Message.c_str());
+            ROS_INFO("%fs, #%zu: %s", message.Timestamp, message.Counter, message.Message.c_str());
             break;
         case ROS_LOG_WARN:
-            ROS_WARN("cisst-ros: %zu %s", message.Counter, message.Message.c_str());
+            ROS_WARN("%fs, #%zu: %s", message.Timestamp, message.Counter, message.Message.c_str());
             break;
         case ROS_LOG_ERROR:
-            ROS_ERROR("cisst-ros: %zu %s", message.Counter, message.Message.c_str());
+            ROS_ERROR("%fs, #%zu: %s", message.Timestamp, message.Counter, message.Message.c_str());
             break;
         case ROS_LOG_FATAL:
-            ROS_FATAL("cisst-ros: %zu %s", message.Counter, message.Message.c_str());
+            ROS_FATAL("%fs, #%zu: %s", message.Timestamp, message.Counter, message.Message.c_str());
             break;
         default:
             break;
