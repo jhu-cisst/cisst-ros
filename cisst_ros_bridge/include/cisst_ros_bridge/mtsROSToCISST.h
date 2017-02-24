@@ -30,6 +30,8 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmForceTorqueJointSet.h>
 #include <cisstParameterTypes/prmForceCartesianSet.h>
 #include <cisstParameterTypes/prmFixtureGainCartesianSet.h>
+#include <cisstParameterTypes/prmVelocityJointSet.h>
+#include <cisstParameterTypes/prmVelocityCartesianSet.h>
 
 // ros include
 #include <ros/ros.h>
@@ -41,6 +43,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/WrenchStamped.h>
+#include <geometry_msgs/TwistStamped.h>
 
 #include <sensor_msgs/JointState.h>
 
@@ -69,10 +72,15 @@ void mtsROSToCISST(const geometry_msgs::Transform & rosData, vctFrm4x4 & cisstDa
 void mtsROSToCISST(const geometry_msgs::Transform & rosData, mtsFrm4x4 & cisstData);
 void mtsROSToCISST(const geometry_msgs::Wrench & rosData, prmForceCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, prmForceCartesianSet & cisstData);
+void mtsROSToCISST(const geometry_msgs::Twist & rosData, prmVelocityCartesianSet & cisstData);
+void mtsROSToCISST(const geometry_msgs::TwistStamped & rosData, prmVelocityCartesianSet & cisstData);
+
 
 // sensor_msgs
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet & cisstData);
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmForceTorqueJointSet & cisstData);
+void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmVelocityJointSet & cisstData);
+
 
 // cisst_msgs
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, prmPositionJointSet & cisstData);

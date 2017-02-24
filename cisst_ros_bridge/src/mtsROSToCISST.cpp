@@ -149,6 +149,19 @@ void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, prmForceCartesi
     mtsROSToCISST(rosData.wrench, cisstData);
 }
 
+void mtsROSToCISST(const geometry_msgs::Twist & rosData, prmVelocityCartesianSet & cisstData)
+{
+    cisstData.SetVelocity(vct3(rosData.linear.x, rosData.linear.y, rosData.linear.z));
+    cisstData.SetAngularVelocity(vct3(rosData.linear.x, rosData.linear.y, rosData.linear.z));
+}
+
+void mtsROSToCISST(const geometry_msgs::TwistStamped & rosData, prmVelocityCartesianSet & cisstData)
+{
+    cisstData.SetTimestamp(rosData.header.stamp.toSec());
+    mtsROSToCISST(rosData.twist, cisstData);
+}
+
+
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet & cisstData)
 {
     cisstData.Goal().SetSize(rosData.position.size());
@@ -162,6 +175,14 @@ void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmForceTorqueJointS
     std::copy(rosData.effort.begin(), rosData.effort.end(),
               cisstData.ForceTorque().begin());
 }
+
+void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmVelocityJointSet & cisstData)
+{
+    cisstData.Goal().SetSize(rosData.velocity.size());
+    std::copy(rosData.velocity.begin(), rosData.velocity.end(),
+              cisstData.Goal().begin());
+}
+
 
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, prmPositionJointSet & cisstData)
 {
