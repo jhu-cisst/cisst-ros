@@ -152,7 +152,7 @@ void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, prmForceCartesi
 void mtsROSToCISST(const geometry_msgs::Twist & rosData, prmVelocityCartesianSet & cisstData)
 {
     cisstData.SetVelocity(vct3(rosData.linear.x, rosData.linear.y, rosData.linear.z));
-    cisstData.SetAngularVelocity(vct3(rosData.linear.x, rosData.linear.y, rosData.linear.z));
+    cisstData.SetAngularVelocity(vct3(rosData.angular.x, rosData.angular.y, rosData.angular.z));
 }
 
 void mtsROSToCISST(const geometry_msgs::TwistStamped & rosData, prmVelocityCartesianSet & cisstData)
