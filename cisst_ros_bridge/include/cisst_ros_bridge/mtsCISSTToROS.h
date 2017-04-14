@@ -120,6 +120,7 @@ void mtsCISSTToROS(const mtsMessage & cisstData, std_msgs::String & rosData);
 void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData);
 void mtsCISSTToROS(const prmEventButton & cisstData, cisst_msgs::BoolStamped & rosData);
 void mtsCISSTToROS(const prmEventButton & cisstData, sensor_msgs::Joy & rosData);
+void mtsCISSTToROS(const vctDoubleVec & cisstData, std_msgs::Float64MultiArray & rosData);
 void mtsCISSTToROS(const vctDoubleMat & cisstData, std_msgs::Float64MultiArray & rosData);
 
 // geometry_msgs
