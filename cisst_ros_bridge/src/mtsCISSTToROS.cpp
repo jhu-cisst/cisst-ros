@@ -143,6 +143,7 @@ void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pos
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::PoseStamped & rosData)
 {
     mtsCISSTToROSHeader(cisstData, rosData);
+    rosData.header.frame_id = cisstData.MovingFrame();
     mtsCISSTToROSPose(cisstData.Position(), rosData.pose);
 }
 
