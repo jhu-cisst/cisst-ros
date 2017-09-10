@@ -29,7 +29,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmPositionJointSet.h>
 #include <cisstParameterTypes/prmForceTorqueJointSet.h>
 #include <cisstParameterTypes/prmForceCartesianSet.h>
-#include <cisstParameterTypes/prmFixtureGainCartesianSet.h>
+#include <cisstParameterTypes/prmCartesianImpedanceGains.h>
 #include <cisstParameterTypes/prmVelocityJointSet.h>
 #include <cisstParameterTypes/prmVelocityCartesianSet.h>
 
@@ -49,7 +49,7 @@ http://www.cisst.org/cisst/license.txt.
 
 // non standard messages
 #include <cisst_msgs/vctDoubleVec.h>
-#include <cisst_msgs/prmFixtureGainCartesianSet.h>
+#include <cisst_msgs/prmCartesianImpedanceGains.h>
 
 // std_msgs
 void mtsROSToCISST(const std_msgs::Float32 & rosData, double & cisstData);
@@ -85,6 +85,6 @@ void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmVelocityJointSet 
 // cisst_msgs
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, prmPositionJointSet & cisstData);
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & cisstData);
-void mtsROSToCISST(const cisst_msgs::prmFixtureGainCartesianSet & rosData, prmFixtureGainCartesianSet & cisstData);
+void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData, prmCartesianImpedanceGains & cisstData);
 
 #endif // _mtsROSToCISST_h

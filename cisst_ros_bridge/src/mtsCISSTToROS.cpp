@@ -428,8 +428,8 @@ void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & ro
     }
 }
 
-void mtsCISSTToROS(const prmFixtureGainCartesianSet & cisstData,
-                   cisst_msgs::prmFixtureGainCartesianSet & rosData)
+void mtsCISSTToROS(const prmCartesianImpedanceGains & cisstData,
+                   cisst_msgs::prmCartesianImpedanceGains & rosData)
 {
     mtsCISSTToROSHeader(cisstData, rosData);
 

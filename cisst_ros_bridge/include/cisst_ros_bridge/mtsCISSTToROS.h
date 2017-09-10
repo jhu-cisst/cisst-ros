@@ -34,7 +34,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmVelocityCartesianGet.h>
 #include <cisstParameterTypes/prmForceCartesianGet.h>
 #include <cisstParameterTypes/prmEventButton.h>
-#include <cisstParameterTypes/prmFixtureGainCartesianSet.h>
+#include <cisstParameterTypes/prmCartesianImpedanceGains.h>
 #include <cisstParameterTypes/prmInputData.h>
 
 // ros include
@@ -55,7 +55,7 @@ http://www.cisst.org/cisst/license.txt.
 
 // non standard messages
 #include <cisst_msgs/vctDoubleVec.h>
-#include <cisst_msgs/prmFixtureGainCartesianSet.h>
+#include <cisst_msgs/prmCartesianImpedanceGains.h>
 #include <cisst_msgs/BoolStamped.h>
 
 // helper functions
@@ -156,7 +156,7 @@ void mtsCISSTToROS(const prmInputData & cisstData, sensor_msgs::Joy & rosData);
 // cisst_msgs
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::vctDoubleVec & rosData);
 void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & rosData);
-void mtsCISSTToROS(const prmFixtureGainCartesianSet & cisstData,
-                   cisst_msgs::prmFixtureGainCartesianSet & rosData);
+void mtsCISSTToROS(const prmCartesianImpedanceGains & cisstData,
+                   cisst_msgs::prmCartesianImpedanceGains & rosData);
 
 #endif // _mtsCISSTToROS_h

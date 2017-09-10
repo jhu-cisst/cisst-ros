@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   vctDoubleVec.msg
-  prmFixtureGainCartesianSet.msg
+  prmCartesianImpedanceGains.msg
   BoolStamped.msg
   StringStamped.msg
   )

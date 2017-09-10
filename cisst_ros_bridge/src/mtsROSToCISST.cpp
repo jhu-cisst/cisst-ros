@@ -202,7 +202,8 @@ void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & ciss
     }
 }
 
-void mtsROSToCISST(const cisst_msgs::prmFixtureGainCartesianSet & rosData, prmFixtureGainCartesianSet & cisstData)
+void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData,
+                   prmCartesianImpedanceGains & cisstData)
 {
     vct3 vct3Data;   // holder for vct3 data
     vctMatRot3 rotationData;   // holder for rotation data
