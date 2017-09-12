@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2015 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2017 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -205,53 +205,39 @@ void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & ciss
 void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData,
                    prmCartesianImpedanceGains & cisstData)
 {
-    vct3 vct3Data;   // holder for vct3 data
-    vctMatRot3 rotationData;   // holder for rotation data
-    vctFrm4x4 poseData;   // holder for pose data
-
     // vf pos/rot
-    mtsROSToCISST(rosData.ForcePosition, vct3Data);
-    cisstData.SetForcePosition(vct3Data);
-    mtsROSToCISST(rosData.ForceOrientation, rotationData);
-    cisstData.SetForceOrientation(rotationData);
-    mtsROSToCISST(rosData.TorqueOrientation, rotationData);
-    cisstData.SetTorqueOrientation(rotationData);
+    mtsROSToCISST(rosData.ForcePosition,
+                  cisstData.ForcePosition());
+    mtsROSToCISST(rosData.ForceOrientation,
+                  cisstData.ForceOrientation());
+    mtsROSToCISST(rosData.TorqueOrientation,
+                  cisstData.TorqueOrientation());
 
     // force gains
-    mtsROSToCISST(rosData.PosStiffPos, vct3Data);
-    cisstData.SetPositionStiffnessPos(vct3Data);
-
-    mtsROSToCISST(rosData.PosStiffNeg, vct3Data);
-    cisstData.SetPositionStiffnessNeg(vct3Data);
-
-    mtsROSToCISST(rosData.PosDampingPos, vct3Data);
-    cisstData.SetPositionDampingPos(vct3Data);
-
-    mtsROSToCISST(rosData.PosDampingNeg, vct3Data);
-    cisstData.SetPositionDampingNeg(vct3Data);
-
-    mtsROSToCISST(rosData.ForceBiasPos, vct3Data);
-    cisstData.SetForceBiasPos(vct3Data);
-
-    mtsROSToCISST(rosData.ForceBiasNeg, vct3Data);
-    cisstData.SetForceBiasNeg(vct3Data);
+    mtsROSToCISST(rosData.PosStiffPos,
+                  cisstData.PositionStiffnessPos());
+    mtsROSToCISST(rosData.PosStiffNeg,
+                  cisstData.PositionStiffnessNeg());
+    mtsROSToCISST(rosData.PosDampingPos,
+                  cisstData.PositionDampingPos());
+    mtsROSToCISST(rosData.PosDampingNeg,
+                  cisstData.PositionDampingNeg());
+    mtsROSToCISST(rosData.ForceBiasPos,
+                  cisstData.ForceBiasPos());
+    mtsROSToCISST(rosData.ForceBiasNeg,
+                  cisstData.ForceBiasNeg());
 
     // toqrue gains
-    mtsROSToCISST(rosData.OriStiffPos, vct3Data);
-    cisstData.SetOrientationStiffnessPos(vct3Data);
-
-    mtsROSToCISST(rosData.OriStiffNeg, vct3Data);
-    cisstData.SetOrientationStiffnessNeg(vct3Data);
-
-    mtsROSToCISST(rosData.OriDampingPos, vct3Data);
-    cisstData.SetOrientationDampingPos(vct3Data);
-
-    mtsROSToCISST(rosData.OriDampingNeg, vct3Data);
-    cisstData.SetOrientationDampingNeg(vct3Data);
-
-    mtsROSToCISST(rosData.TorqueBiasPos, vct3Data);
-    cisstData.SetTorqueBiasPos(vct3Data);
-
-    mtsROSToCISST(rosData.TorqueBiasNeg, vct3Data);
-    cisstData.SetTorqueBiasNeg(vct3Data);
+    mtsROSToCISST(rosData.OriStiffPos,
+                  cisstData.OrientationStiffnessPos());
+    mtsROSToCISST(rosData.OriStiffNeg,
+                  cisstData.OrientationStiffnessNeg());
+    mtsROSToCISST(rosData.OriDampingPos,
+                  cisstData.OrientationDampingPos());
+    mtsROSToCISST(rosData.OriDampingNeg,
+                  cisstData.OrientationDampingNeg());
+    mtsROSToCISST(rosData.TorqueBiasPos,
+                  cisstData.TorqueBiasPos());
+    mtsROSToCISST(rosData.TorqueBiasNeg,
+                  cisstData.TorqueBiasNeg());
 }
