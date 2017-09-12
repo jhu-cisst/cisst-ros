@@ -95,7 +95,7 @@ bool mtsROSBridge::AddPublisherFromEventVoid(const std::string & interfaceRequir
     mtsROSEventVoidPublisher* newPublisher = new mtsROSEventVoidPublisher(topicName, *(this->Node));
     if (!interfaceRequired->AddEventHandlerVoid(&mtsROSEventVoidPublisher::EventHandler, newPublisher, eventName))
     {
-        ROS_ERROR("mtsROS::AddPublisherFromEventVoid: failed to create required interface.");
+        ROS_ERROR("mtsROSBridge::AddPublisherFromEventVoid: failed to create required interface.");
         CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromEventVoid: faild to create required interface \""
                                  << interfaceRequiredName << "\"" << std::endl;
         delete newPublisher;
@@ -138,7 +138,7 @@ bool mtsROSBridge::AddSubscriberToCommandVoid(const std::string & interfaceRequi
         interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
     }
     if (!interfaceRequired) {
-        ROS_ERROR("mtsROS::AddSubscriberToCommandVoid: failed to create required interface.");
+        ROS_ERROR("mtsROSBridge::AddSubscriberToCommandVoid: failed to create required interface.");
         CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandVoid: faild to create required interface \""
                                  << interfaceRequiredName << "\"" << std::endl;
         return false;
@@ -146,7 +146,7 @@ bool mtsROSBridge::AddSubscriberToCommandVoid(const std::string & interfaceRequi
 
     mtsROSSubscriberVoid * newSubscriber = new mtsROSSubscriberVoid(topicName, *(this->Node));
     if (!interfaceRequired->AddFunction(functionName, newSubscriber->Function)) {
-        ROS_ERROR("mtsROS::AddSubscriberToCommandVoid: failed to create function.");
+        ROS_ERROR("mtsROSBridge::AddSubscriberToCommandVoid: failed to create function.");
         CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandVoid: failed to create function \""
                                  << functionName << "\"" << std::endl;
         delete newSubscriber;
