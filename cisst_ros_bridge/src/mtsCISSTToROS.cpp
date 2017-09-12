@@ -469,3 +469,15 @@ void mtsCISSTToROS(const prmCartesianImpedanceGains & cisstData,
     mtsCISSTToROS(cisstData.TorqueBiasNeg(),
                   rosData.TorqueBiasNeg);
 }
+
+void mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
+                   cisst_msgs::mtsIntervalStatistics & rosData)
+{
+    mtsCISSTToROSHeader(cisstData, rosData);
+    rosData.AvgPeriod = cisstData.GetAvg();
+    rosData.StdDevPeriod = cisstData.GetStdDev();
+    rosData.MinPeriod = cisstData.GetMin();
+    rosData.MaxPeriod = cisstData.GetMax();
+    rosData.MinComputeTime = cisstData.MinComputeTime();
+    rosData.MaxComputeTime = cisstData.MaxComputeTime();
+}

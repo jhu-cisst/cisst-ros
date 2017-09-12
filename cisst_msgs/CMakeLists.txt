@@ -18,6 +18,7 @@ add_message_files(
   FILES
   vctDoubleVec.msg
   prmCartesianImpedanceGains.msg
+  mtsIntervalStatistics.msg
   BoolStamped.msg
   StringStamped.msg
   )

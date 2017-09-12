@@ -26,6 +26,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstMultiTask/mtsManagerLocal.h>
 #include <cisstMultiTask/mtsVector.h>
 #include <cisstMultiTask/mtsTransformationTypes.h>
+#include <cisstMultiTask/mtsIntervalStatistics.h>
 
 #include <cisstParameterTypes/prmPositionJointGet.h>
 #include <cisstParameterTypes/prmVelocityJointGet.h>
@@ -56,6 +57,7 @@ http://www.cisst.org/cisst/license.txt.
 // non standard messages
 #include <cisst_msgs/vctDoubleVec.h>
 #include <cisst_msgs/prmCartesianImpedanceGains.h>
+#include <cisst_msgs/mtsIntervalStatistics.h>
 #include <cisst_msgs/BoolStamped.h>
 
 // helper functions
@@ -158,5 +160,7 @@ void mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::vctDoubleV
 void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & rosData);
 void mtsCISSTToROS(const prmCartesianImpedanceGains & cisstData,
                    cisst_msgs::prmCartesianImpedanceGains & rosData);
+void mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
+                   cisst_msgs::mtsIntervalStatistics & rosData);
 
 #endif // _mtsCISSTToROS_h
