@@ -57,9 +57,11 @@ class mtsROSPublisher: public mtsROSPublisherBase
 {
 public:
     mtsROSPublisher(const std::string & rosTopicName,
-                    ros::NodeHandle & node)
+                    ros::NodeHandle & node,
+                    const uint32_t queueSize = 5,
+                    const bool latch = false)
     {
-        mPublisher = node.advertise<_rosType>(rosTopicName, 5);
+        mPublisher = node.advertise<_rosType>(rosTopicName, queueSize, latch);
     }
     virtual ~mtsROSPublisher() {
         //! \todo, how to remove the topic from the node?
@@ -89,9 +91,12 @@ protected:
 class mtsROSEventVoidPublisher: public mtsROSPublisherBase
 {
 public:
-    mtsROSEventVoidPublisher(const std::string & rosTopicName, ros::NodeHandle & node)
+    mtsROSEventVoidPublisher(const std::string & rosTopicName,
+                             ros::NodeHandle & node,
+                             const uint32_t queueSize = 5,
+                             const bool latch = false)
     {
-        mPublisher = node.advertise<std_msgs::Empty>(rosTopicName, 5);
+        mPublisher = node.advertise<std_msgs::Empty>(rosTopicName, queueSize, latch);
     }
     virtual ~mtsROSEventVoidPublisher() {
         //! \todo remove the topic from the node
@@ -113,9 +118,11 @@ class mtsROSEventWritePublisher: public mtsROSPublisherBase
 {
 public:
     mtsROSEventWritePublisher(const std::string & rosTopicName,
-                              ros::NodeHandle & node)
+                              ros::NodeHandle & node,
+                              const uint32_t queueSize = 5,
+                              const bool latch = false)
     {
-        mPublisher = node.advertise<_rosType>(rosTopicName, 5);
+        mPublisher = node.advertise<_rosType>(rosTopicName, queueSize, latch);
     }
     virtual ~mtsROSEventWritePublisher() {}
 
@@ -270,9 +277,11 @@ class mtsROSCommandWritePublisher
 {
 public:
     mtsROSCommandWritePublisher(const std::string & rosTopicName,
-                                ros::NodeHandle & node)
+                                ros::NodeHandle & node,
+                                const uint32_t queueSize = 5,
+                                const bool latch = false)
     {
-        mPublisher = node.advertise<_rosType>(rosTopicName, 5);
+        mPublisher = node.advertise<_rosType>(rosTopicName, queueSize, latch);
     }
     virtual ~mtsROSCommandWritePublisher() {}
 
@@ -293,8 +302,12 @@ protected:
 class mtsROSCommandVoidPublisher
 {
 public:
-    mtsROSCommandVoidPublisher(const std::string & rosTopicName, ros::NodeHandle & node) {
-        Publisher = node.advertise<std_msgs::Empty>(rosTopicName, 5);
+    mtsROSCommandVoidPublisher(const std::string & rosTopicName,
+                               ros::NodeHandle & node,
+                                const uint32_t queueSize = 5,
+                                const bool latch = false)
+    {
+        Publisher = node.advertise<std_msgs::Empty>(rosTopicName, queueSize, latch);
     }
     virtual ~mtsROSCommandVoidPublisher() {}
 
@@ -417,7 +430,9 @@ public:
     template <typename _mtsType, typename _rosType>
     bool AddPublisherFromCommandRead(const std::string & interfaceRequiredName,
                                      const std::string & functionName,
-                                     const std::string & topicName);
+                                     const std::string & topicName,
+                                     const uint32_t queueSize = 5,
+                                     const bool latch = false);
 
     template <typename _mtsType, typename _rosType>
     bool CISST_DEPRECATED AddPublisherFromReadCommand(const std::string & interfaceRequiredName,
@@ -437,7 +452,9 @@ public:
     */
     bool AddPublisherFromEventVoid(const std::string & interfaceRequiredName,
                                    const std::string & eventName,
-                                   const std::string & topicName);
+                                   const std::string & topicName,
+                                   const uint32_t queueSize = 1,
+                                   const bool latch = true);
 
     /*! Add an event handler (write) to a cisstMultiTask required
         interface.  When connected to an existing provided interface,
@@ -452,7 +469,9 @@ public:
     template <typename _mtsType, typename _rosType>
     bool AddPublisherFromEventWrite(const std::string & interfaceRequiredName,
                                     const std::string & eventName,
-                                    const std::string & topicName);
+                                    const std::string & topicName,
+                                    const uint32_t queueSize = 1,
+                                    const bool latch = true);
 
     // --------- Subscriber ------------------
 
@@ -531,7 +550,9 @@ public:
     template <typename _mtsType, typename _rosType>
     bool AddPublisherFromCommandWrite(const std::string & interfaceProvidedName,
                                       const std::string & commandName,
-                                      const std::string & topicName);
+                                      const std::string & topicName,
+                                      const uint32_t queueSize = 5,
+                                      const bool latch = false);
 
     /*! Add a command (void) to a cisstMultiTask provided interface.
         When connected to an existing required interface, this allows
@@ -544,7 +565,9 @@ public:
     */
     bool AddPublisherFromCommandVoid(const std::string & interfaceProvidedName,
                                      const std::string & commandName,
-                                     const std::string & topicName);
+                                     const std::string & topicName,
+                                     const uint32_t queueSize = 5,
+                                     const bool latch = false);
 
     // --------- Subscriber ------------------
 
@@ -614,7 +637,9 @@ protected:
 template <typename _mtsType, typename _rosType>
 bool mtsROSBridge::AddPublisherFromCommandRead(const std::string & interfaceRequiredName,
                                                const std::string & functionName,
-                                               const std::string & topicName)
+                                               const std::string & topicName,
+                                               const uint32_t queueSize,
+                                               const bool latch)
 {
     // check if the interface exists of try to create one
     mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
@@ -627,7 +652,8 @@ bool mtsROSBridge::AddPublisherFromCommandRead(const std::string & interfaceRequ
                                  << interfaceRequiredName << "\"" << std::endl;
         return false;
     }
-    mtsROSPublisherBase * newPublisher = new mtsROSPublisher<_mtsType, _rosType>(topicName, *(this->Node));
+    mtsROSPublisherBase * newPublisher =
+        new mtsROSPublisher<_mtsType, _rosType>(topicName, *(this->Node), queueSize, latch);
     if (!interfaceRequired->AddFunction(functionName, newPublisher->Function)) {
         ROS_ERROR("mtsROSBridge::AddPublisherFromCommandRead: failed to create function.");
         CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromCommandRead: faild to create function \""
@@ -656,7 +682,8 @@ bool mtsROSBridge::AddSubscriberToCommandWrite(const std::string & interfaceRequ
                                  << interfaceRequiredName << "\"" << std::endl;
         return false;
     }
-    mtsROSSubscriberWrite<_mtsType, _rosType> * newSubscriber = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->Node));
+    mtsROSSubscriberWrite<_mtsType, _rosType> * newSubscriber =
+        new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->Node));
     if (!interfaceRequired->AddFunction(functionName, newSubscriber->Function)) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToCommandWrite: failed to create function.");
         CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandWrite: failed to create function \""
@@ -671,7 +698,9 @@ bool mtsROSBridge::AddSubscriberToCommandWrite(const std::string & interfaceRequ
 template <typename _mtsType, typename _rosType>
 bool mtsROSBridge::AddPublisherFromEventWrite(const std::string & interfaceRequiredName,
                                               const std::string & eventName,
-                                              const std::string & topicName)
+                                              const std::string & topicName,
+                                              const uint32_t queueSize,
+                                              const bool latch)
 {
     // check if the interface exists of try to create one
     mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
@@ -679,7 +708,8 @@ bool mtsROSBridge::AddPublisherFromEventWrite(const std::string & interfaceRequi
         interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
     }
 
-    mtsROSEventWritePublisher<_mtsType, _rosType>* newPublisher = new mtsROSEventWritePublisher<_mtsType, _rosType>(topicName, *(this->Node));
+    mtsROSEventWritePublisher<_mtsType, _rosType>* newPublisher =
+        new mtsROSEventWritePublisher<_mtsType, _rosType>(topicName, *(this->Node), queueSize, latch);
     if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWritePublisher<_mtsType, _rosType>::EventHandler, newPublisher, eventName))
     {
         ROS_ERROR("mtsROSBridge::AddPublisherFromEventWrite: failed to create required interface.");
@@ -696,7 +726,9 @@ bool mtsROSBridge::AddPublisherFromEventWrite(const std::string & interfaceRequi
 template <typename _mtsType, typename _rosType>
 bool mtsROSBridge::AddPublisherFromCommandWrite(const std::string & interfaceProvidedName,
                                                 const std::string & commandName,
-                                                const std::string & topicName)
+                                                const std::string & topicName,
+                                                const uint32_t queueSize,
+                                                const bool latch)
 {
     // check if the interface exists of try to create one
     mtsInterfaceProvided * interfaceProvided = this->GetInterfaceProvided(interfaceProvidedName);
@@ -704,7 +736,8 @@ bool mtsROSBridge::AddPublisherFromCommandWrite(const std::string & interfacePro
         interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
     }
 
-    mtsROSCommandWritePublisher<_mtsType, _rosType>* newPublisher = new mtsROSCommandWritePublisher<_mtsType, _rosType>(topicName, *(this->Node));
+    mtsROSCommandWritePublisher<_mtsType, _rosType>* newPublisher =
+        new mtsROSCommandWritePublisher<_mtsType, _rosType>(topicName, *(this->Node), queueSize, latch);
     if (!interfaceProvided->AddCommandWrite(&mtsROSCommandWritePublisher<_mtsType, _rosType>::Command,
                                             newPublisher, commandName))
     {

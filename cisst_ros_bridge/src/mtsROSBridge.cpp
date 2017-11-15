@@ -84,7 +84,9 @@ void mtsROSBridge::Run(void)
 
 bool mtsROSBridge::AddPublisherFromEventVoid(const std::string & interfaceRequiredName,
                                              const std::string & eventName,
-                                             const std::string & topicName)
+                                             const std::string & topicName,
+                                             const uint32_t queueSize,
+                                             const bool latch)
 {
     // check if the interface exists of try to create one
     mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
@@ -92,7 +94,8 @@ bool mtsROSBridge::AddPublisherFromEventVoid(const std::string & interfaceRequir
         interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
     }
 
-    mtsROSEventVoidPublisher* newPublisher = new mtsROSEventVoidPublisher(topicName, *(this->Node));
+    mtsROSEventVoidPublisher* newPublisher =
+        new mtsROSEventVoidPublisher(topicName, *(this->Node), queueSize, latch);
     if (!interfaceRequired->AddEventHandlerVoid(&mtsROSEventVoidPublisher::EventHandler, newPublisher, eventName))
     {
         ROS_ERROR("mtsROSBridge::AddPublisherFromEventVoid: failed to create required interface.");
@@ -157,7 +160,9 @@ bool mtsROSBridge::AddSubscriberToCommandVoid(const std::string & interfaceRequi
 
 bool mtsROSBridge::AddPublisherFromCommandVoid(const std::string & interfaceProvidedName,
                                                const std::string & commandName,
-                                               const std::string & topicName)
+                                               const std::string & topicName,
+                                               const uint32_t queueSize,
+                                               const bool latch)
 {
     // check if the interface exists of try to create one
     mtsInterfaceProvided * interfaceProvided = this->GetInterfaceProvided(interfaceProvidedName);
@@ -165,7 +170,8 @@ bool mtsROSBridge::AddPublisherFromCommandVoid(const std::string & interfaceProv
         interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
     }
 
-    mtsROSCommandVoidPublisher* newPublisher = new mtsROSCommandVoidPublisher(topicName, *(this->Node));
+    mtsROSCommandVoidPublisher* newPublisher =
+        new mtsROSCommandVoidPublisher(topicName, *(this->Node), queueSize, latch);
     if (!interfaceProvided->AddCommandVoid(&mtsROSCommandVoidPublisher::Command,
                                            newPublisher, commandName))
     {
