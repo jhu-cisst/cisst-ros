@@ -27,6 +27,7 @@ http://www.cisst.org/cisst/license.txt.
 
 // ros include
 #include <ros/ros.h>
+#include <tf2_ros/transform_broadcaster.h>
 #include <std_msgs/Empty.h>
 
 // conversion methods
@@ -141,6 +142,39 @@ public:
 protected:
     _rosType mROSData;
 };
+
+
+class mtsROStf2Broadcaster: public mtsROSPublisherBase
+{
+public:
+    mtsROStf2Broadcaster(const std::string name):
+        mName(name)
+    {
+    }
+    virtual ~mtsROStf2Broadcaster() {
+        //! \todo, how to remove the topic from the node?
+    }
+
+    bool Execute(void) {
+        mtsExecutionResult result = Function(mCISSTData);
+        if (result) {
+            mtsCISSTToROS(mCISSTData, mROSData);
+            mBroadcaster.sendTransform(mROSData);
+            return true;
+        }
+        ROS_ERROR("mtsROStf2Broadcaster::Execute: mtsFunction call failed");
+        CMN_LOG_RUN_ERROR << "mtsROStf2Broadcaster::Execute: " << result
+                          << " for " << mName << std::endl;
+        return false;
+    }
+
+protected:
+    std::string mName; // for error messages only
+    tf2_ros::TransformBroadcaster mBroadcaster;
+    geometry_msgs::TransformStamped mROSData;
+    prmPositionCartesianGet mCISSTData;
+};
+
 
 class mtsROSEventWriteLog: public mtsROSPublisherBase
 {
@@ -514,6 +548,10 @@ public:
                                                      const std::string & topicName) {
         return AddSubscriberToCommandVoid(interfaceRequiredName, functionName, topicName);
     }
+
+    // -------- tf2 broadcasters
+    bool Addtf2BroadcasterFromCommandRead(const std::string & interfaceRequiredName,
+                                          const std::string & functionName);
 
     // --------- Events to ROS log
 

@@ -5,11 +5,12 @@ project(cisst_ros_bridge)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  geometry_msgs
   roscpp
+  tf2_ros
   rospy
-  sensor_msgs
   std_msgs
+  geometry_msgs
+  sensor_msgs
   cisst_msgs
   )
 

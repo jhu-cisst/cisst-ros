@@ -108,6 +108,35 @@ bool mtsROSBridge::AddPublisherFromEventVoid(const std::string & interfaceRequir
     return true;
 }
 
+
+bool mtsROSBridge::Addtf2BroadcasterFromCommandRead(const std::string & interfaceRequiredName,
+                                                    const std::string & functionName)
+{
+    // check if the interface exists of try to create one
+    mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
+    if (!interfaceRequired) {
+        interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
+    }
+    if (!interfaceRequired) {
+        ROS_ERROR("mtsROSBridge::Addtf2BroadcasterFromCommandRead: failed to create required interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "Addtf2BroadcasterFromCommandRead: failed to create required interface \""
+                                 << interfaceRequiredName << "\"" << std::endl;
+        return false;
+    }
+    mtsROSPublisherBase * newPublisher =
+        new mtsROStf2Broadcaster(interfaceRequiredName + "::" + functionName);
+    if (!interfaceRequired->AddFunction(functionName, newPublisher->Function)) {
+        ROS_ERROR("mtsROSBridge::Addtf2BroadcasterFromCommandRead: failed to create function.");
+        CMN_LOG_CLASS_INIT_ERROR << "Addtf2BroadcasterFromCommandRead: faild to create function \""
+                                 << functionName << "\"" << std::endl;
+        delete newPublisher;
+        return false;
+    }
+    Publishers.push_back(newPublisher);
+    return true;
+}
+
+
 bool mtsROSBridge::AddLogFromEventWrite(const std::string & interfaceRequiredName,
                                         const std::string & eventName,
                                         const mtsROSEventWriteLog::LogLevel & level)
