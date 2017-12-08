@@ -167,6 +167,7 @@ public:
                               << " for " << mName << std::endl;
             return false;
         }
+        return false;
     }
 
 protected:
