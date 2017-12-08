@@ -161,11 +161,12 @@ public:
             mtsCISSTToROS(mCISSTData, mROSData);
             mBroadcaster.sendTransform(mROSData);
             return true;
+        } else if (result.Value() != mtsExecutionResult::FUNCTION_NOT_BOUND) {
+            ROS_ERROR("mtsROStf2Broadcaster::Execute: mtsFunction call failed");
+            CMN_LOG_RUN_ERROR << "mtsROStf2Broadcaster::Execute: " << result
+                              << " for " << mName << std::endl;
+            return false;
         }
-        ROS_ERROR("mtsROStf2Broadcaster::Execute: mtsFunction call failed");
-        CMN_LOG_RUN_ERROR << "mtsROStf2Broadcaster::Execute: " << result
-                          << " for " << mName << std::endl;
-        return false;
     }
 
 protected:
