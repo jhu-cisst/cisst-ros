@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2017 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2018 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -100,6 +100,12 @@ void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartes
 {
     mtsROSToCISST(rosData.pose, cisstData);
 }
+
+void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, vctFrm3 & cisstData)
+{
+    mtsROSPoseToCISST(rosData.pose, cisstData);
+}
+
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, vctFrm3 & cisstData)
 {
     mtsROSPoseToCISST(rosData, cisstData);
