@@ -94,11 +94,13 @@ void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianGet 
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianSet & cisstData)
 {
     mtsROSPoseToCISST(rosData, cisstData.Goal());
+    cisstData.SetValid(true);
 }
 
 void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartesianSet & cisstData)
 {
     mtsROSToCISST(rosData.pose, cisstData);
+    cisstData.SetValid(true);
 }
 
 void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, vctFrm3 & cisstData)
