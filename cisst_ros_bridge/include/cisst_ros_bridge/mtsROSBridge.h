@@ -69,7 +69,7 @@ public:
     }
 
     bool Execute(void) {
-        if (mPublisher.getNumSubscribers() == 0) {
+        if ((mPublisher.getNumSubscribers() == 0) && !mPublisher.isLatched()) {
             return true;
         }
         mtsExecutionResult result = Function(mCISSTData);
@@ -132,7 +132,7 @@ public:
     }
 
     void EventHandler(const _mtsType & CISSTData) {
-        if (mPublisher.getNumSubscribers() == 0) {
+        if ((mPublisher.getNumSubscribers() == 0) && !mPublisher.isLatched()) {
             return;
         }
         mtsCISSTToROS(CISSTData, mROSData);
@@ -322,7 +322,7 @@ public:
     virtual ~mtsROSCommandWritePublisher() {}
 
     void Command(const _mtsType & CISSTData) {
-        if (mPublisher.getNumSubscribers() == 0) {
+        if ((mPublisher.getNumSubscribers() == 0) && !mPublisher.isLatched()) {
             return;
         }
         mtsCISSTToROS(CISSTData, mROSData);
