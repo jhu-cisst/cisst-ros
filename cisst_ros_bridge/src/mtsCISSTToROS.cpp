@@ -476,10 +476,15 @@ void mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
                    cisst_msgs::mtsIntervalStatistics & rosData)
 {
     mtsCISSTToROSHeader(cisstData, rosData);
-    rosData.AvgPeriod = cisstData.GetAvg();
-    rosData.StdDevPeriod = cisstData.GetStdDev();
-    rosData.MinPeriod = cisstData.GetMin();
-    rosData.MaxPeriod = cisstData.GetMax();
-    rosData.MinComputeTime = cisstData.MinComputeTime();
-    rosData.MaxComputeTime = cisstData.MaxComputeTime();
+    rosData.PeriodAvg = cisstData.PeriodAvg();
+    rosData.PeriodStdDev = cisstData.PeriodStdDev();
+    rosData.PeriodMin = cisstData.PeriodMin();
+    rosData.PeriodMax = cisstData.PeriodMax();
+    rosData.ComputeTimeAvg = cisstData.ComputeTimeAvg();
+    rosData.ComputeTimeStdDev = cisstData.ComputeTimeStdDev();
+    rosData.ComputeTimeMin = cisstData.ComputeTimeMin();
+    rosData.ComputeTimeMax = cisstData.ComputeTimeMax();
+    rosData.NumberOfSamples = cisstData.NumberOfSamples();
+    rosData.NumberOfOverruns = cisstData.NumberOfOverruns();
+    rosData.StatisticsInterval = cisstData.StatisticsInterval();
 }
