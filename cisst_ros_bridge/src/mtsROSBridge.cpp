@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2017 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2018 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -53,6 +53,24 @@ mtsROSBridge::mtsROSBridge(const std::string & componentName,
 
 void mtsROSBridge::Configure(const std::string & CMN_UNUSED(filename))
 {
+}
+
+void mtsROSBridge::PublishIntervalStatistics(const std::string & rosNamespace)
+{
+    // create an interface to get access to this component interval statistics
+    mtsInterfaceProvided * controlInterface = AddInterfaceProvided("__control");
+    controlInterface->AddCommandReadState(StateTable, StateTable.PeriodStats,
+                                          "GetPeriodStatistics");
+
+    // create an publisher to publish this component interval statistics
+    std::string topicName = rosNamespace + "/period_statistics";
+    this->AddPublisherFromCommandRead<mtsIntervalStatistics, cisst_msgs::mtsIntervalStatistics>
+        ("__control", "GetPeriodStatistics",
+         topicName);
+
+    mtsManagerLocal * componentManager = mtsManagerLocal::GetInstance();
+    componentManager->Connect(this->GetName(), "__control",
+                              this->GetName(), "__control");
 }
 
 void mtsROSBridge::Startup(void)

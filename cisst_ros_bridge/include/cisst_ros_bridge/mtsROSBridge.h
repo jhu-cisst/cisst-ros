@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2017 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2018 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -444,6 +444,7 @@ public:
 
     // taskPeriodic
     void Configure(const std::string & CMN_UNUSED(filename) = "");
+    void PublishIntervalStatistics(const std::string & rosNamespace);
     void Startup(void);
     void Run(void);
     void Cleanup(void);
