@@ -444,7 +444,10 @@ public:
 
     // taskPeriodic
     void Configure(const std::string & CMN_UNUSED(filename) = "");
-    void PublishIntervalStatistics(const std::string & rosNamespace);
+    void AddIntervalStatisticsInterface(const std::string & interfaceName = "IntervalStatistics");
+    void AddIntervalStatisticsPublisher(const std::string & rosNamespace,
+                                        const std::string & componentName,
+                                        const std::string & interfaceName = "IntervalStatistics");
     void Startup(void);
     void Run(void);
     void Cleanup(void);
