@@ -63,6 +63,7 @@ void mtsROSToCISST(const geometry_msgs::Quaternion & rosData, vctMatRot3 & cisst
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianGet & cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartesianSet & cisstData);
+void mtsROSToCISST(const geometry_msgs::TransformStamped & rosData, prmPositionCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, vctFrm3 & cisstData);
 void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, vctFrm3 & cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, vctFrm4x4 & cisstData);

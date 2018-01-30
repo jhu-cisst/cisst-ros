@@ -103,6 +103,12 @@ void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartes
     cisstData.SetValid(true);
 }
 
+void mtsROSToCISST(const geometry_msgs::TransformStamped & rosData, prmPositionCartesianSet & cisstData)
+{
+    mtsROSToCISST(rosData.transform, cisstData.Goal());
+    cisstData.SetValid(true);
+}
+
 void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, vctFrm3 & cisstData)
 {
     mtsROSPoseToCISST(rosData.pose, cisstData);
