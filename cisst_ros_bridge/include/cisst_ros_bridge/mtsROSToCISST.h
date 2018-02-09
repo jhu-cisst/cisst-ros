@@ -21,6 +21,8 @@ http://www.cisst.org/cisst/license.txt.
 #define _mtsROSToCISST_h
 
 // cisst include
+#include <cisstMultiTask/mtsManagerLocal.h>
+
 #include <cisstVector/vctDynamicVectorTypes.h>
 #include <cisstMultiTask/mtsTransformationTypes.h>
 #include <cisstParameterTypes/prmPositionCartesianGet.h>
@@ -50,6 +52,65 @@ http://www.cisst.org/cisst/license.txt.
 // non standard messages
 #include <cisst_msgs/vctDoubleVec.h>
 #include <cisst_msgs/prmCartesianImpedanceGains.h>
+
+// helper functions
+template <typename _cisstFrame>
+void mtsROSTransformToCISST(const geometry_msgs::Transform & rosTransform, _cisstFrame & cisstFrame)
+{
+    cisstFrame.Translation().X() = rosTransform.translation.x;
+    cisstFrame.Translation().Y() = rosTransform.translation.y;
+    cisstFrame.Translation().Z() = rosTransform.translation.z;
+    vctQuatRot3 quat;
+    quat.X() = rosTransform.rotation.x;
+    quat.Y() = rosTransform.rotation.y;
+    quat.Z() = rosTransform.rotation.z;
+    quat.W() = rosTransform.rotation.w;
+    vctMatRot3 rotation(quat, VCT_NORMALIZE);
+    cisstFrame.Rotation().Assign(rotation);
+}
+
+template <typename _cisstFrame>
+void mtsROSPoseToCISST(const geometry_msgs::Pose & rosPose, _cisstFrame & cisstFrame)
+{
+    cisstFrame.Translation().X() = rosPose.position.x;
+    cisstFrame.Translation().Y() = rosPose.position.y;
+    cisstFrame.Translation().Z() = rosPose.position.z;
+    vctQuatRot3 quat;
+    quat.X() = rosPose.orientation.x;
+    quat.Y() = rosPose.orientation.y;
+    quat.Z() = rosPose.orientation.z;
+    quat.W() = rosPose.orientation.w;
+    vctMatRot3 rotation(quat, VCT_NORMALIZE);
+    cisstFrame.Rotation().Assign(rotation);
+}
+
+template <typename _cisstType>
+void mtsROSToCISSTNoHeader(_cisstType & cisstData)
+{
+    const double cisstNow = mtsManagerLocal::GetInstance()->GetTimeServer().GetRelativeTime();
+    cisstData.SetTimestamp(cisstNow);
+    // always set as valid for now
+    cisstData.SetValid(true);
+}
+
+template <typename _rosType, typename _cisstType>
+void mtsROSToCISSTHeader(const _rosType & rosData, _cisstType & cisstData)
+{
+    const double cisstNow = mtsManagerLocal::GetInstance()->GetTimeServer().GetRelativeTime();
+    // first check that header.stamp is not zero
+    if (rosData.header.stamp.isZero()) {
+        cisstData.SetTimestamp(cisstNow);
+    } else {
+        const double ageInSeconds = (ros::Time::now() - rosData.header.stamp).toSec();
+        if (ageInSeconds > 0.0) {
+            cisstData.SetTimestamp(cisstNow - ageInSeconds);
+        } else {
+            cisstData.SetTimestamp(cisstNow);
+        }
+    }
+    // always set as valid for now
+    cisstData.SetValid(true);
+}
 
 // std_msgs
 void mtsROSToCISST(const std_msgs::Float32 & rosData, double & cisstData);
