@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2017 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2018 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -259,6 +259,7 @@ void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData, geometry_msgs::Twi
 void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData, geometry_msgs::TwistStamped & rosData)
 {
     mtsCISSTToROSHeader(cisstData, rosData);
+    rosData.header.frame_id = cisstData.MovingFrame();
     mtsCISSTToROS(cisstData, rosData.twist);
 }
 
