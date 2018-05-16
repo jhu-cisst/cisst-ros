@@ -9,7 +9,7 @@ Change log
 * Deprecated features:
   * None
 * New features:
-  * cisst_ros_bridge: 
+  * cisst_ros_bridge:
     * Added support for tf2 from read command
     * Added options for queue size and latch for publishers (important for events)
     * Better time stamping and setting valid flag in conversion from ROS to cisst
