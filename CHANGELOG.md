@@ -1,6 +1,23 @@
 Change log
 ==========
 
+1.4.0 (2018-05-16)
+==================
+
+* API changes:
+  * None
+* Deprecated features:
+  * None
+* New features:
+  * cisst_ros_bridge: 
+    * Added support for tf2 from read command
+    * Added options for queue size and latch for publishers (important for events)
+    * Better time stamping and setting valid flag in conversion from ROS to cisst
+    * Export moving/reference frame from cisst to ROS tf2, twist and tranform
+    * mtsIntervalStatistics: added custom message and publishes statistics from ros bridge task
+* Bug fixes:
+  * None
+
 1.3.0 (2017-11-07)
 ==================
 
