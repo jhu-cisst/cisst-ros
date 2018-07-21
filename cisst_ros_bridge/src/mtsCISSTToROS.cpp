@@ -409,6 +409,15 @@ void mtsCISSTToROS(const prmInputData & cisstData, sensor_msgs::Joy & rosData)
 }
 
 // ---------------------------------------------
+// diagnostic_msgs
+// ---------------------------------------------
+void mtsCISSTToROS(const prmKeyValue & cisstData, diagnostic_msgs::KeyValue & rosData)
+{
+    rosData.key = cisstData.Key;
+    rosData.value = cisstData.Value;
+}
+
+// ---------------------------------------------
 // cisst_msgs
 // ---------------------------------------------
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::vctDoubleVec & rosData)

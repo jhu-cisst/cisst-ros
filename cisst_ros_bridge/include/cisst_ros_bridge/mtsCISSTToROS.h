@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2017 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2018 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -37,6 +37,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmEventButton.h>
 #include <cisstParameterTypes/prmCartesianImpedanceGains.h>
 #include <cisstParameterTypes/prmInputData.h>
+#include <cisstParameterTypes/prmKeyValue.h>
 
 // ros include
 #include <ros/ros.h>
@@ -53,6 +54,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/Joy.h>
+#include <diagnostic_msgs/KeyValue.h>
 
 // non standard messages
 #include <cisst_msgs/vctDoubleVec.h>
@@ -154,6 +156,9 @@ void mtsCISSTToROS(const prmStateJoint & cisstData, sensor_msgs::JointState & ro
 void mtsCISSTToROS(const vctDoubleMat & cisstData, sensor_msgs::PointCloud & rosData);
 void mtsCISSTToROS(const std::vector<vct3> & cisstData, sensor_msgs::PointCloud & rosData);
 void mtsCISSTToROS(const prmInputData & cisstData, sensor_msgs::Joy & rosData);
+
+// diagnostic_msgs
+void mtsCISSTToROS(const prmKeyValue & cisstData, diagnostic_msgs::KeyValue & rosData);
 
 // cisst_msgs
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::vctDoubleVec & rosData);
