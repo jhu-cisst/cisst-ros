@@ -178,6 +178,11 @@ void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmVelocityJointSet 
               cisstData.Goal().begin());
 }
 
+void mtsROSToCISST(const diagnostic_msgs::KeyValue & rosData, prmKeyValue & cisstData)
+{
+    cisstData.Key = rosData.key;
+    cisstData.Value = rosData.value;
+}
 
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, prmPositionJointSet & cisstData)
 {
