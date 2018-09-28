@@ -55,6 +55,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/Joy.h>
 #include <diagnostic_msgs/KeyValue.h>
+#include <std_srvs/Trigger.h>
 
 // non standard messages
 #include <cisst_msgs/vctDoubleVec.h>
@@ -159,6 +160,9 @@ void mtsCISSTToROS(const prmInputData & cisstData, sensor_msgs::Joy & rosData);
 
 // diagnostic_msgs
 void mtsCISSTToROS(const prmKeyValue & cisstData, diagnostic_msgs::KeyValue & rosData);
+
+// std_srvs
+void mtsCISSTToROS(const bool & cisstData, std_srvs::Trigger::Response & rosData);
 
 // cisst_msgs
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::vctDoubleVec & rosData);

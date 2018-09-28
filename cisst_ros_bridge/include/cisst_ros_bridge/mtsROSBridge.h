@@ -218,10 +218,10 @@ protected:
     const LogLevel mLevel;
 };
 
+
 // ----------------------------------------------------
 // Subscriber
 // ----------------------------------------------------
-
 
 template <typename _mtsType, typename _rosType>
 class mtsROSSubscriberWrite
@@ -340,8 +340,8 @@ class mtsROSCommandVoidPublisher
 public:
     mtsROSCommandVoidPublisher(const std::string & rosTopicName,
                                ros::NodeHandle & node,
-                                const uint32_t queueSize = 5,
-                                const bool latch = false)
+                               const uint32_t queueSize = 5,
+                               const bool latch = false)
     {
         Publisher = node.advertise<std_msgs::Empty>(rosTopicName, queueSize, latch);
     }
@@ -357,67 +357,111 @@ protected:
     std_msgs::Empty mEmptyMsg;
 };
 
+
+// ----------------------------------------------------
+// Service
+// ----------------------------------------------------
+template <typename _mtsResponseType,
+          typename _rosType>
+class mtsROSCommandReadService
+{
+public:
+    typedef mtsROSCommandReadService<_mtsResponseType,
+                                     _rosType> ThisType;
+
+    mtsFunctionRead Function;
+
+    mtsROSCommandReadService(const std::string rosServiceName,
+                             ros::NodeHandle & node)
+    {
+        mServiceServer = node.advertiseService(rosServiceName,
+                                               &ThisType::Callback, this);
+    }
+
+    bool Callback(typename _rosType::Request & CMN_UNUSED(request),
+                  typename _rosType::Response & response) {
+        mtsExecutionResult result = Function(mCISSTData);
+        if (result) {
+            mtsCISSTToROS(mCISSTData, response);
+            return true;
+        }
+        ROS_ERROR("mtsROSCommandReadService::Callback: mtsFunction call failed");
+        CMN_LOG_RUN_ERROR << "mtsROSCommandReadService::Callback: " << result
+                          << " for topic " << mServiceServer.getService() << std::endl;
+        return false;
+    }
+
+protected:
+    _mtsResponseType mCISSTData;
+    ros::ServiceServer mServiceServer;
+};
+
+
 // ----------------------------------------------------
 // Bridge
 // ----------------------------------------------------
 
 /*! Base component to convert cisst/SAW commands and event to/from ROS
-    topics.  This component starts without any cisstMultiTask
-    interface nor commands nor functions.  The user can configure this
-    component by adding one of the following:
+  topics.  This component starts without any cisstMultiTask
+  interface nor commands nor functions.  The user can configure this
+  component by adding one of the following:
 
-    - AddPublisherFromCommandRead
-      [required interface][function read] -> [topic publish] (periodic)
+  - AddPublisherFromCommandRead
+  [required interface][function read] -> [topic publish] (periodic)
 
-    - AddPublisherFromEventVoid
-      [required interface][event void] -> [topic publish]
+  - AddPublisherFromEventVoid
+  [required interface][event void] -> [topic publish]
 
-    - AddPublisherFromEventWrite
-      [required interface][event write] -> [topic publish]
+  - AddPublisherFromEventWrite
+  [required interface][event write] -> [topic publish]
 
-    - AddSubscriberToCommandVoid
-      [required interface][function void] <- [topic subscribe]
+  - Addtf2BroadcasterFromCommandRead
+  [required interface][function read] -> [broadcast tf] (periodic)
+  The function read must get prmPositionCartesianGet
 
-    - AddSubscriberToCommandWrite
-      [required interface][function write] <- [topic subscribe]
+  - AddSubscriberToCommandVoid
+  [required interface][function void] <- [topic subscribe]
 
-    - AddPublisherFromCommandWrite
-      [provided interface][command write] -> [topic publish]
+  - AddSubscriberToCommandWrite
+  [required interface][function write] <- [topic subscribe]
 
-    - AddPublisherFromCommandVoid
-      [provided interface][command void] -> [topic publish]
+  - AddPublisherFromCommandWrite
+  [provided interface][command write] -> [topic publish]
 
-    - AddSubscriberToCommandRead
-      [provided interface][command read] <- [topic subscribe]
+  - AddPublisherFromCommandVoid
+  [provided interface][command void] -> [topic publish]
 
-    - AddSubscriberToEventVoid
-      [providedInterface][event void] <- [topic subscribe]
+  - AddSubscriberToCommandRead
+  [provided interface][command read] <- [topic subscribe]
 
-    - AddSubscriberToEventWrite
-      [providedInterface][event write] <- [topic subscribe]
+  - AddSubscriberToEventVoid
+  [providedInterface][event void] <- [topic subscribe]
 
-    For each of these methods (except the ones with Void commands or
-    events), the user needs to provided the cisst/SAW and ROS types
-    used to convert the data back and forth.  Since the conversion
-    method has to be defined at compilation time, this is done using
-    template specialization:
+  - AddSubscriberToEventWrite
+  [providedInterface][event write] <- [topic subscribe]
 
-       mtsROSBridge bridge("publisher", 5.0 * cmn_ms);
-       bridge.AddPublisherFromCommandRead
-            <vctDoubleVec, cisst_msgs::vctDoubleVec>
-                 ("required",
-                  "GetValue1",
-                  "/sawROSExample/get_value_1");
+  For each of these methods (except the ones with Void commands or
+  events), the user needs to provided the cisst/SAW and ROS types
+  used to convert the data back and forth.  Since the conversion
+  method has to be defined at compilation time, this is done using
+  template specialization:
 
-    The first template parameter is the cisst type used for the
-    command, the second parameter is the ROS type used to publish.  At
-    compilation time, the compiler will look for one of the following
-    overloaded method:
-    - mtsCISSTToROS(const _cisstType & in, _rosType out)
-    - mtsROSToCISST(const _rosType & in, _cisstType out)
+  mtsROSBridge bridge("publisher", 5.0 * cmn_ms);
+  bridge.AddPublisherFromCommandRead
+  <vctDoubleVec, cisst_msgs::vctDoubleVec>
+  ("required",
+  "GetValue1",
+  "/sawROSExample/get_value_1");
 
-    Some default conversion methods are provided in mtsROSToCISST.h
-    and mtsCISSTToROS.h.
+  The first template parameter is the cisst type used for the
+  command, the second parameter is the ROS type used to publish.  At
+  compilation time, the compiler will look for one of the following
+  overloaded method:
+  - mtsCISSTToROS(const _cisstType & in, _rosType out)
+  - mtsROSToCISST(const _rosType & in, _cisstType out)
+
+  Some default conversion methods are provided in mtsROSToCISST.h
+  and mtsCISSTToROS.h.
 
 */
 class mtsROSBridge: public mtsTaskPeriodic
@@ -426,14 +470,14 @@ class mtsROSBridge: public mtsTaskPeriodic
 
 public:
     /*!
-     \brief Constructor
+      \brief Constructor
 
-     \param componentName component name
-     \param periodInSeconds thread period
-     \param spin call spinOnce() in run() is set to true
-     \param sig true to install default signal handler, if
-            set to false, either install your own handler or
-            rely on cisst cleanup()
+      \param componentName component name
+      \param periodInSeconds thread period
+      \param spin call spinOnce() in run() is set to true
+      \param sig true to install default signal handler, if
+      set to false, either install your own handler or
+      rely on cisst cleanup()
     */
     mtsROSBridge(const std::string & componentName,
                  const double periodInSeconds,
@@ -457,15 +501,15 @@ public:
     // --------- Publisher ------------------
 
     /*! Add a read function to a cisstMultiTask required interface.
-        When connected to an existing provided interface, this allows
-        to read some data from an existing cisstMultiTask component
-        and publish it to ROS.  This action is performed periodically,
-        it is triggered by the periodicity defined when the bridge
-        (this class) is constructed.
+      When connected to an existing provided interface, this allows
+      to read some data from an existing cisstMultiTask component
+      and publish it to ROS.  This action is performed periodically,
+      it is triggered by the periodicity defined when the bridge
+      (this class) is constructed.
 
-        \param interfaceRequiredName Name of the required interface to be created
-        \param functionName Name of the read function added to the interface
-        \param topicName Name of the topic used to publish
+      \param interfaceRequiredName Name of the required interface to be created
+      \param functionName Name of the read function added to the interface
+      \param topicName Name of the topic used to publish
     */
     template <typename _mtsType, typename _rosType>
     bool AddPublisherFromCommandRead(const std::string & interfaceRequiredName,
@@ -474,21 +518,14 @@ public:
                                      const uint32_t queueSize = 5,
                                      const bool latch = false);
 
-    template <typename _mtsType, typename _rosType>
-    bool CISST_DEPRECATED AddPublisherFromReadCommand(const std::string & interfaceRequiredName,
-                                                      const std::string & functionName,
-                                                      const std::string & topicName) {
-        return AddPublisherFromCommandRead<_mtsType, _rosType>(interfaceRequiredName, functionName, topicName);
-    }
-
     /*! Add an event handler (void) to a cisstMultiTask required
-        interface.  When connected to an existing provided interface,
-        this allows to handle events from an existing cisstMultiTask
-        component and publish it to ROS using std::msgs::Empty.
+      interface.  When connected to an existing provided interface,
+      this allows to handle events from an existing cisstMultiTask
+      component and publish it to ROS using std::msgs::Empty.
 
-        \param interfaceRequiredName Name of the required interface to be created
-        \param eventName Name of the event to handle
-        \param topicName Name of the topic used to publish
+      \param interfaceRequiredName Name of the required interface to be created
+      \param eventName Name of the event to handle
+      \param topicName Name of the topic used to publish
     */
     bool AddPublisherFromEventVoid(const std::string & interfaceRequiredName,
                                    const std::string & eventName,
@@ -497,14 +534,14 @@ public:
                                    const bool latch = true);
 
     /*! Add an event handler (write) to a cisstMultiTask required
-        interface.  When connected to an existing provided interface,
-        this allows to handle events from an existing cisstMultiTask
-        component and publish it to ROS after converting from _mtsType
-        to _rosType.
+      interface.  When connected to an existing provided interface,
+      this allows to handle events from an existing cisstMultiTask
+      component and publish it to ROS after converting from _mtsType
+      to _rosType.
 
-        \param interfaceRequiredName Name of the required interface to be created
-        \param eventName Name of the event to handle
-        \param topicName Name of the topic used to publish
+      \param interfaceRequiredName Name of the required interface to be created
+      \param eventName Name of the event to handle
+      \param topicName Name of the topic used to publish
     */
     template <typename _mtsType, typename _rosType>
     bool AddPublisherFromEventWrite(const std::string & interfaceRequiredName,
@@ -516,44 +553,31 @@ public:
     // --------- Subscriber ------------------
 
     /*! Add a write function to a cisstMultiTask required interface.
-        When connected to an existing provided interface, this allows
-        to send commands to an existing cisstMultiTask component from
-        a ROS subscriber after converting from _rosType to _mtsType.
+      When connected to an existing provided interface, this allows
+      to send commands to an existing cisstMultiTask component from
+      a ROS subscriber after converting from _rosType to _mtsType.
 
-        \param interfaceRequiredName Name of the required interface to be created
-        \param functionName Name of the write function
-        \param topicName Name of the topic this subscribes to
+      \param interfaceRequiredName Name of the required interface to be created
+      \param functionName Name of the write function
+      \param topicName Name of the topic this subscribes to
     */
     template <typename _mtsType, typename _rosType>
     bool AddSubscriberToCommandWrite(const std::string & interfaceRequiredName,
                                      const std::string & functionName,
                                      const std::string & topicName);
 
-    template <typename _mtsType, typename _rosType>
-    bool CISST_DEPRECATED AddSubscriberToWriteCommand(const std::string & interfaceRequiredName,
-                                                      const std::string & functionName,
-                                                      const std::string & topicName) {
-        return AddSubscriberToCommandWrite<_mtsType, _rosType>(interfaceRequiredName, functionName, topicName);
-    }
-
     /*! Add a void function to a cisstMultiTask required interface.
-        When connected to an existing provided interface, this allows
-        to send commands to an existing cisstMultiTask component from
-        a ROS subscriber (receiving std_msgs::Empty).
+      When connected to an existing provided interface, this allows
+      to send commands to an existing cisstMultiTask component from
+      a ROS subscriber (receiving std_msgs::Empty).
 
-        \param interfaceRequiredName Name of the required interface to be created
-        \param functionName Name of the void function
-        \param topicName Name of the topic this subscribes to
+      \param interfaceRequiredName Name of the required interface to be created
+      \param functionName Name of the void function
+      \param topicName Name of the topic this subscribes to
     */
     bool AddSubscriberToCommandVoid(const std::string & interfaceRequiredName,
                                     const std::string & functionName,
                                     const std::string & topicName);
-
-    bool CISST_DEPRECATED AddSubscriberToVoidCommand(const std::string & interfaceRequiredName,
-                                                     const std::string & functionName,
-                                                     const std::string & topicName) {
-        return AddSubscriberToCommandVoid(interfaceRequiredName, functionName, topicName);
-    }
 
     // -------- tf2 broadcasters
     bool Addtf2BroadcasterFromCommandRead(const std::string & interfaceRequiredName,
@@ -562,16 +586,16 @@ public:
     // --------- Events to ROS log
 
     /*! Add an event handler (write) to a cisstMultiTask required
-        interface.  When connected to an existing provided interface,
-        this allows to handle events with a std::string payload from
-        an existing cisstMultiTask component and log the message using
-        either ROS_DEBUG, ROS_INFO, ROS_WARN, ROS_ERROR or ROS_FATAL
-        based on the level selected (see
-        mtsROSEventWriteLog::LogLevel).
+      interface.  When connected to an existing provided interface,
+      this allows to handle events with a std::string payload from
+      an existing cisstMultiTask component and log the message using
+      either ROS_DEBUG, ROS_INFO, ROS_WARN, ROS_ERROR or ROS_FATAL
+      based on the level selected (see
+      mtsROSEventWriteLog::LogLevel).
 
-        \param interfaceRequiredName Name of the required interface to be created
-        \param eventName Name of the event to handle
-        \param level Level used to log in ROS
+      \param interfaceRequiredName Name of the required interface to be created
+      \param eventName Name of the event to handle
+      \param level Level used to log in ROS
     */
     bool AddLogFromEventWrite(const std::string & interfaceRequiredName,
                               const std::string & eventName,
@@ -582,14 +606,14 @@ public:
     // --------- Publisher ------------------
 
     /*! Add a command (write) to a cisstMultiTask provided interface.
-        When connected to an existing required interface, this allows
-        to execute write functions from an existing cisstMultiTask
-        component and publish it to ROS after converting from _mtsType
-        to _rosType.
+      When connected to an existing required interface, this allows
+      to execute write functions from an existing cisstMultiTask
+      component and publish it to ROS after converting from _mtsType
+      to _rosType.
 
-        \param interfaceProvidedName Name of the provided interface to be created
-        \param commandName Name of the write command added to the interface
-        \param topicName Name of the topic used to publish
+      \param interfaceProvidedName Name of the provided interface to be created
+      \param commandName Name of the write command added to the interface
+      \param topicName Name of the topic used to publish
     */
     template <typename _mtsType, typename _rosType>
     bool AddPublisherFromCommandWrite(const std::string & interfaceProvidedName,
@@ -599,13 +623,13 @@ public:
                                       const bool latch = false);
 
     /*! Add a command (void) to a cisstMultiTask provided interface.
-        When connected to an existing required interface, this allows
-        to execute void functions from an existing cisstMultiTask
-        component and publish it to ROS (using std_msgs::Empty).
+      When connected to an existing required interface, this allows
+      to execute void functions from an existing cisstMultiTask
+      component and publish it to ROS (using std_msgs::Empty).
 
-        \param interfaceProvidedName Name of the provided interface to be created
-        \param commandName Name of the void command added to the interface
-        \param topicName Name of the topic used to publish
+      \param interfaceProvidedName Name of the provided interface to be created
+      \param commandName Name of the void command added to the interface
+      \param topicName Name of the topic used to publish
     */
     bool AddPublisherFromCommandVoid(const std::string & interfaceProvidedName,
                                      const std::string & commandName,
@@ -616,17 +640,17 @@ public:
     // --------- Subscriber ------------------
 
     /*! Add a command read to a cisstMultiTask provided interface.
-        When connected to an existing required interface, this allows
-        to execute read functions from an existing cisstMultiTask
-        component.  When the subscriber receives some data, it adds it
-        to a local state table after converting from _rosType to
-        _mtsType.  The data will be cached for the next call to the
-        read command (see mtsStateTable).
+      When connected to an existing required interface, this allows
+      to execute read functions from an existing cisstMultiTask
+      component.  When the subscriber receives some data, it adds it
+      to a local state table after converting from _rosType to
+      _mtsType.  The data will be cached for the next call to the
+      read command (see mtsStateTable).
 
-        \param interfaceProvidedName Name of the provided interface to be created
-        \param commandName Name of the void command added to the interface
-        \param topicName Name of the topic this subscribes to
-        \param tableSize Size of the state table used to cache the data
+      \param interfaceProvidedName Name of the provided interface to be created
+      \param commandName Name of the void command added to the interface
+      \param topicName Name of the topic this subscribes to
+      \param tableSize Size of the state table used to cache the data
     */
     template <typename _mtsType, typename _rosType>
     bool AddSubscriberToCommandRead(const std::string & interfaceProvidedName,
@@ -635,33 +659,38 @@ public:
                                     const size_t & tableSize = 500);
 
     /*! Add a void event to a cisstMultiTask provided interface.  When
-        connected to an existing required interface, this allows to
-        send void events to an existing cisstMultiTask component.
-        When the subscriber receives some data (std_msgs::Empty), it
-        triggers the event.
+      connected to an existing required interface, this allows to
+      send void events to an existing cisstMultiTask component.
+      When the subscriber receives some data (std_msgs::Empty), it
+      triggers the event.
 
-        \param interfaceProvidedName Name of the provided interface to be created
-        \param eventName Name of the write event added to the interface
-        \param topicName Name of the topic this subscribes to
+      \param interfaceProvidedName Name of the provided interface to be created
+      \param eventName Name of the write event added to the interface
+      \param topicName Name of the topic this subscribes to
     */
     bool AddSubscriberToEventVoid(const std::string & interfaceProvidedName,
                                   const std::string & eventName,
                                   const std::string & topicName);
 
     /*! Add a write event to a cisstMultiTask provided interface.
-        When connected to an existing required interface, this allows
-        to send write events to an existing cisstMultiTask component.
-        When the subscriber receives some data, it triggers the event
-        after converting the data from _rosType to _mtsType.
+      When connected to an existing required interface, this allows
+      to send write events to an existing cisstMultiTask component.
+      When the subscriber receives some data, it triggers the event
+      after converting the data from _rosType to _mtsType.
 
-        \param interfaceProvidedName Name of the provided interface to be created
-        \param eventName Name of the write event added to the interface
-        \param topicName Name of the topic this subscribes to
+      \param interfaceProvidedName Name of the provided interface to be created
+      \param eventName Name of the write event added to the interface
+      \param topicName Name of the topic this subscribes to
     */
     template <typename _mtsType, typename _rosType>
     bool AddSubscriberToEventWrite(const std::string & interfaceProvidedName,
                                    const std::string & eventName,
                                    const std::string & topicName);
+
+    template <typename _mtsResponseType, typename _rosType>
+    bool AddServiceFromCommandRead(const std::string & interfaceRequiredName,
+                                   const std::string & functionName,
+                                   const std::string & serviceName);
 
 protected:
     //! list of publishers
@@ -686,7 +715,8 @@ bool mtsROSBridge::AddPublisherFromCommandRead(const std::string & interfaceRequ
                                                const bool latch)
 {
     // check if the interface exists of try to create one
-    mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
+    mtsInterfaceRequired * interfaceRequired
+        = this->GetInterfaceRequired(interfaceRequiredName);
     if (!interfaceRequired) {
         interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
     }
@@ -726,8 +756,8 @@ bool mtsROSBridge::AddSubscriberToCommandWrite(const std::string & interfaceRequ
                                  << interfaceRequiredName << "\"" << std::endl;
         return false;
     }
-    mtsROSSubscriberWrite<_mtsType, _rosType> * newSubscriber =
-        new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->Node));
+    mtsROSSubscriberWrite<_mtsType, _rosType> * newSubscriber
+        = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->Node));
     if (!interfaceRequired->AddFunction(functionName, newSubscriber->Function)) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToCommandWrite: failed to create function.");
         CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandWrite: failed to create function \""
@@ -752,16 +782,16 @@ bool mtsROSBridge::AddPublisherFromEventWrite(const std::string & interfaceRequi
         interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
     }
 
-    mtsROSEventWritePublisher<_mtsType, _rosType>* newPublisher =
-        new mtsROSEventWritePublisher<_mtsType, _rosType>(topicName, *(this->Node), queueSize, latch);
+    mtsROSEventWritePublisher<_mtsType, _rosType>* newPublisher
+        = new mtsROSEventWritePublisher<_mtsType, _rosType>(topicName, *(this->Node), queueSize, latch);
     if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWritePublisher<_mtsType, _rosType>::EventHandler, newPublisher, eventName))
-    {
-        ROS_ERROR("mtsROSBridge::AddPublisherFromEventWrite: failed to create required interface.");
-        CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromEventWrite: failed to create required interface \""
-                                 << interfaceRequiredName << "\"" << std::endl;
-        delete newPublisher;
-        return false;
-    }
+        {
+            ROS_ERROR("mtsROSBridge::AddPublisherFromEventWrite: failed to create required interface.");
+            CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromEventWrite: failed to create required interface \""
+                                     << interfaceRequiredName << "\"" << std::endl;
+            delete newPublisher;
+            return false;
+        }
     Publishers.push_back(newPublisher);
     return true;
 }
@@ -780,15 +810,43 @@ bool mtsROSBridge::AddPublisherFromCommandWrite(const std::string & interfacePro
         interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
     }
 
-    mtsROSCommandWritePublisher<_mtsType, _rosType>* newPublisher =
-        new mtsROSCommandWritePublisher<_mtsType, _rosType>(topicName, *(this->Node), queueSize, latch);
+    mtsROSCommandWritePublisher<_mtsType, _rosType>* newPublisher
+        = new mtsROSCommandWritePublisher<_mtsType, _rosType>(topicName, *(this->Node), queueSize, latch);
     if (!interfaceProvided->AddCommandWrite(&mtsROSCommandWritePublisher<_mtsType, _rosType>::Command,
                                             newPublisher, commandName))
-    {
-        ROS_ERROR("mtsROSBridge::AddPublisherFromCommandWrite: failed to create provided interface.");
-        CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromCommandWrite: failed to create provided interface \""
+        {
+            ROS_ERROR("mtsROSBridge::AddPublisherFromCommandWrite: failed to create provided interface.");
+            CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromCommandWrite: failed to create provided interface \""
+                                     << interfaceProvidedName << "\"" << std::endl;
+            delete newPublisher;
+            return false;
+        }
+    return true;
+}
+
+
+template <typename _mtsType, typename _rosType>
+bool mtsROSBridge::AddSubscriberToCommandRead(const std::string & interfaceProvidedName,
+                                              const std::string & commandName,
+                                              const std::string & topicName,
+                                              const size_t & tableSize)
+{
+    // check if the interface exists of try to create one
+    mtsInterfaceProvided * interfaceProvided = this->GetInterfaceProvided(interfaceProvidedName);
+    if (!interfaceProvided) {
+        interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
+    }
+
+    mtsROSSubscriberStateTable<_mtsType, _rosType> * newSubscriber
+        = new mtsROSSubscriberStateTable<_mtsType, _rosType>(topicName, *(this->Node), tableSize);
+    if (!interfaceProvided->AddCommandReadState(newSubscriber->StateTable,
+                                                newSubscriber->CISSTData,
+                                                commandName)) {
+        ROS_ERROR("mtsROSBridge::AddSubscriberToCommandRead: failed to add command read to provided interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandRead: failed to add command read \""
+                                 << commandName << "\" to provided interface \""
                                  << interfaceProvidedName << "\"" << std::endl;
-        delete newPublisher;
+        delete newSubscriber;
         return false;
     }
     return true;
@@ -806,7 +864,8 @@ bool mtsROSBridge::AddSubscriberToEventWrite(const std::string & interfaceProvid
         interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
     }
 
-    mtsROSSubscriberWrite<_mtsType, _rosType> * newSubscriber = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->Node));
+    mtsROSSubscriberWrite<_mtsType, _rosType> * newSubscriber
+        = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->Node));
     if (!interfaceProvided->AddEventWrite(newSubscriber->Function,
                                           eventName, _mtsType())) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToEventWrite: failed to add event to provided interface.");
@@ -820,27 +879,33 @@ bool mtsROSBridge::AddSubscriberToEventWrite(const std::string & interfaceProvid
 }
 
 
-template <typename _mtsType, typename _rosType>
-bool mtsROSBridge::AddSubscriberToCommandRead(const std::string & interfaceProvidedName,
-                                              const std::string & commandName,
-                                              const std::string & topicName,
-                                              const size_t & tableSize)
+
+
+template <typename _mtsResponseType, typename _rosType>
+bool mtsROSBridge::AddServiceFromCommandRead(const std::string & interfaceRequiredName,
+                                             const std::string & functionName,
+                                             const std::string & serviceName)
 {
     // check if the interface exists of try to create one
-    mtsInterfaceProvided * interfaceProvided = this->GetInterfaceProvided(interfaceProvidedName);
-    if (!interfaceProvided) {
-        interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
+    mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
+    if (!interfaceRequired) {
+        interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
+    }
+    if (!interfaceRequired) {
+        ROS_ERROR("mtsROSBridge::AddServiceFromCommandRead: failed to create required interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "AddServiceFromCommandRead: faild to create required interface \""
+                                 << interfaceRequiredName << "\"" << std::endl;
+        return false;
     }
 
-    mtsROSSubscriberStateTable<_mtsType, _rosType> * newSubscriber = new mtsROSSubscriberStateTable<_mtsType, _rosType>(topicName, *(this->Node), tableSize);
-    if (!interfaceProvided->AddCommandReadState(newSubscriber->StateTable,
-                                                newSubscriber->CISSTData,
-                                                commandName)) {
-        ROS_ERROR("mtsROSBridge::AddSubscriberToCommandRead: failed to add command read to provided interface.");
-        CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandRead: failed to add command read \""
-                                 << commandName << "\" to provided interface \""
-                                 << interfaceProvidedName << "\"" << std::endl;
-        delete newSubscriber;
+    mtsROSCommandReadService<_mtsResponseType, _rosType>  * newService
+        = new mtsROSCommandReadService<_mtsResponseType, _rosType>(serviceName, *(this->Node));
+
+    if (!interfaceRequired->AddFunction(functionName, newService->Function)) {
+        ROS_ERROR("mtsROSBridge::AddServiceFromCommandRead: failed to create function.");
+        CMN_LOG_CLASS_INIT_ERROR << "AddServiceFromCommandRead: failed to create function \""
+                                 << functionName << "\"" << std::endl;
+        delete newService;
         return false;
     }
     return true;
