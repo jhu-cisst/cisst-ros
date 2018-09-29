@@ -424,6 +424,13 @@ void mtsCISSTToROS(const prmKeyValue & cisstData, diagnostic_msgs::KeyValue & ro
 void mtsCISSTToROS(const bool & cisstData, std_srvs::Trigger::Response & rosData)
 {
     rosData.success = cisstData;
+    rosData.message = "";
+}
+
+void mtsCISSTToROS(const std::string & cisstData, std_srvs::Trigger::Response & rosData)
+{
+    rosData.success = true;
+    rosData.message = cisstData;
 }
 
 // ---------------------------------------------

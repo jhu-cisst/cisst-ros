@@ -163,6 +163,7 @@ void mtsCISSTToROS(const prmKeyValue & cisstData, diagnostic_msgs::KeyValue & ro
 
 // std_srvs
 void mtsCISSTToROS(const bool & cisstData, std_srvs::Trigger::Response & rosData);
+void mtsCISSTToROS(const std::string & cisstData, std_srvs::Trigger::Response & rosData);
 
 // cisst_msgs
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::vctDoubleVec & rosData);
