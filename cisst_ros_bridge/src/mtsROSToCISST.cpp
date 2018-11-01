@@ -69,6 +69,12 @@ void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianSet 
     mtsROSPoseToCISST(rosData, cisstData.Goal());
 }
 
+void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartesianGet & cisstData)
+{
+    mtsROSToCISSTHeader(rosData, cisstData);
+    mtsROSToCISST(rosData.pose, cisstData);
+}
+
 void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartesianSet & cisstData)
 {
     mtsROSToCISSTHeader(rosData, cisstData);
@@ -134,6 +140,24 @@ void mtsROSToCISST(const geometry_msgs::Wrench & rosData, prmForceCartesianSet &
 }
 
 void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, prmForceCartesianSet & cisstData)
+{
+    mtsROSToCISSTHeader(rosData, cisstData);
+    mtsROSToCISST(rosData.wrench, cisstData);
+}
+
+void mtsROSToCISST(const geometry_msgs::Wrench & rosData, mtsDoubleVec & cisstData)
+{
+    mtsROSToCISSTNoHeader(cisstData);
+    cisstData.SetSize(6);
+    cisstData.Element(0) = rosData.force.x;
+    cisstData.Element(1) = rosData.force.y;
+    cisstData.Element(2) = rosData.force.z;
+    cisstData.Element(3) = rosData.torque.x;
+    cisstData.Element(4) = rosData.torque.y;
+    cisstData.Element(5) = rosData.torque.z;        
+}
+
+void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, mtsDoubleVec & cisstData)
 {
     mtsROSToCISSTHeader(rosData, cisstData);
     mtsROSToCISST(rosData.wrench, cisstData);
