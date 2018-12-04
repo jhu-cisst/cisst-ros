@@ -20,6 +20,7 @@
   <build_depend>diagnostic_msgs</build_depend>
   <build_depend>cisst_msgs</build_depend>
   <build_depend>cisst</build_depend>
+  <build_depend>crtk_msgs</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>tf2_ros</run_depend>
@@ -30,6 +31,7 @@
   <run_depend>diagnostic_msgs</run_depend>
   <run_depend>cisst_msgs</run_depend>
   <run_depend>cisst</run_depend>
+  <run_depend>crtk_msgs</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

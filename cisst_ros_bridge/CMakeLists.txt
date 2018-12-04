@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   sensor_msgs
   cisst_msgs
+  crtk_msgs
   )
 
 set (REQUIRED_CISST_LIBRARIES
@@ -31,7 +32,7 @@ include (${CISST_USE_FILE})
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES cisst_ros_bridge
-  CATKIN_DEPENDS geometry_msgs roscpp rospy sensor_msgs std_msgs cisst_msgs
+  CATKIN_DEPENDS geometry_msgs roscpp rospy sensor_msgs std_msgs cisst_msgs crtk_msgs
 #  DEPENDS system_lib
 )
 

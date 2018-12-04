@@ -515,3 +515,12 @@ void mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
     rosData.NumberOfOverruns = cisstData.NumberOfOverruns();
     rosData.StatisticsInterval = cisstData.StatisticsInterval();
 }
+
+void mtsCISSTToROS(const prmOperatingState & cisstData,
+                   crtk_msgs::robot_state & rosData)
+{
+    mtsCISSTToROSHeader(cisstData, rosData);
+    rosData.state = cisstData.State();
+    rosData.is_homed = cisstData.IsHomed();
+    rosData.is_busy = cisstData.IsBusy();
+}
