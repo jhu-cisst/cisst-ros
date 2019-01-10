@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2018 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -122,6 +122,12 @@ void mtsROSToCISST(const geometry_msgs::Transform & rosData, mtsFrm4x4 & cisstDa
 {
     mtsROSToCISSTNoHeader(cisstData);
     mtsROSTransformToCISST(rosData, cisstData);
+}
+
+void mtsROSToCISST(const geometry_msgs::TransformStamped & rosData, mtsFrm4x4 & cisstData)
+{
+    mtsROSToCISSTHeader(rosData, cisstData);
+    mtsROSTransformToCISST(rosData.transform, cisstData);
 }
 
 void mtsROSToCISST(const geometry_msgs::Wrench & rosData, prmForceCartesianSet & cisstData)
