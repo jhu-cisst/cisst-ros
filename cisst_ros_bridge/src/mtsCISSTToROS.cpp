@@ -291,6 +291,7 @@ void mtsCISSTToROS(const prmForceCartesianGet & cisstData, geometry_msgs::Wrench
 void mtsCISSTToROS(const prmForceCartesianGet & cisstData, geometry_msgs::WrenchStamped & rosData)
 {
     mtsCISSTToROSHeader(cisstData, rosData);
+    rosData.header.frame_id = cisstData.MovingFrame();
     mtsCISSTToROS(cisstData, rosData.wrench);
 }
 

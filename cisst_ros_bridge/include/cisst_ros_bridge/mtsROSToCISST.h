@@ -25,6 +25,7 @@ http://www.cisst.org/cisst/license.txt.
 
 #include <cisstVector/vctDynamicVectorTypes.h>
 #include <cisstMultiTask/mtsTransformationTypes.h>
+#include <cisstMultiTask/mtsVector.h>
 #include <cisstParameterTypes/prmPositionCartesianGet.h>
 #include <cisstParameterTypes/prmPositionCartesianSet.h>
 #include <cisstParameterTypes/prmPositionJointGet.h>
@@ -123,6 +124,7 @@ void mtsROSToCISST(const geometry_msgs::Vector3 & rosData, vct3 & cisstData);
 void mtsROSToCISST(const geometry_msgs::Quaternion & rosData, vctMatRot3 & cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianGet & cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianSet & cisstData);
+void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartesianGet & cisstData);
 void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::TransformStamped & rosData, prmPositionCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, vctFrm3 & cisstData);
@@ -136,6 +138,8 @@ void mtsROSToCISST(const geometry_msgs::Transform & rosData, mtsFrm4x4 & cisstDa
 void mtsROSToCISST(const geometry_msgs::TransformStamped & rosData, mtsFrm4x4 & cisstData);
 void mtsROSToCISST(const geometry_msgs::Wrench & rosData, prmForceCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, prmForceCartesianSet & cisstData);
+void mtsROSToCISST(const geometry_msgs::Wrench & rosData, mtsDoubleVec & cisstData);
+void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, mtsDoubleVec & cisstData);
 void mtsROSToCISST(const geometry_msgs::Twist & rosData, prmVelocityCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::TwistStamped & rosData, prmVelocityCartesianSet & cisstData);
 
