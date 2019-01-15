@@ -160,7 +160,7 @@ void mtsROSToCISST(const geometry_msgs::Wrench & rosData, mtsDoubleVec & cisstDa
     cisstData.Element(2) = rosData.force.z;
     cisstData.Element(3) = rosData.torque.x;
     cisstData.Element(4) = rosData.torque.y;
-    cisstData.Element(5) = rosData.torque.z;        
+    cisstData.Element(5) = rosData.torque.z;
 }
 
 void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, mtsDoubleVec & cisstData)
@@ -271,4 +271,13 @@ void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData,
                   cisstData.TorqueBiasPos());
     mtsROSToCISST(rosData.TorqueBiasNeg,
                   cisstData.TorqueBiasNeg());
+}
+
+void mtsROSToCISST(const crtk_msgs::robot_state & rosData,
+                   prmOperatingState & cisstData)
+{
+    mtsROSToCISSTHeader(rosData, cisstData);
+    cisstData.State() = rosData.state;;
+    cisstData.IsHomed() = rosData.is_homed;
+    cisstData.IsBusy() = rosData.is_busy;
 }

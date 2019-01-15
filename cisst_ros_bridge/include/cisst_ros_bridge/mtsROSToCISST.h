@@ -36,6 +36,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmVelocityJointSet.h>
 #include <cisstParameterTypes/prmVelocityCartesianSet.h>
 #include <cisstParameterTypes/prmKeyValue.h>
+#include <cisstParameterTypes/prmOperatingState.h>
 
 // ros include
 #include <ros/ros.h>
@@ -53,6 +54,9 @@ http://www.cisst.org/cisst/license.txt.
 // non standard messages
 #include <cisst_msgs/vctDoubleVec.h>
 #include <cisst_msgs/prmCartesianImpedanceGains.h>
+
+// crtk
+#include <crtk_msgs/robot_state.h>
 
 // helper functions
 template <typename _cisstFrame>
@@ -155,5 +159,8 @@ void mtsROSToCISST(const diagnostic_msgs::KeyValue & rosData, prmKeyValue & ciss
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, prmPositionJointSet & cisstData);
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & cisstData);
 void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData, prmCartesianImpedanceGains & cisstData);
+
+// crtk_msgs
+void mtsROSToCISST(const crtk_msgs::robot_state & rosData, prmOperatingState & cisstData);
 
 #endif // _mtsROSToCISST_h
