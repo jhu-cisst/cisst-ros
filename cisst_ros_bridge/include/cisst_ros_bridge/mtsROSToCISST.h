@@ -40,6 +40,7 @@ http://www.cisst.org/cisst/license.txt.
 // ros include
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Float64.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int32.h>
 #include <std_msgs/String.h>
@@ -115,6 +116,7 @@ void mtsROSToCISSTHeader(const _rosType & rosData, _cisstType & cisstData)
 
 // std_msgs
 void mtsROSToCISST(const std_msgs::Float32 & rosData, double & cisstData);
+void mtsROSToCISST(const std_msgs::Float64 & rosData, double & cisstData);
 void mtsROSToCISST(const std_msgs::Int32 & rosData, int & cisstData);
 void mtsROSToCISST(const std_msgs::Bool & rosData, bool & cisstData);
 void mtsROSToCISST(const std_msgs::String & rosData, std::string & cisstData);
