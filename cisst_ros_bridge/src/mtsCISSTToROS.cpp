@@ -23,6 +23,11 @@ void mtsCISSTToROS(const double & cisstData, std_msgs::Float32 & rosData)
     rosData.data = cisstData;
 }
 
+void mtsCISSTToROS(const double & cisstData, std_msgs::Float64 & rosData)
+{
+    rosData.data = cisstData;
+}
+
 void mtsCISSTToROS(const int & cisstData, std_msgs::Int32 & rosData)
 {
     rosData.data = cisstData;
