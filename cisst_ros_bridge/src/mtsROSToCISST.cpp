@@ -165,7 +165,7 @@ void mtsROSToCISST(const geometry_msgs::Wrench & rosData, mtsDoubleVec & cisstDa
     cisstData.Element(2) = rosData.force.z;
     cisstData.Element(3) = rosData.torque.x;
     cisstData.Element(4) = rosData.torque.y;
-    cisstData.Element(5) = rosData.torque.z;        
+    cisstData.Element(5) = rosData.torque.z;
 }
 
 void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, mtsDoubleVec & cisstData)
@@ -250,6 +250,10 @@ void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData,
                   cisstData.TorqueOrientation());
 
     // force gains
+    mtsROSToCISST(rosData.PosDeadbandPos,
+                  cisstData.PositionDeadbandPos());
+    mtsROSToCISST(rosData.PosDeadbandNeg,
+                  cisstData.PositionDeadbandNeg());
     mtsROSToCISST(rosData.PosStiffPos,
                   cisstData.PositionStiffnessPos());
     mtsROSToCISST(rosData.PosStiffNeg,
@@ -263,7 +267,11 @@ void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData,
     mtsROSToCISST(rosData.ForceBiasNeg,
                   cisstData.ForceBiasNeg());
 
-    // toqrue gains
+    // torque gains
+    mtsROSToCISST(rosData.OriDeadbandPos,
+                  cisstData.OrientationDeadbandPos());
+    mtsROSToCISST(rosData.OriDeadbandNeg,
+                  cisstData.OrientationDeadbandNeg());
     mtsROSToCISST(rosData.OriStiffPos,
                   cisstData.OrientationStiffnessPos());
     mtsROSToCISST(rosData.OriStiffNeg,
