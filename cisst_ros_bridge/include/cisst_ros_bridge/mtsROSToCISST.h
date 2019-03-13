@@ -44,6 +44,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int32.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Float64MultiArray.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/WrenchStamped.h>
@@ -120,6 +121,8 @@ void mtsROSToCISST(const std_msgs::Float64 & rosData, double & cisstData);
 void mtsROSToCISST(const std_msgs::Int32 & rosData, int & cisstData);
 void mtsROSToCISST(const std_msgs::Bool & rosData, bool & cisstData);
 void mtsROSToCISST(const std_msgs::String & rosData, std::string & cisstData);
+void mtsROSToCISST(const std_msgs::Float64MultiArray & rosData, vctDoubleVec & cisstData);
+
 
 // geometry_msgs
 void mtsROSToCISST(const geometry_msgs::Vector3 & rosData, vct3 & cisstData);

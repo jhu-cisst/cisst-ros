@@ -44,6 +44,16 @@ void mtsROSToCISST(const std_msgs::String & rosData, std::string & cisstData)
     cisstData = rosData.data;
 }
 
+void mtsROSToCISST(const std_msgs::Float64MultiArray & rosData, vctDoubleVec & cisstData)
+{
+    const size_t size = rosData.data.size();
+    if (size != 0) {
+        cisstData.SetSize(size);
+        std::copy(rosData.data.begin(), rosData.data.end(),
+                  cisstData.begin());
+    }
+}
+
 void mtsROSToCISST(const geometry_msgs::Vector3 & rosData, vct3 & cisstData)
 {
     cisstData[0] = rosData.x;
