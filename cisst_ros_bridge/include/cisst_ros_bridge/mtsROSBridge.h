@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2018 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -51,6 +51,7 @@ public:
 
 protected:
     ros::Publisher mPublisher;
+    std::string mName;
 };
 
 template <typename _mtsType, typename _rosType>
@@ -62,6 +63,7 @@ public:
                     const uint32_t queueSize = 5,
                     const bool latch = false)
     {
+        mName = rosTopicName;
         mPublisher = node.advertise<_rosType>(rosTopicName, queueSize, latch);
     }
     virtual ~mtsROSPublisher() {
@@ -74,13 +76,15 @@ public:
         }
         mtsExecutionResult result = Function(mCISSTData);
         if (result) {
-            mtsCISSTToROS(mCISSTData, mROSData);
-            mPublisher.publish(mROSData);
-            return true;
+            if (mtsCISSTToROS(mCISSTData, mROSData, mName)) {
+                mPublisher.publish(mROSData);
+                return true;
+            }
+        } else {
+            ROS_ERROR("mtsROSPublisher::Execute: mtsFunction call failed");
+            CMN_LOG_RUN_ERROR << "mtsROSPublisher::Execute: " << result
+                              << " for topic " << mPublisher.getTopic() << std::endl;
         }
-        ROS_ERROR("mtsROSPublisher::Execute: mtsFunction call failed");
-        CMN_LOG_RUN_ERROR << "mtsROSPublisher::Execute: " << result
-                          << " for topic " << mPublisher.getTopic() << std::endl;
         return false;
     }
 
@@ -123,6 +127,7 @@ public:
                               const uint32_t queueSize = 5,
                               const bool latch = false)
     {
+        mName = rosTopicName;
         mPublisher = node.advertise<_rosType>(rosTopicName, queueSize, latch);
     }
     virtual ~mtsROSEventWritePublisher() {}
@@ -135,8 +140,9 @@ public:
         if ((mPublisher.getNumSubscribers() == 0) && !mPublisher.isLatched()) {
             return;
         }
-        mtsCISSTToROS(CISSTData, mROSData);
-        mPublisher.publish(mROSData);
+        if (mtsCISSTToROS(CISSTData, mROSData, mName)) {
+            mPublisher.publish(mROSData);
+        }
     }
 
 protected:
@@ -147,9 +153,9 @@ protected:
 class mtsROStf2Broadcaster: public mtsROSPublisherBase
 {
 public:
-    mtsROStf2Broadcaster(const std::string name):
-        mName(name)
+    mtsROStf2Broadcaster(const std::string name)
     {
+        mName = name;
     }
     virtual ~mtsROStf2Broadcaster() {
         //! \todo, how to remove the topic from the node?
@@ -158,9 +164,10 @@ public:
     bool Execute(void) {
         mtsExecutionResult result = Function(mCISSTData);
         if (result) {
-            mtsCISSTToROS(mCISSTData, mROSData);
-            mBroadcaster.sendTransform(mROSData);
-            return true;
+            if (mtsCISSTToROS(mCISSTData, mROSData, mName)) {
+                mBroadcaster.sendTransform(mROSData);
+                return true;
+            }
         } else if (result.Value() != mtsExecutionResult::FUNCTION_NOT_BOUND) {
             ROS_ERROR("mtsROStf2Broadcaster::Execute: mtsFunction call failed");
             CMN_LOG_RUN_ERROR << "mtsROStf2Broadcaster::Execute: " << result
@@ -171,7 +178,6 @@ public:
     }
 
 protected:
-    std::string mName; // for error messages only
     tf2_ros::TransformBroadcaster mBroadcaster;
     geometry_msgs::TransformStamped mROSData;
     prmPositionCartesianGet mCISSTData;
@@ -317,6 +323,7 @@ public:
                                 const uint32_t queueSize = 5,
                                 const bool latch = false)
     {
+        mName = rosTopicName;
         mPublisher = node.advertise<_rosType>(rosTopicName, queueSize, latch);
     }
     virtual ~mtsROSCommandWritePublisher() {}
@@ -325,12 +332,14 @@ public:
         if ((mPublisher.getNumSubscribers() == 0) && !mPublisher.isLatched()) {
             return;
         }
-        mtsCISSTToROS(CISSTData, mROSData);
-        mPublisher.publish(mROSData);
+        if (mtsCISSTToROS(CISSTData, mROSData, mName)) {
+            mPublisher.publish(mROSData);
+        }
     }
 
 protected:
     ros::Publisher mPublisher;
+    std::string mName;
     _rosType mROSData;
 };
 
@@ -374,6 +383,7 @@ public:
     mtsROSCommandReadService(const std::string rosServiceName,
                              ros::NodeHandle & node)
     {
+        mName = rosServiceName;
         mServiceServer = node.advertiseService(rosServiceName,
                                                &ThisType::Callback, this);
     }
@@ -382,18 +392,21 @@ public:
                   typename _rosType::Response & response) {
         mtsExecutionResult result = Function(mCISSTData);
         if (result) {
-            mtsCISSTToROS(mCISSTData, response);
-            return true;
+            if (mtsCISSTToROS(mCISSTData, response, mName)) {
+                return true;
+            }
+        } else {
+            ROS_ERROR("mtsROSCommandReadService::Callback: mtsFunction call failed");
+            CMN_LOG_RUN_ERROR << "mtsROSCommandReadService::Callback: " << result
+                              << " for topic " << mServiceServer.getService() << std::endl;
         }
-        ROS_ERROR("mtsROSCommandReadService::Callback: mtsFunction call failed");
-        CMN_LOG_RUN_ERROR << "mtsROSCommandReadService::Callback: " << result
-                          << " for topic " << mServiceServer.getService() << std::endl;
         return false;
     }
 
 protected:
     _mtsResponseType mCISSTData;
     ros::ServiceServer mServiceServer;
+    std::string mName;
 };
 
 
@@ -457,8 +470,8 @@ protected:
   command, the second parameter is the ROS type used to publish.  At
   compilation time, the compiler will look for one of the following
   overloaded method:
-  - mtsCISSTToROS(const _cisstType & in, _rosType out)
-  - mtsROSToCISST(const _rosType & in, _cisstType out)
+  - bool mtsCISSTToROS(const _cisstType & in, _rosType out, const std::string & debugInfo)
+  - bool mtsROSToCISST(const _rosType & in, _cisstType out, const std::string & debugInfo)
 
   Some default conversion methods are provided in mtsROSToCISST.h
   and mtsCISSTToROS.h.
