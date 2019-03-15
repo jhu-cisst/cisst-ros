@@ -194,6 +194,7 @@ bool mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
                    cisst_msgs::mtsIntervalStatistics & rosData, const std::string & debugInfo);
 
 // crtk_msgs
-void mtsCISSTToROS(const prmOperatingState & cisstData, crtk_msgs::robot_state & rosData);
+bool mtsCISSTToROS(const prmOperatingState & cisstData,
+                   crtk_msgs::robot_state & rosData, const std::string & debugInfo);
 
 #endif // _mtsCISSTToROS_h

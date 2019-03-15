@@ -661,11 +661,15 @@ bool mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
     return false;
 }
 
-void mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::robot_state & rosData)
+bool mtsCISSTToROS(const prmOperatingState & cisstData,
+                   crtk_msgs::robot_state & rosData,
+                   const std::string & debugInfo)
 {
-    mtsCISSTToROSHeader(cisstData, rosData);
-    rosData.state = cisstData.State();
-    rosData.is_homed = cisstData.IsHomed();
-    rosData.is_busy = cisstData.IsBusy();
+    if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
+        rosData.state = cisstData.State();
+        rosData.is_homed = cisstData.IsHomed();
+        rosData.is_busy = cisstData.IsBusy();
+        return true;
+    }
+    return false;
 }
