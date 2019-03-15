@@ -666,7 +666,11 @@ bool mtsCISSTToROS(const prmOperatingState & cisstData,
                    const std::string & debugInfo)
 {
     if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
-        rosData.state = cisstData.State();
+        try {
+            rosData.state = prmOperatingState::EnumToString(cisstData.State());
+        } catch (...) {
+            rosData.state = "VOID";
+        }
         rosData.is_homed = cisstData.IsHomed();
         rosData.is_busy = cisstData.IsBusy();
         return true;

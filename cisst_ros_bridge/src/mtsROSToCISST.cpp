@@ -290,7 +290,11 @@ void mtsROSToCISST(const crtk_msgs::robot_state & rosData,
                    prmOperatingState & cisstData)
 {
     mtsROSToCISSTHeader(rosData, cisstData);
-    cisstData.State() = rosData.state;;
+    try {
+        cisstData.State() = prmOperatingState::EnumFromString(rosData.state);
+    } catch (...) {
+        cisstData.State() = prmOperatingState::VOID;
+    }
     cisstData.IsHomed() = rosData.is_homed;
     cisstData.IsBusy() = rosData.is_busy;
 }
