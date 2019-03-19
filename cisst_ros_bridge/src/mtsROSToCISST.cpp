@@ -293,7 +293,7 @@ void mtsROSToCISST(const crtk_msgs::robot_state & rosData,
     try {
         cisstData.State() = prmOperatingState::EnumFromString(rosData.state);
     } catch (...) {
-        cisstData.State() = prmOperatingState::VOID;
+        cisstData.State() = prmOperatingState::UNDEFINED;
     }
     cisstData.IsHomed() = rosData.is_homed;
     cisstData.IsBusy() = rosData.is_busy;
