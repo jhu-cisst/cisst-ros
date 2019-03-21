@@ -66,7 +66,8 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_msgs/BoolStamped.h>
 
 // crtk
-#include <crtk_msgs/robot_state.h>
+#include <crtk_msgs/operating_state.h>
+#include <crtk_msgs/trigger_operating_state.h>
 
 // helper functions
 template <typename _cisstFrame>
@@ -182,19 +183,35 @@ bool mtsCISSTToROS(const prmInputData & cisstData, sensor_msgs::Joy & rosData, c
 bool mtsCISSTToROS(const prmKeyValue & cisstData, diagnostic_msgs::KeyValue & rosData, const std::string & debugInfo);
 
 // std_srvs
-bool mtsCISSTToROS(const bool & cisstData, std_srvs::Trigger::Response & rosData, const std::string & debugInfo);
-bool mtsCISSTToROS(const std::string & cisstData, std_srvs::Trigger::Response & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const bool & cisstData,
+                   std_srvs::Trigger::Response & rosData,
+                   const std::string & debugInfo);
+bool mtsCISSTToROS(const std::string & cisstData,
+                   std_srvs::Trigger::Response & rosData,
+                   const std::string & debugInfo);
 
 // cisst_msgs
-bool mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::vctDoubleVec & rosData, const std::string & debugInfo);
-bool mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const prmPositionJointGet & cisstData,
+                   cisst_msgs::vctDoubleVec & rosData,
+                   const std::string & debugInfo);
+bool mtsCISSTToROS(const vctDoubleVec & cisstData,
+                   cisst_msgs::vctDoubleVec & rosData,
+                   const std::string & debugInfo);
 bool mtsCISSTToROS(const prmCartesianImpedanceGains & cisstData,
-                   cisst_msgs::prmCartesianImpedanceGains & rosData, const std::string & debugInfo);
+                   cisst_msgs::prmCartesianImpedanceGains & rosData,
+                   const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
-                   cisst_msgs::mtsIntervalStatistics & rosData, const std::string & debugInfo);
+                   cisst_msgs::mtsIntervalStatistics & rosData,
+                   const std::string & debugInfo);
 
 // crtk_msgs
 bool mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::robot_state & rosData, const std::string & debugInfo);
+                   crtk_msgs::operating_state & rosData,
+                   const std::string & debugInfo);
+
+// crtk_srvs
+bool mtsCISSTToROS(const prmOperatingState & cisstData,
+                   crtk_msgs::trigger_operating_state::Response & rosData,
+                   const std::string & debugInfo);
 
 #endif // _mtsCISSTToROS_h

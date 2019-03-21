@@ -286,7 +286,7 @@ void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData,
                   cisstData.TorqueBiasNeg());
 }
 
-void mtsROSToCISST(const crtk_msgs::robot_state & rosData,
+void mtsROSToCISST(const crtk_msgs::operating_state & rosData,
                    prmOperatingState & cisstData)
 {
     mtsROSToCISSTHeader(rosData, cisstData);

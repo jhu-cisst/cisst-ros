@@ -57,7 +57,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_msgs/prmCartesianImpedanceGains.h>
 
 // crtk
-#include <crtk_msgs/robot_state.h>
+#include <crtk_msgs/operating_state.h>
 
 // helper functions
 template <typename _cisstFrame>
@@ -163,6 +163,6 @@ void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & ciss
 void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData, prmCartesianImpedanceGains & cisstData);
 
 // crtk_msgs
-void mtsROSToCISST(const crtk_msgs::robot_state & rosData, prmOperatingState & cisstData);
+void mtsROSToCISST(const crtk_msgs::operating_state & rosData, prmOperatingState & cisstData);
 
 #endif // _mtsROSToCISST_h
