@@ -600,6 +600,10 @@ bool mtsCISSTToROS(const prmCartesianImpedanceGains & cisstData,
                       rosData.TorqueOrientation, debugInfo);
 
         // force gains
+        mtsCISSTToROS(cisstData.PositionDeadbandPos(),
+                      rosData.PosDeadbandPos, debugInfo);
+        mtsCISSTToROS(cisstData.PositionDeadbandNeg(),
+                      rosData.PosDeadbandNeg, debugInfo);
         mtsCISSTToROS(cisstData.PositionStiffnessPos(),
                       rosData.PosStiffPos, debugInfo);
         mtsCISSTToROS(cisstData.PositionStiffnessNeg(),
@@ -614,6 +618,10 @@ bool mtsCISSTToROS(const prmCartesianImpedanceGains & cisstData,
                       rosData.ForceBiasNeg, debugInfo);
 
         // torque gains
+        mtsCISSTToROS(cisstData.OrientationDeadbandPos(),
+                      rosData.OriDeadbandPos, debugInfo);
+        mtsCISSTToROS(cisstData.OrientationDeadbandNeg(),
+                      rosData.OriDeadbandNeg, debugInfo);
         mtsCISSTToROS(cisstData.OrientationStiffnessPos(),
                       rosData.OriStiffPos, debugInfo);
         mtsCISSTToROS(cisstData.OrientationStiffnessNeg(),

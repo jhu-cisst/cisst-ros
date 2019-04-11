@@ -1,6 +1,21 @@
 Change log
 ==========
 
+1.5.0 (2019-04-09)
+==================
+
+* API changes:
+  * **Important**: when publishing from cisst to ROS, if the data has a `Valid` flag and it's is not set to `true`, the data is NOT published.  Make sure your application properly sets the `Valid` flag (most `prm` types have this flag!)
+* Deprecated features:
+  * None
+* New features:
+  * cisst_ros_bridge:
+    * Added support for services
+    * Added support for prmKeyValue
+    * WrenchStamped now updates the frame_id from/to `prm` types
+* Bug fixes:
+  * In time conversion from cisst to ROS, added try/catch with error message containing topic name
+
 1.4.0 (2018-05-16)
 ==================
 
