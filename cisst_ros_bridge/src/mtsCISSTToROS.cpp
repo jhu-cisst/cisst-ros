@@ -276,6 +276,18 @@ bool mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::Quaternion & ros
     return true;
 }
 
+bool mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::QuaternionStamped & rosData,
+                   const std::string & debugInfo)
+{
+    mtsCISSTToROSHeader(rosData, debugInfo);
+    vctQuatRot3 quat(cisstData, VCT_NORMALIZE);
+    rosData.quaternion.x = quat.X();
+    rosData.quaternion.y = quat.Y();
+    rosData.quaternion.z = quat.Z();
+    rosData.quaternion.w = quat.W();
+    return true;
+}
+
 bool mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Wrench & rosData,
                    const std::string & debugInfo)
 {
