@@ -196,7 +196,7 @@ bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pos
                    const std::string & debugInfo)
 {
     if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
-        rosData.header.frame_id = cisstData.MovingFrame();
+        rosData.header.frame_id = cisstData.ReferenceFrame();
         mtsCISSTToROSPose(cisstData.Position(), rosData.pose);
         return true;
     }
