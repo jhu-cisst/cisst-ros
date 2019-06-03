@@ -196,7 +196,7 @@ bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pos
                    const std::string & debugInfo)
 {
     if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
-        rosData.header.frame_id = cisstData.MovingFrame();
+        rosData.header.frame_id = cisstData.ReferenceFrame();
         mtsCISSTToROSPose(cisstData.Position(), rosData.pose);
         return true;
     }
@@ -273,6 +273,18 @@ bool mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::Quaternion & ros
     rosData.y = quat.Y();
     rosData.z = quat.Z();
     rosData.w = quat.W();
+    return true;
+}
+
+bool mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::QuaternionStamped & rosData,
+                   const std::string & debugInfo)
+{
+    mtsCISSTToROSHeader(rosData, debugInfo);
+    vctQuatRot3 quat(cisstData, VCT_NORMALIZE);
+    rosData.quaternion.x = quat.X();
+    rosData.quaternion.y = quat.Y();
+    rosData.quaternion.z = quat.Z();
+    rosData.quaternion.w = quat.W();
     return true;
 }
 

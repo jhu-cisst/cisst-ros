@@ -49,6 +49,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <std_msgs/String.h>
 #include <std_msgs/Float64MultiArray.h>
 #include <geometry_msgs/Vector3Stamped.h>
+#include <geometry_msgs/QuaternionStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/TwistStamped.h>
@@ -162,6 +163,7 @@ bool mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::TransformStamped 
 bool mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Transform & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vct3 & cisstData, geometry_msgs::Vector3 & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::Quaternion & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::QuaternionStamped & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Wrench & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::WrenchStamped & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Vector3Stamped & rosData, const std::string & debugInfo);
