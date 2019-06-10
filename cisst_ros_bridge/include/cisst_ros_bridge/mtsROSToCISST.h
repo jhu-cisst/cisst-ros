@@ -58,6 +58,7 @@ http://www.cisst.org/cisst/license.txt.
 
 // crtk
 #include <crtk_msgs/operating_state.h>
+#include <crtk_msgs/StringStamped.h>
 
 // helper functions
 template <typename _cisstFrame>
@@ -164,5 +165,6 @@ void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData, prmCa
 
 // crtk_msgs
 void mtsROSToCISST(const crtk_msgs::operating_state & rosData, prmOperatingState & cisstData);
+void mtsROSToCISST(const crtk_msgs::StringStamped & rosData, std::string & cisstData);
 
 #endif // _mtsROSToCISST_h

@@ -298,3 +298,9 @@ void mtsROSToCISST(const crtk_msgs::operating_state & rosData,
     cisstData.IsHomed() = rosData.is_homed;
     cisstData.IsBusy() = rosData.is_busy;
 }
+
+void mtsROSToCISST(const crtk_msgs::StringStamped & rosData,
+                   std::string & cisstData)
+{
+    cisstData = rosData.string;
+}
