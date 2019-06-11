@@ -291,7 +291,7 @@ void mtsROSToCISST(const crtk_msgs::operating_state & rosData,
 {
     mtsROSToCISSTHeader(rosData, cisstData);
     try {
-        cisstData.State() = prmOperatingState::EnumFromString(rosData.state);
+        cisstData.State() = prmOperatingState::StateTypeFromString(rosData.state);
     } catch (...) {
         cisstData.State() = prmOperatingState::UNDEFINED;
     }

@@ -680,7 +680,7 @@ bool mtsCISSTToROSOperatingState(const prmOperatingState & cisstData,
 {
     if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
         try {
-            rosData.state = prmOperatingState::EnumToString(cisstData.State());
+            rosData.state = prmOperatingState::StateTypeToString(cisstData.State());
         } catch (...) {
             rosData.state = "UNDEFINED";
         }
