@@ -302,5 +302,5 @@ void mtsROSToCISST(const crtk_msgs::operating_state & rosData,
 void mtsROSToCISST(const crtk_msgs::StringStamped & rosData,
                    std::string & cisstData)
 {
-    cisstData = rosData.string;
+    cisstData = rosData.data;
 }
