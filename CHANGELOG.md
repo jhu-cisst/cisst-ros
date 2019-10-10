@@ -5,7 +5,7 @@ Change log
 ==================
 
 * API changes:
-  * **Important**: when publishing from cisst to ROS, if the data has a `Valid` flag and it's is not set to `true`, the data is NOT published.  Make sure your application properly sets the `Valid` flag (most `prm` types have this flag!)
+  * **Important**: when publishing from cisst to ROS, if the data has a `Valid` flag and it is not set to `true`, the data is NOT published.  Make sure your application properly sets the `Valid` flag (most `prm` types have this flag!)
 * Deprecated features:
   * None
 * New features:
