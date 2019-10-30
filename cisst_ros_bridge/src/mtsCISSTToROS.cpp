@@ -113,13 +113,15 @@ bool mtsCISSTToROS(const prmEventButton & cisstData, cisst_msgs::BoolStamped & r
 bool mtsCISSTToROS(const prmEventButton & cisstData, sensor_msgs::Joy & rosData,
                    const std::string & debugInfo)
 {
+    rosData.axes.resize(0);
+    rosData.buttons.resize(1);
     if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
-        rosData.axes.resize(0);
-        rosData.buttons.resize(1);
         if (cisstData.Type() == prmEventButton::PRESSED) {
             rosData.buttons[0] = 1;
         } else if (cisstData.Type() == prmEventButton::RELEASED) {
             rosData.buttons[0] = 0;
+        } else if (cisstData.Type() == prmEventButton::CLICKED) {
+            rosData.buttons[0] = 2;
         }
         return true;
     }
