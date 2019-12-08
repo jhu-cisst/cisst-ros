@@ -97,6 +97,11 @@ void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, vctFrm3 & cisstDa
     mtsROSPoseToCISST(rosData.pose, cisstData);
 }
 
+void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, vctFrm4x4 & cisstData)
+{
+    mtsROSPoseToCISST(rosData.pose, cisstData);
+}
+
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, vctFrm3 & cisstData)
 {
     mtsROSPoseToCISST(rosData, cisstData);
