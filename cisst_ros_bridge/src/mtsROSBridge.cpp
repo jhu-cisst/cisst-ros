@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2018 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -28,7 +28,7 @@ mtsROSBridge::mtsROSBridge(const std::string & componentName,
                            const double periodInSeconds,
                            const bool spin,
                            const bool sig,
-                           ros::NodeHandle * nh):
+                           ros::NodeHandle * nodeHandle):
     mtsTaskPeriodic(componentName, periodInSeconds),
     mSpin(spin),
     mSignal(sig)
@@ -39,16 +39,26 @@ mtsROSBridge::mtsROSBridge(const std::string & componentName,
     strcpy(argv[0], "mtsROSBridge");
     int argc = 1;
 
-    if (nh != NULL) {
-        Node = nh;
+    if (nodeHandle != NULL) {
+        mNodeHandlePointer = ros::NodeHandlePtr(nodeHandle);
     } else {
         if (mSignal) {
             ros::init(argc, argv, componentName);
         } else {
             ros::init(argc, argv, componentName, ros::init_options::NoSigintHandler);
         }
-        Node = new ros::NodeHandle;
+        mNodeHandlePointer = ros::NodeHandlePtr(new ros::NodeHandle());
     }
+}
+
+mtsROSBridge::mtsROSBridge(const std::string & componentName,
+                           const double periodInSeconds,
+                           ros::NodeHandle * nodeHandle):
+    mtsTaskPeriodic(componentName, periodInSeconds),
+    mSpin(false),
+    mSignal(false)
+{
+    mNodeHandlePointer = ros::NodeHandlePtr(nodeHandle);
 }
 
 void mtsROSBridge::Configure(const std::string & CMN_UNUSED(filename))
@@ -118,7 +128,7 @@ bool mtsROSBridge::AddPublisherFromEventVoid(const std::string & interfaceRequir
     }
 
     mtsROSEventVoidPublisher* newPublisher =
-        new mtsROSEventVoidPublisher(topicName, *(this->Node), queueSize, latch);
+        new mtsROSEventVoidPublisher(topicName, *(this->mNodeHandlePointer), queueSize, latch);
     if (!interfaceRequired->AddEventHandlerVoid(&mtsROSEventVoidPublisher::EventHandler, newPublisher, eventName))
     {
         ROS_ERROR("mtsROSBridge::AddPublisherFromEventVoid: failed to create required interface.");
@@ -199,7 +209,7 @@ bool mtsROSBridge::AddSubscriberToCommandVoid(const std::string & interfaceRequi
         return false;
     }
 
-    mtsROSSubscriberVoid * newSubscriber = new mtsROSSubscriberVoid(topicName, *(this->Node));
+    mtsROSSubscriberVoid * newSubscriber = new mtsROSSubscriberVoid(topicName, *(this->mNodeHandlePointer));
     if (!interfaceRequired->AddFunction(functionName, newSubscriber->Function)) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToCommandVoid: failed to create function.");
         CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandVoid: failed to create function \""
@@ -223,7 +233,7 @@ bool mtsROSBridge::AddPublisherFromCommandVoid(const std::string & interfaceProv
     }
 
     mtsROSCommandVoidPublisher* newPublisher =
-        new mtsROSCommandVoidPublisher(topicName, *(this->Node), queueSize, latch);
+        new mtsROSCommandVoidPublisher(topicName, *(this->mNodeHandlePointer), queueSize, latch);
     if (!interfaceProvided->AddCommandVoid(&mtsROSCommandVoidPublisher::Command,
                                            newPublisher, commandName))
     {
@@ -246,7 +256,7 @@ bool mtsROSBridge::AddSubscriberToEventVoid(const std::string & interfaceProvide
         interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
     }
 
-    mtsROSSubscriberVoid * newSubscriber = new mtsROSSubscriberVoid(topicName, *(this->Node));
+    mtsROSSubscriberVoid * newSubscriber = new mtsROSSubscriberVoid(topicName, *(this->mNodeHandlePointer));
     if (!interfaceProvided->AddEventVoid(newSubscriber->Function,
                                           eventName)) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToEventVoid: failed to add event to provided interface.");

@@ -492,11 +492,20 @@ public:
       set to false, either install your own handler or
       rely on cisst cleanup()
     */
+    CISST_DEPRECATED mtsROSBridge(const std::string & componentName,
+                                  const double periodInSeconds,
+                                  const bool spin = false,
+                                  const bool sig = true,
+                                  ros::NodeHandle * nodeHandle = NULL);
+
+    /*!  Constructor using an existing ros::NodeHandle.  By default,
+      spin is set to false (see also PerformsSpin) and this
+      constructor doesn't redefine the signal handler.
+    */
     mtsROSBridge(const std::string & componentName,
                  const double periodInSeconds,
-                 const bool spin = false,
-                 const bool sig = true,
-                 ros::NodeHandle* nh = NULL);
+                 ros::NodeHandle * nodeHandle);
+
     inline ~mtsROSBridge() {}
 
     // taskPeriodic
@@ -508,6 +517,17 @@ public:
     void Startup(void);
     void Run(void);
     void Cleanup(void);
+
+    /*! Request that the bridge calls ros::spinOnce in its Run method.
+      This allows to piggy back on the existing thread/periodicity
+      instead of using ros::spin in your main.  This can be used if
+      you also have another library or toolkit that has its own event
+      loop (i.e. Qt with QApplication.exec()).  If you use multiple
+      mtsROSBridge, make sure there's only one bridge with spin turned
+      on. */
+    inline void PerformsSpin(const bool spin) {
+        mSpin = spin;
+    }
 
     // --------- Required interface
 
@@ -711,7 +731,7 @@ protected:
     PublishersType Publishers;
 
     //! ros node
-    ros::NodeHandle * Node;
+    ros::NodeHandlePtr mNodeHandlePointer;
 
     //! spin flag, if set call spinOnce() in run
     bool mSpin;
@@ -740,7 +760,7 @@ bool mtsROSBridge::AddPublisherFromCommandRead(const std::string & interfaceRequ
         return false;
     }
     mtsROSPublisherBase * newPublisher =
-        new mtsROSPublisher<_mtsType, _rosType>(topicName, *(this->Node), queueSize, latch);
+        new mtsROSPublisher<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer), queueSize, latch);
     if (!interfaceRequired->AddFunction(functionName, newPublisher->Function)) {
         ROS_ERROR("mtsROSBridge::AddPublisherFromCommandRead: failed to create function.");
         CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromCommandRead: faild to create function \""
@@ -770,7 +790,7 @@ bool mtsROSBridge::AddSubscriberToCommandWrite(const std::string & interfaceRequ
         return false;
     }
     mtsROSSubscriberWrite<_mtsType, _rosType> * newSubscriber
-        = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->Node));
+        = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer));
     if (!interfaceRequired->AddFunction(functionName, newSubscriber->Function)) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToCommandWrite: failed to create function.");
         CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandWrite: failed to create function \""
@@ -796,7 +816,7 @@ bool mtsROSBridge::AddPublisherFromEventWrite(const std::string & interfaceRequi
     }
 
     mtsROSEventWritePublisher<_mtsType, _rosType>* newPublisher
-        = new mtsROSEventWritePublisher<_mtsType, _rosType>(topicName, *(this->Node), queueSize, latch);
+        = new mtsROSEventWritePublisher<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer), queueSize, latch);
     if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWritePublisher<_mtsType, _rosType>::EventHandler, newPublisher, eventName))
         {
             ROS_ERROR("mtsROSBridge::AddPublisherFromEventWrite: failed to create required interface.");
@@ -824,7 +844,7 @@ bool mtsROSBridge::AddPublisherFromCommandWrite(const std::string & interfacePro
     }
 
     mtsROSCommandWritePublisher<_mtsType, _rosType>* newPublisher
-        = new mtsROSCommandWritePublisher<_mtsType, _rosType>(topicName, *(this->Node), queueSize, latch);
+        = new mtsROSCommandWritePublisher<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer), queueSize, latch);
     if (!interfaceProvided->AddCommandWrite(&mtsROSCommandWritePublisher<_mtsType, _rosType>::Command,
                                             newPublisher, commandName))
         {
@@ -851,7 +871,7 @@ bool mtsROSBridge::AddSubscriberToCommandRead(const std::string & interfaceProvi
     }
 
     mtsROSSubscriberStateTable<_mtsType, _rosType> * newSubscriber
-        = new mtsROSSubscriberStateTable<_mtsType, _rosType>(topicName, *(this->Node), tableSize);
+        = new mtsROSSubscriberStateTable<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer), tableSize);
     if (!interfaceProvided->AddCommandReadState(newSubscriber->StateTable,
                                                 newSubscriber->CISSTData,
                                                 commandName)) {
@@ -878,7 +898,7 @@ bool mtsROSBridge::AddSubscriberToEventWrite(const std::string & interfaceProvid
     }
 
     mtsROSSubscriberWrite<_mtsType, _rosType> * newSubscriber
-        = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->Node));
+        = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer));
     if (!interfaceProvided->AddEventWrite(newSubscriber->Function,
                                           eventName, _mtsType())) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToEventWrite: failed to add event to provided interface.");
@@ -912,7 +932,7 @@ bool mtsROSBridge::AddServiceFromCommandRead(const std::string & interfaceRequir
     }
 
     mtsROSCommandReadService<_mtsResponseType, _rosType>  * newService
-        = new mtsROSCommandReadService<_mtsResponseType, _rosType>(serviceName, *(this->Node));
+        = new mtsROSCommandReadService<_mtsResponseType, _rosType>(serviceName, *(this->mNodeHandlePointer));
 
     if (!interfaceRequired->AddFunction(functionName, newService->Function)) {
         ROS_ERROR("mtsROSBridge::AddServiceFromCommandRead: failed to create function.");
