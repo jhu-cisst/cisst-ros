@@ -65,6 +65,18 @@ void mtsROSBridge::Configure(const std::string & CMN_UNUSED(filename))
 {
 }
 
+mtsROSBridge::~mtsROSBridge()
+{
+    const PublishersType::iterator end = Publishers.end();
+    PublishersType::iterator iter;
+    for (iter = Publishers.begin();
+         iter != end;
+         ++iter) {
+        delete (*iter);
+    }
+    Publishers.clear();
+}
+
 void mtsROSBridge::AddIntervalStatisticsInterface(const std::string & interfaceName)
 {
     // create an interface to get access to this component interval statistics

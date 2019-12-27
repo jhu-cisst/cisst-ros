@@ -67,7 +67,7 @@ public:
         mPublisher = node.advertise<_rosType>(rosTopicName, queueSize, latch);
     }
     virtual ~mtsROSPublisher() {
-        //! \todo, how to remove the topic from the node?
+        mPublisher.shutdown();
     }
 
     bool Execute(void) {
@@ -104,7 +104,7 @@ public:
         mPublisher = node.advertise<std_msgs::Empty>(rosTopicName, queueSize, latch);
     }
     virtual ~mtsROSEventVoidPublisher() {
-        //! \todo remove the topic from the node
+        mPublisher.shutdown();
     }
     bool Execute(void) {
         return true;
@@ -130,7 +130,9 @@ public:
         mName = rosTopicName;
         mPublisher = node.advertise<_rosType>(rosTopicName, queueSize, latch);
     }
-    virtual ~mtsROSEventWritePublisher() {}
+    virtual ~mtsROSEventWritePublisher() {
+        mPublisher.shutdown();
+    }
 
     bool Execute(void) {
         return true;
@@ -158,7 +160,6 @@ public:
         mName = name;
     }
     virtual ~mtsROStf2Broadcaster() {
-        //! \todo, how to remove the topic from the node?
     }
 
     bool Execute(void) {
@@ -238,7 +239,7 @@ public:
         mSubscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
     }
     virtual ~mtsROSSubscriberWrite() {
-        // \todo, how to remove the subscriber from the node?
+        mSubscriber.shutdown();
     }
 
     void Callback(const _rosType & rosData) {
@@ -262,10 +263,12 @@ protected:
 class mtsROSSubscriberVoid
 {
 public:
-    mtsROSSubscriberVoid(const std::string & rosTopicName, ros::NodeHandle & node){
+    mtsROSSubscriberVoid(const std::string & rosTopicName, ros::NodeHandle & node) {
         mSubscriber = node.subscribe(rosTopicName, 1, &mtsROSSubscriberVoid::Callback, this);
     }
-    virtual ~mtsROSSubscriberVoid(){}
+    virtual ~mtsROSSubscriberVoid() {
+        mSubscriber.shutdown();
+    }
 
     void Callback(const std_msgs::Empty & CMN_UNUSED(rosData)) {
         mtsExecutionResult result = Function();
@@ -293,11 +296,11 @@ public:
                                const size_t & tableSize):
         StateTable(tableSize, rosTopicName)
     {
-        Subscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
+        mSubscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
         StateTable.AddData(CISSTData, rosTopicName);
     }
     virtual ~mtsROSSubscriberStateTable() {
-        // \todo, how to remove the subscriber from the node?
+        mSubscriber.shutdown();
     }
 
     void Callback(const _rosType & rosData) {
@@ -310,7 +313,7 @@ public:
     _mtsType CISSTData;
 
 protected:
-    ros::Subscriber Subscriber;
+    ros::Subscriber mSubscriber;
 };
 
 
@@ -326,7 +329,9 @@ public:
         mName = rosTopicName;
         mPublisher = node.advertise<_rosType>(rosTopicName, queueSize, latch);
     }
-    virtual ~mtsROSCommandWritePublisher() {}
+    virtual ~mtsROSCommandWritePublisher() {
+        mPublisher.shutdown();
+    }
 
     void Command(const _mtsType & CISSTData) {
         if ((mPublisher.getNumSubscribers() == 0) && !mPublisher.isLatched()) {
@@ -352,17 +357,19 @@ public:
                                const uint32_t queueSize = 5,
                                const bool latch = false)
     {
-        Publisher = node.advertise<std_msgs::Empty>(rosTopicName, queueSize, latch);
+        mPublisher = node.advertise<std_msgs::Empty>(rosTopicName, queueSize, latch);
     }
-    virtual ~mtsROSCommandVoidPublisher() {}
+    virtual ~mtsROSCommandVoidPublisher() {
+        mPublisher.shutdown();
+    }
 
     void Command(void)
     {
-        Publisher.publish(mEmptyMsg);
+        mPublisher.publish(mEmptyMsg);
     }
 
 protected:
-    ros::Publisher Publisher;
+    ros::Publisher mPublisher;
     std_msgs::Empty mEmptyMsg;
 };
 
@@ -506,7 +513,7 @@ public:
                  const double periodInSeconds,
                  ros::NodeHandle * nodeHandle);
 
-    inline ~mtsROSBridge() {}
+    ~mtsROSBridge();
 
     // taskPeriodic
     void Configure(const std::string & CMN_UNUSED(filename) = "");
