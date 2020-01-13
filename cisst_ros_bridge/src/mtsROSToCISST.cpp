@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -216,6 +216,23 @@ void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmVelocityJointSet 
     cisstData.Goal().SetSize(rosData.velocity.size());
     std::copy(rosData.velocity.begin(), rosData.velocity.end(),
               cisstData.Goal().begin());
+}
+
+void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmStateJoint & cisstData)
+{
+    mtsROSToCISSTHeader(rosData, cisstData);
+    cisstData.Name().SetSize(rosData.name.size());
+    std::copy(rosData.name.begin(), rosData.name.end(),
+              cisstData.Name().begin());
+    cisstData.Position().SetSize(rosData.position.size());
+    std::copy(rosData.position.begin(), rosData.position.end(),
+              cisstData.Position().begin());
+    cisstData.Velocity().SetSize(rosData.velocity.size());
+    std::copy(rosData.velocity.begin(), rosData.velocity.end(),
+              cisstData.Velocity().begin());
+    cisstData.Effort().SetSize(rosData.effort.size());
+    std::copy(rosData.effort.begin(), rosData.effort.end(),
+              cisstData.Effort().begin());
 }
 
 void mtsROSToCISST(const diagnostic_msgs::KeyValue & rosData, prmKeyValue & cisstData)

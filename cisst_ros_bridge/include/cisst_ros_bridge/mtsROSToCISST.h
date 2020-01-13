@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -36,6 +36,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmVelocityJointSet.h>
 #include <cisstParameterTypes/prmVelocityCartesianSet.h>
 #include <cisstParameterTypes/prmKeyValue.h>
+#include <cisstParameterTypes/prmStateJoint.h>
 
 // ros include
 #include <ros/ros.h>
@@ -150,6 +151,7 @@ void mtsROSToCISST(const geometry_msgs::TwistStamped & rosData, prmVelocityCarte
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet & cisstData);
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmForceTorqueJointSet & cisstData);
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmVelocityJointSet & cisstData);
+void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmStateJoint & cisstData);
 
 // diagnostic_msgs
 void mtsROSToCISST(const diagnostic_msgs::KeyValue & rosData, prmKeyValue & cisstData);
