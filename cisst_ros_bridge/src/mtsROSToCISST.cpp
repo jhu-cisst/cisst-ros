@@ -44,6 +44,11 @@ void mtsROSToCISST(const std_msgs::String & rosData, std::string & cisstData)
     cisstData = rosData.data;
 }
 
+void mtsROSToCISST(const ::std_msgs::String & rosData, mtsMessage & cisstData)
+{
+    cisstData.Message = rosData.data;
+}
+
 void mtsROSToCISST(const geometry_msgs::Vector3 & rosData, vct3 & cisstData)
 {
     cisstData[0] = rosData.x;
@@ -84,6 +89,12 @@ void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartes
 {
     mtsROSToCISSTHeader(rosData, cisstData);
     mtsROSToCISST(rosData.pose, cisstData);
+}
+
+void mtsROSToCISST(const geometry_msgs::TransformStamped & rosData, prmPositionCartesianGet & cisstData)
+{
+    mtsROSToCISSTHeader(rosData, cisstData);
+    mtsROSToCISST(rosData.transform, cisstData.Position());
 }
 
 void mtsROSToCISST(const geometry_msgs::TransformStamped & rosData, prmPositionCartesianSet & cisstData)
@@ -306,4 +317,20 @@ void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData,
                   cisstData.TorqueBiasPos());
     mtsROSToCISST(rosData.TorqueBiasNeg,
                   cisstData.TorqueBiasNeg());
+}
+
+void mtsROSToCISST(const cisst_msgs::mtsIntervalStatistics & rosData, mtsIntervalStatistics & cisstData)
+{
+    mtsROSToCISSTHeader(rosData, cisstData);
+    cisstData.SetFromExisting(rosData.PeriodAvg,
+                              rosData.PeriodStdDev,
+                              rosData.PeriodMin,
+                              rosData.PeriodMax,
+                              rosData.ComputeTimeAvg,
+                              rosData.ComputeTimeStdDev,
+                              rosData.ComputeTimeMin,
+                              rosData.ComputeTimeMax,
+                              rosData.NumberOfSamples,
+                              rosData.NumberOfOverruns,
+                              rosData.StatisticsInterval);
 }

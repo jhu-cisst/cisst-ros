@@ -205,6 +205,12 @@ bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pos
     return false;
 }
 
+bool mtsCISSTToROS(const prmPositionCartesianSet & cisstData, geometry_msgs::Pose & rosData,
+                   const std::string &)
+{
+    mtsCISSTToROSPose(cisstData.Goal(), rosData);
+    return true;
+}
 
 bool mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Pose & rosData,
                    const std::string &)
@@ -427,6 +433,24 @@ bool mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointStat
         if (size != 0) {
             rosData.position.resize(size);
             std::copy(cisstData.Position().begin(), cisstData.Position().end(),
+                      rosData.position.begin());
+        }
+        return true;
+    }
+    return false;
+}
+
+bool mtsCISSTToROS(const prmPositionJointSet & cisstData, sensor_msgs::JointState & rosData,
+                   const std::string & debugInfo)
+{
+    if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
+        rosData.name.resize(0);
+        rosData.velocity.resize(0);
+        rosData.effort.resize(0);
+        const size_t size = cisstData.Goal().size();
+        if (size != 0) {
+            rosData.position.resize(size);
+            std::copy(cisstData.Goal().begin(), cisstData.Goal().end(),
                       rosData.position.begin());
         }
         return true;
