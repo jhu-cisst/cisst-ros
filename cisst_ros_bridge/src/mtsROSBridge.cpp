@@ -51,6 +51,25 @@ mtsROSBridge::mtsROSBridge(const std::string & componentName,
     }
 }
 
+mtsROSBridge::mtsROSBridge(const mtsTaskPeriodicConstructorArg &arg):
+    mtsTaskPeriodic(arg),
+    mSpin(false),
+    mSignal(true)
+{
+    typedef char * char_pointer;
+    char_pointer * argv = new char_pointer[1];
+    argv[0]= new char[strlen("mtsROSBridge") + 1];
+    strcpy(argv[0], "mtsROSBridge");
+    int argc = 1;
+
+    if (mSignal) {
+        ros::init(argc, argv, Name);
+    } else {
+        ros::init(argc, argv, Name, ros::init_options::NoSigintHandler);
+    }
+    mNodeHandlePointer = ros::NodeHandlePtr(new ros::NodeHandle());
+}
+
 mtsROSBridge::mtsROSBridge(const std::string & componentName,
                            const double periodInSeconds,
                            ros::NodeHandle * nodeHandle):
