@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -24,8 +24,11 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstMultiTask/mtsManagerLocal.h>
 
 #include <cisstVector/vctDynamicVectorTypes.h>
-#include <cisstMultiTask/mtsTransformationTypes.h>
+
 #include <cisstMultiTask/mtsVector.h>
+#include <cisstMultiTask/mtsTransformationTypes.h>
+#include <cisstMultiTask/mtsIntervalStatistics.h>
+
 #include <cisstParameterTypes/prmPositionCartesianGet.h>
 #include <cisstParameterTypes/prmPositionCartesianSet.h>
 #include <cisstParameterTypes/prmPositionJointGet.h>
@@ -36,6 +39,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmVelocityJointSet.h>
 #include <cisstParameterTypes/prmVelocityCartesianSet.h>
 #include <cisstParameterTypes/prmKeyValue.h>
+#include <cisstParameterTypes/prmStateJoint.h>
 #include <cisstParameterTypes/prmOperatingState.h>
 
 // ros include
@@ -54,6 +58,7 @@ http://www.cisst.org/cisst/license.txt.
 
 // non standard messages
 #include <cisst_msgs/vctDoubleVec.h>
+#include <cisst_msgs/mtsIntervalStatistics.h>
 #include <cisst_msgs/prmCartesianImpedanceGains.h>
 
 // crtk
@@ -125,6 +130,7 @@ void mtsROSToCISST(const std_msgs::Float64 & rosData, double & cisstData);
 void mtsROSToCISST(const std_msgs::Int32 & rosData, int & cisstData);
 void mtsROSToCISST(const std_msgs::Bool & rosData, bool & cisstData);
 void mtsROSToCISST(const std_msgs::String & rosData, std::string & cisstData);
+void mtsROSToCISST(const ::std_msgs::String & rosData, mtsMessage & cisstData);
 
 // geometry_msgs
 void mtsROSToCISST(const geometry_msgs::Vector3 & rosData, vct3 & cisstData);
@@ -133,6 +139,7 @@ void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianGet 
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, prmPositionCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartesianGet & cisstData);
 void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartesianSet & cisstData);
+void mtsROSToCISST(const geometry_msgs::TransformStamped & rosData, prmPositionCartesianGet & cisstData);
 void mtsROSToCISST(const geometry_msgs::TransformStamped & rosData, prmPositionCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::Pose & rosData, vctFrm3 & cisstData);
 void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, vctFrm3 & cisstData);
@@ -155,6 +162,7 @@ void mtsROSToCISST(const geometry_msgs::TwistStamped & rosData, prmVelocityCarte
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet & cisstData);
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmForceTorqueJointSet & cisstData);
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmVelocityJointSet & cisstData);
+void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmStateJoint & cisstData);
 
 // diagnostic_msgs
 void mtsROSToCISST(const diagnostic_msgs::KeyValue & rosData, prmKeyValue & cisstData);
@@ -163,6 +171,7 @@ void mtsROSToCISST(const diagnostic_msgs::KeyValue & rosData, prmKeyValue & ciss
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, prmPositionJointSet & cisstData);
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & cisstData);
 void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData, prmCartesianImpedanceGains & cisstData);
+void mtsROSToCISST(const cisst_msgs::mtsIntervalStatistics & rosData, mtsIntervalStatistics & cisstData);
 
 // crtk_msgs
 void mtsROSToCISST(const crtk_msgs::operating_state & rosData, prmOperatingState & cisstData);

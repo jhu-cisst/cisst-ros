@@ -505,6 +505,8 @@ public:
                                   const bool sig = true,
                                   ros::NodeHandle * nodeHandle = NULL);
 
+    mtsROSBridge(const mtsTaskPeriodicConstructorArg & arg);
+
     /*!  Constructor using an existing ros::NodeHandle.  By default,
       spin is set to false (see also PerformsSpin) and this
       constructor doesn't redefine the signal handler.
