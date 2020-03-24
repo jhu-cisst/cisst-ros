@@ -698,35 +698,3 @@ bool mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
     }
     return false;
 }
-
-template <typename _ros_operating_state>
-bool mtsCISSTToROSOperatingState(const prmOperatingState & cisstData,
-                                 _ros_operating_state & rosData,
-                                 const std::string & debugInfo)
-{
-    if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
-        try {
-            rosData.state = prmOperatingState::StateTypeToString(cisstData.State());
-        } catch (...) {
-            rosData.state = "UNDEFINED";
-        }
-        rosData.is_homed = cisstData.IsHomed();
-        rosData.is_busy = cisstData.IsBusy();
-        return true;
-    }
-    return false;
-}
-
-bool mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::operating_state & rosData,
-                   const std::string & debugInfo)
-{
-    return mtsCISSTToROSOperatingState(cisstData, rosData, debugInfo);
-}
-
-bool mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::trigger_operating_state::Response & rosData,
-                   const std::string & debugInfo)
-{
-    return mtsCISSTToROSOperatingState(cisstData, rosData.operating_state, debugInfo);
-}

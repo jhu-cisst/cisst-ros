@@ -334,22 +334,3 @@ void mtsROSToCISST(const cisst_msgs::mtsIntervalStatistics & rosData, mtsInterva
                               rosData.NumberOfOverruns,
                               rosData.StatisticsInterval);
 }
-
-void mtsROSToCISST(const crtk_msgs::operating_state & rosData,
-                   prmOperatingState & cisstData)
-{
-    mtsROSToCISSTHeader(rosData, cisstData);
-    try {
-        cisstData.State() = prmOperatingState::StateTypeFromString(rosData.state);
-    } catch (...) {
-        cisstData.State() = prmOperatingState::UNDEFINED;
-    }
-    cisstData.IsHomed() = rosData.is_homed;
-    cisstData.IsBusy() = rosData.is_busy;
-}
-
-void mtsROSToCISST(const crtk_msgs::StringStamped & rosData,
-                   std::string & cisstData)
-{
-    cisstData = rosData.string;
-}

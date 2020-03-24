@@ -68,10 +68,6 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_msgs/mtsIntervalStatistics.h>
 #include <cisst_msgs/BoolStamped.h>
 
-// crtk
-#include <crtk_msgs/operating_state.h>
-#include <crtk_msgs/trigger_operating_state.h>
-
 // helper functions
 template <typename _cisstFrame>
 void mtsCISSTToROSPose(const _cisstFrame & cisstFrame, geometry_msgs::Pose & rosPose)
@@ -208,16 +204,6 @@ bool mtsCISSTToROS(const prmCartesianImpedanceGains & cisstData,
                    const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
                    cisst_msgs::mtsIntervalStatistics & rosData,
-                   const std::string & debugInfo);
-
-// crtk_msgs
-bool mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::operating_state & rosData,
-                   const std::string & debugInfo);
-
-// crtk_srvs
-bool mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::trigger_operating_state::Response & rosData,
                    const std::string & debugInfo);
 
 #endif // _mtsCISSTToROS_h
