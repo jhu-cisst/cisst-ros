@@ -74,10 +74,11 @@ public:
 
 protected:
     //! ros node
-    ros::NodeHandlePtr m_node_handle_ptr;
+    ros::NodeHandle * m_node_handle_ptr = nullptr;
 
     mtsROSBridge * m_subscribers_bridge = nullptr;
     mtsROSBridge * m_events_bridge = nullptr;
+    mtsROSBridge * m_stats_bridge = nullptr;
 };
 
 CMN_DECLARE_SERVICES_INSTANTIATION(mts_ros_crtk_bridge);

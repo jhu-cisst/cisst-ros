@@ -33,18 +33,27 @@ mts_ros_crtk_bridge::mts_ros_crtk_bridge(const std::string & component_name,
     mtsTaskFromSignal(component_name),
     m_node_handle_ptr(node_handle)
 {
-    mtsManagerLocal * componentManager = mtsComponentManager::GetInstance();
+    mtsManagerLocal * component_manager = mtsComponentManager::GetInstance();
 
     // subscribers bridge is shared for all subscribers since we only want one
     m_subscribers_bridge =
-        new mtsROSBridge(component_name + "_subscribers", 0.1 * cmn_ms, m_node_handle_ptr.get());
+        new mtsROSBridge(component_name + "_subscribers", 0.1 * cmn_ms, m_node_handle_ptr);
+    m_subscribers_bridge->AddIntervalStatisticsInterface();
     m_subscribers_bridge->PerformsSpin(true);
-    componentManager->AddComponent(m_subscribers_bridge);
+    component_manager->AddComponent(m_subscribers_bridge);
 
     // event bridge
     m_events_bridge =
-        new mtsROSBridge(component_name + "_events", 0.1 * cmn_ms, m_node_handle_ptr.get());
-    componentManager->AddComponent(m_events_bridge);
+        new mtsROSBridge(component_name + "_events", 0.1 * cmn_ms, m_node_handle_ptr);
+    m_events_bridge->AddIntervalStatisticsInterface();
+    component_manager->AddComponent(m_events_bridge);
+
+    // stats bridge
+    m_stats_bridge =
+        new mtsROSBridge(component_name + "_stats", 200.0 * cmn_ms, m_node_handle_ptr);
+    component_manager->AddComponent(m_stats_bridge);
+    m_stats_bridge->AddIntervalStatisticsPublisher("stats/subscribers", m_subscribers_bridge->GetName());
+    m_stats_bridge->AddIntervalStatisticsPublisher("stats/events", m_events_bridge->GetName());
 }
 
 mts_ros_crtk_bridge::~mts_ros_crtk_bridge(void)
@@ -81,7 +90,7 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & componen
     }
 
     // clean ROS namespace
-    std::string clean_namespace = ros_namespace + '/';
+    std::string clean_namespace = ros_namespace;
     std::replace(clean_namespace.begin(), clean_namespace.end(), ' ', '_');
     std::replace(clean_namespace.begin(), clean_namespace.end(), '-', '_');
     std::replace(clean_namespace.begin(), clean_namespace.end(), '.', '_');
@@ -89,12 +98,17 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & componen
     // create a new bridge for this provided interface
     mtsROSBridge * pub_bridge =
         new mtsROSBridge(this->GetName() + "_" + clean_namespace,
-                         publish_period_in_seconds, m_node_handle_ptr.get());
+                         publish_period_in_seconds, m_node_handle_ptr);
+
+    // add trailing / for clean namespace
+    clean_namespace.append("/");
 
     typedef std::vector<std::string> list_type;
     typedef list_type::const_iterator iter_type;
     list_type commands;
     iter_type iter, end;
+
+    bool has_stats = false;
 
     // write commands
     commands = interface_provided->GetNamesOfCommandsWrite();
@@ -147,6 +161,8 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & componen
         } else if (*iter == "operating_state") {
             m_subscribers_bridge->AddServiceFromCommandRead<prmOperatingState, crtk_msgs::trigger_operating_state>
                 (interface_name, "operating_state", clean_namespace + "operating_state");
+        } else if (*iter == "GetPeriodStatistics") {
+            has_stats = true;
         }
     }
 
@@ -180,9 +196,20 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & componen
         component_manager->Connect(m_events_bridge->GetName(), interface_name,
                                    component_name, interface_name);
     }
+
+    // add stats for publisher itself
+    pub_bridge->AddIntervalStatisticsInterface();
     component_manager->AddComponent(pub_bridge);
     component_manager->Connect(pub_bridge->GetName(), interface_name,
                                component_name, interface_name);
+    m_stats_bridge->AddIntervalStatisticsPublisher("stats/publishers_" + interface_name,
+                                                   pub_bridge->GetName());
+
+    // stats from the component we're bridging
+    if (has_stats) {
+        m_stats_bridge->AddIntervalStatisticsPublisher("stats/" + interface_name,
+                                                       component_name, interface_name);
+    }
 }
 
 #if 0
@@ -201,7 +228,7 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & componen
             std::replace(rosButton.begin(), rosButton.end(), '.', '_');
             spin_bridge->AddPublisherFromEventWrite<prmEventButton, sensor_msgs::Joy>
                 (*button, "Button", rosButton);
-            componentManager->Connect(spin_bridge->GetName(), *button,
-                                      forceDimension->GetName(), *button);
+            component_manager->Connect(spin_bridge->GetName(), *button,
+                                       forceDimension->GetName(), *button);
         }
 #endif
