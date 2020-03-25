@@ -187,6 +187,42 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & componen
         }
     }
 
+    // buttons are a pain, they tend to have one interface per button
+    // with a single write event called "Button".  By convention, the
+    // button interface is using the name of the device it is attached
+    // too as prefix (e.g. ForceDimension Falcon00 has button
+    // Falcon00-Left, SensablePhantom left has button leftButton1).
+    // So we look at all interfaces on the component that match the
+    // interface_name and have an event write called "Button".
+    list_type interfaces = component->GetNamesOfInterfacesProvided();
+    const size_t prefix_size = interface_name.size();
+    end = interfaces.end();
+    for (iter = interfaces.begin();
+         iter != end;
+         ++iter) {
+        // can only be a prefix if shorter
+        if (iter->size() > prefix_size) {
+            if (std::equal(interface_name.begin(),
+                           interface_name.end(),
+                           iter->begin())) {
+                // remove heading - or _
+                size_t offset = 0;
+                const char first_char = iter->at(prefix_size);
+                if ((first_char == '-') || (first_char == '_')) {
+                    offset = 1;
+                }
+                std::string button_name = iter->substr(prefix_size + offset);
+                // put all to lower case to be more ROS alike
+                std::transform(button_name.begin(), button_name.end(), button_name.begin(), tolower);
+                // add and connect interface to event bridge
+                m_events_bridge->AddPublisherFromEventWrite<prmEventButton, sensor_msgs::Joy>
+                    (*iter, "Button", clean_namespace + button_name);
+                component_manager->Connect(m_events_bridge->GetName(), *iter,
+                                           component_name, *iter);
+            }
+        }
+    }
+
     // connect interfaces
     if (m_subscribers_bridge->GetInterfaceRequired(interface_name)) {
             component_manager->Connect(m_subscribers_bridge->GetName(), interface_name,
