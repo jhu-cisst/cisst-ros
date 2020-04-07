@@ -175,14 +175,14 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & componen
         if (*iter == "operating_state") {
             m_events_bridge->AddPublisherFromEventWrite<prmOperatingState, crtk_msgs::operating_state>
                 (interface_name, "operating_state", clean_namespace + "operating_state");
-        } else if (*iter == "Error") {
-            m_events_bridge->AddLogFromEventWrite(interface_name, "Error",
+        } else if (*iter == "error") {
+            m_events_bridge->AddLogFromEventWrite(interface_name, "error",
                                                   mtsROSEventWriteLog::ROS_LOG_ERROR);
-        } else if (*iter == "Warning") {
-            m_events_bridge->AddLogFromEventWrite(interface_name, "Warning",
+        } else if (*iter == "warning") {
+            m_events_bridge->AddLogFromEventWrite(interface_name, "warning",
                                                   mtsROSEventWriteLog::ROS_LOG_WARN);
-        } else if (*iter == "Status") {
-            m_events_bridge->AddLogFromEventWrite(interface_name, "Status",
+        } else if (*iter == "status") {
+            m_events_bridge->AddLogFromEventWrite(interface_name, "status",
                                                   mtsROSEventWriteLog::ROS_LOG_INFO);
         }
     }
