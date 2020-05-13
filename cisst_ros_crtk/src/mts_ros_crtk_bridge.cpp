@@ -167,6 +167,9 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
         } else if (_crtk_command == "measured_cf") {
             _pub_bridge->AddPublisherFromCommandRead<prmForceCartesianGet, geometry_msgs::WrenchStamped>
                 (_interface_name, *_command, _ros_topic);
+        } else if (_crtk_command == "jacobian") {
+            _pub_bridge->AddPublisherFromCommandRead<vctDoubleMat, std_msgs::Float64MultiArray>
+                (_interface_name, *_command, _ros_topic);
         } else if (_crtk_command == "operating_state") {
             m_subscribers_bridge->AddServiceFromCommandRead<prmOperatingState, crtk_msgs::trigger_operating_state>
                 (_required_interface_name, *_command, _ros_topic);
