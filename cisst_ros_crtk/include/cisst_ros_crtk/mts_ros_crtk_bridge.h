@@ -22,6 +22,7 @@ http://www.cisst.org/cisst/license.txt.
 
 // cisst include
 #include <cisstMultiTask/mtsTaskFromSignal.h>
+#include <cisstMultiTask/mtsDelayedConnections.h>
 
 class mtsROSBridge;
 
@@ -72,6 +73,11 @@ public:
                                   _publish_period_in_seconds, _interface_name);
     }
 
+    /*! Connect all components created and used so far. */
+    inline virtual void Connect(void) {
+        m_connections.Connect();
+    }
+
     /*! Access to different bridges to allow users to add custom
       publishers/subscribers */
     inline mtsROSBridge & subscribers_bridge(void) {
@@ -108,6 +114,8 @@ protected:
     mtsROSBridge * m_subscribers_bridge = nullptr;
     mtsROSBridge * m_events_bridge = nullptr;
     mtsROSBridge * m_stats_bridge = nullptr;
+
+    mtsDelayedConnections m_connections;
 };
 
 CMN_DECLARE_SERVICES_INSTANTIATION(mts_ros_crtk_bridge);

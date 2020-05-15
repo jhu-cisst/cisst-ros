@@ -101,7 +101,7 @@ void mtsROSBridge::AddIntervalStatisticsInterface(const std::string & interfaceN
     // create an interface to get access to this component interval statistics
     mtsInterfaceProvided * controlInterface = AddInterfaceProvided(interfaceName);
     controlInterface->AddCommandReadState(StateTable, StateTable.PeriodStats,
-                                          "GetPeriodStatistics");
+                                          "period_statistics");
 }
 
 void mtsROSBridge::AddIntervalStatisticsPublisher(const std::string & rosNamespace,
@@ -111,7 +111,7 @@ void mtsROSBridge::AddIntervalStatisticsPublisher(const std::string & rosNamespa
     // create an publisher to publish this component interval statistics
     std::string topicName = rosNamespace + "/period_statistics";
     this->AddPublisherFromCommandRead<mtsIntervalStatistics, cisst_msgs::mtsIntervalStatistics>
-        (componentName + interfaceName, "GetPeriodStatistics",
+        (componentName + interfaceName, "period_statistics",
          topicName);
 
     mtsManagerLocal * componentManager = mtsManagerLocal::GetInstance();

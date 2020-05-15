@@ -110,8 +110,6 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
         _clean_namespace.append("/");
     }
 
-    bool _has_stats = false;
-
     std::string _crtk_command;
     std::string _ros_topic;
 
@@ -173,8 +171,12 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
         } else if (_crtk_command == "operating_state") {
             m_subscribers_bridge->AddServiceFromCommandRead<prmOperatingState, crtk_msgs::trigger_operating_state>
                 (_required_interface_name, *_command, _ros_topic);
-        } else if (_crtk_command == "GetPeriodStatistics") {
-            _has_stats = true;
+        } else if (_crtk_command == "period_statistics") {
+            std::string _namespace = _component_name + "_" + _interface_name;
+            std::transform(_namespace.begin(), _namespace.end(), _namespace.begin(), tolower);
+            clean_namespace(_namespace);
+            m_stats_bridge->AddIntervalStatisticsPublisher("stats/" + _namespace,
+                                                           _component_name, _interface_name);
         }
     }
 
@@ -238,47 +240,42 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
                 // add and connect interface to event bridge
                 m_events_bridge->AddPublisherFromEventWrite<prmEventButton, sensor_msgs::Joy>
                     (*_iter, "Button", _clean_namespace + _button_name);
-                _component_manager->Connect(m_events_bridge->GetName(), *_iter,
-                                            _component_name, *_iter);
+                m_connections.Add(m_events_bridge->GetName(), *_iter,
+                                  _component_name, *_iter);
             }
         }
     }
 
     // connect interfaces
     if (m_subscribers_bridge->GetInterfaceRequired(_required_interface_name)) {
-        _component_manager->Connect(m_subscribers_bridge->GetName(), _required_interface_name,
-                                    _component_name, _interface_name);
+        m_connections.Add(m_subscribers_bridge->GetName(), _required_interface_name,
+                          _component_name, _interface_name);
     }
     if (m_events_bridge->GetInterfaceRequired(_required_interface_name)) {
-        _component_manager->Connect(m_events_bridge->GetName(), _required_interface_name,
-                                    _component_name, _interface_name);
+        m_connections.Add(m_events_bridge->GetName(), _required_interface_name,
+                          _component_name, _interface_name);
     }
     if (m_events_bridge->GetInterfaceRequired(_required_interface_name + "-ros-log")) {
-        _component_manager->Connect(m_events_bridge->GetName(), _required_interface_name + "-ros-log",
+        m_connections.Add(m_events_bridge->GetName(), _required_interface_name + "-ros-log",
                                     _component_name, _interface_name);
     }
 
     // add stats for publisher itself
     _pub_bridge->AddIntervalStatisticsInterface();
     _component_manager->AddComponent(_pub_bridge);
-    _component_manager->Connect(_pub_bridge->GetName(), _interface_name,
-                                _component_name, _interface_name);
+    m_connections.Add(_pub_bridge->GetName(), _interface_name,
+                      _component_name, _interface_name);
 
     std::string _pub_namespace = "stats/publishers_" + _component_name + "_" + _interface_name;
     clean_namespace(_pub_namespace);
     std::transform(_pub_namespace.begin(), _pub_namespace.end(), _pub_namespace.begin(), tolower);
     m_stats_bridge->AddIntervalStatisticsPublisher(_pub_namespace,
                                                    _pub_bridge->GetName());
-
-    // stats from the component we're bridging
-    if (_has_stats) {
-        m_stats_bridge->AddIntervalStatisticsPublisher("stats/" + _interface_name,
-                                                       _component_name, _interface_name);
-    }
 }
 
 void mts_ros_crtk_bridge::clean_namespace(std::string & _ros_namespace)
 {
+    _ros_namespace = ros::names::clean(_ros_namespace);
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), ' ', '_');
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), '-', '_');
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), '.', '_');
