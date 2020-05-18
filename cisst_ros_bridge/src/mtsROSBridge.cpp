@@ -96,12 +96,17 @@ mtsROSBridge::~mtsROSBridge()
     Publishers.clear();
 }
 
-void mtsROSBridge::AddIntervalStatisticsInterface(const std::string & interfaceName)
+bool mtsROSBridge::AddIntervalStatisticsInterface(const std::string & interfaceName)
 {
+    // check if the interface already exists
+    if (GetInterfaceProvided(interfaceName)) {
+        return false;
+    }
     // create an interface to get access to this component interval statistics
     mtsInterfaceProvided * controlInterface = AddInterfaceProvided(interfaceName);
     controlInterface->AddCommandReadState(StateTable, StateTable.PeriodStats,
                                           "period_statistics");
+    return true;
 }
 
 void mtsROSBridge::AddIntervalStatisticsPublisher(const std::string & rosNamespace,

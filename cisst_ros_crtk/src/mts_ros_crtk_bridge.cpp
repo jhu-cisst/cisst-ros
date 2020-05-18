@@ -98,21 +98,39 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
     // bridged (e.g. subscribers and events)
     const std::string _required_interface_name = _component_name + "_using_" + _interface_name;
 
-    // create a new bridge for this provided interface
-    std::cerr << CMN_LOG_DETAILS
-              << " -- add code to see if this components already exists and make sure it is a mtsROSBridge"
-              << std::endl;
+    // create new pub/tf bridges for this provided interface if needed
+    mtsComponent * _existing_component;
+    mtsROSBridge * _pub_bridge;
+    mtsROSBridge * _tf_bridge;
 
     bool _pub_bridge_used = false;
-    mtsROSBridge * _pub_bridge =
-        new mtsROSBridge(this->GetName() + "_" + _clean_namespace,
-                         _publish_period_in_seconds, m_node_handle_ptr);
-
     bool _tf_bridge_used = false;
-    mtsROSBridge * _tf_bridge =
-        new mtsROSBridge(this->GetName() + "_tf_" + _clean_namespace,
-                         _tf_period_in_seconds, m_node_handle_ptr);
 
+    bool _pub_bridge_is_new;
+    bool _tf_bridge_is_new;
+    
+    const std::string _pub_bridge_name =  this->GetName() + "_pub_" + _clean_namespace;
+    _existing_component = _component_manager->GetComponent(_pub_bridge_name);
+    if (_existing_component) {
+        _pub_bridge_is_new = false;
+        _pub_bridge = dynamic_cast<mtsROSBridge *>(_existing_component);
+    } else {
+        _pub_bridge_is_new = true;
+        _pub_bridge = new mtsROSBridge(_pub_bridge_name,
+                                       _publish_period_in_seconds, m_node_handle_ptr);
+    }
+
+    const std::string _tf_bridge_name =  this->GetName() + "_tf_" + _clean_namespace;
+    _existing_component = _component_manager->GetComponent(_tf_bridge_name);
+    if (_existing_component) {
+        _tf_bridge_is_new = false;
+        _tf_bridge = dynamic_cast<mtsROSBridge *>(_existing_component);
+    } else {
+        _tf_bridge_is_new = true;
+        _tf_bridge = new mtsROSBridge(_tf_bridge_name,
+                                       _tf_period_in_seconds, m_node_handle_ptr);
+    }
+    
     // add trailing / for clean namespace
     if (!_clean_namespace.empty()) {
         _clean_namespace.append("/");
@@ -279,24 +297,35 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
     }
 
     if (_tf_bridge_used) {
-        _component_manager->AddComponent(_tf_bridge);
+        if (_tf_bridge_is_new) {
+            _component_manager->AddComponent(_tf_bridge);
+        }
         m_connections.Add(_tf_bridge->GetName(), _interface_name,
                           _component_name, _interface_name);
+        if (_tf_bridge->AddIntervalStatisticsInterface()) {
+            std::string _tf_namespace = "stats/tf_" + _component_name + "_" + _interface_name;
+            clean_namespace(_tf_namespace);
+            std::transform(_tf_namespace.begin(), _tf_namespace.end(), _tf_namespace.begin(), tolower);
+            m_stats_bridge->AddIntervalStatisticsPublisher(_tf_namespace,
+                                                           _tf_bridge->GetName());
+        }
     } else {
         delete _tf_bridge;
     }
 
     if (_pub_bridge_used) {
-        _pub_bridge->AddIntervalStatisticsInterface();
-        _component_manager->AddComponent(_pub_bridge);
+        if (_pub_bridge_is_new) {
+            _component_manager->AddComponent(_pub_bridge);
+        }
         m_connections.Add(_pub_bridge->GetName(), _interface_name,
                           _component_name, _interface_name);
-
-        std::string _pub_namespace = "stats/publishers_" + _component_name + "_" + _interface_name;
-        clean_namespace(_pub_namespace);
-        std::transform(_pub_namespace.begin(), _pub_namespace.end(), _pub_namespace.begin(), tolower);
-        m_stats_bridge->AddIntervalStatisticsPublisher(_pub_namespace,
-                                                       _pub_bridge->GetName());
+        if (_pub_bridge->AddIntervalStatisticsInterface()) {
+            std::string _pub_namespace = "stats/publishers_" + _component_name + "_" + _interface_name;
+            clean_namespace(_pub_namespace);
+            std::transform(_pub_namespace.begin(), _pub_namespace.end(), _pub_namespace.begin(), tolower);
+            m_stats_bridge->AddIntervalStatisticsPublisher(_pub_namespace,
+                                                           _pub_bridge->GetName());
+        }
     } else {
         delete _pub_bridge;
     }
