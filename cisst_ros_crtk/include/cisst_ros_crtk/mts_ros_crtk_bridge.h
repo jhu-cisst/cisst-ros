@@ -21,6 +21,7 @@ http://www.cisst.org/cisst/license.txt.
 #define _mts_ros_crtk_bridge_h
 
 // cisst include
+#include <cisstCommon/cmnUnits.h>
 #include <cisstMultiTask/mtsTaskFromSignal.h>
 #include <cisstMultiTask/mtsDelayedConnections.h>
 
@@ -56,21 +57,28 @@ public:
     /*! This method will look at all the provided functions and events
       that match the CRTK convention and automatically create the
       corresponding ROS topics (publishers and subscribers).  This
-      method also adds ROS topics for a few non-CRTK including all
-      events using prmEventButton, errors/warnings and interval
-      statistics. */
+      method also adds ROS topics for a few non-CRTK topics including
+      all events using prmEventButton, errors/warnings, jacobians and
+      interval statistics.  All commands and events using a '/' in
+      their names are also parsed to check if they match the CRTK
+      covention, i.e. `local/measured_cp` will also be automatically
+      bridged. */
     void bridge_interface_provided(const std::string & _component_name,
                                    const std::string & _interface_name,
-                                   const double _publish_period_in_seconds,
-                                   const std::string & _ros_namespace);
-
+                                   const std::string & _ros_namespace,
+                                   const double _publish_period_in_seconds = 10.0 * cmn_ms,
+                                   const double _tf_period_in_seconds = 20.0 * cmn_ms);
+    
     /*! Same method but used the name of the provided interface as ROS
       namespace. */
     inline void bridge_interface_provided(const std::string & _component_name,
                                           const std::string & _interface_name,
-                                          const double _publish_period_in_seconds) {
+                                          const double _publish_period_in_seconds = 10.0 * cmn_ms,
+                                          const double _tf_period_in_seconds = 20.0 * cmn_ms) {
         bridge_interface_provided(_component_name, _interface_name,
-                                  _publish_period_in_seconds, _interface_name);
+                                  _interface_name, // use interface names as ROS namespace
+                                  _publish_period_in_seconds,
+                                  _tf_period_in_seconds);
     }
 
     /*! Connect all components created and used so far. */

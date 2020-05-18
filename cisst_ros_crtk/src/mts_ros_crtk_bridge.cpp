@@ -69,8 +69,9 @@ void mts_ros_crtk_bridge::Run(void)
 
 void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _component_name,
                                                     const std::string & _interface_name,
+                                                    const std::string & _ros_namespace,
                                                     const double _publish_period_in_seconds,
-                                                    const std::string & _ros_namespace)
+                                                    const double _tf_period_in_seconds)
 {
     // first make sure we can find the component to bridge
     mtsManagerLocal * _component_manager = mtsComponentManager::GetInstance();
@@ -101,9 +102,16 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
     std::cerr << CMN_LOG_DETAILS
               << " -- add code to see if this components already exists and make sure it is a mtsROSBridge"
               << std::endl;
+
+    bool _pub_bridge_used = false;
     mtsROSBridge * _pub_bridge =
         new mtsROSBridge(this->GetName() + "_" + _clean_namespace,
                          _publish_period_in_seconds, m_node_handle_ptr);
+
+    bool _tf_bridge_used = false;
+    mtsROSBridge * _tf_bridge =
+        new mtsROSBridge(this->GetName() + "_tf_" + _clean_namespace,
+                         _tf_period_in_seconds, m_node_handle_ptr);
 
     // add trailing / for clean namespace
     if (!_clean_namespace.empty()) {
@@ -153,19 +161,29 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
         _ros_topic = _clean_namespace + *_command;
         if ((_crtk_command == "measured_js")
             || (_crtk_command == "setpoint_js")) {
+            _pub_bridge_used = true;
             _pub_bridge->AddPublisherFromCommandRead<prmStateJoint, sensor_msgs::JointState>
                 (_interface_name, *_command, _ros_topic);
         } else  if ((_crtk_command == "measured_cp")
                     || (_crtk_command == "setpoint_cp")) {
+            _pub_bridge_used = true;
             _pub_bridge->AddPublisherFromCommandRead<prmPositionCartesianGet, geometry_msgs::TransformStamped>
                 (_interface_name, *_command, _ros_topic);
+            // tf broadcast
+            if (_crtk_command == "measured_cp") {
+                _tf_bridge_used = true;
+                _tf_bridge->Addtf2BroadcasterFromCommandRead(_interface_name, *_command);
+            }
         } else if (_crtk_command == "measured_cv") {
+            _pub_bridge_used = true;
             _pub_bridge->AddPublisherFromCommandRead<prmVelocityCartesianGet, geometry_msgs::TwistStamped>
                 (_interface_name, *_command, _ros_topic);
         } else if (_crtk_command == "measured_cf") {
+            _pub_bridge_used = true;
             _pub_bridge->AddPublisherFromCommandRead<prmForceCartesianGet, geometry_msgs::WrenchStamped>
                 (_interface_name, *_command, _ros_topic);
         } else if (_crtk_command == "jacobian") {
+            _pub_bridge_used = true;
             _pub_bridge->AddPublisherFromCommandRead<vctDoubleMat, std_msgs::Float64MultiArray>
                 (_interface_name, *_command, _ros_topic);
         } else if (_crtk_command == "operating_state") {
@@ -260,17 +278,28 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
                                     _component_name, _interface_name);
     }
 
-    // add stats for publisher itself
-    _pub_bridge->AddIntervalStatisticsInterface();
-    _component_manager->AddComponent(_pub_bridge);
-    m_connections.Add(_pub_bridge->GetName(), _interface_name,
-                      _component_name, _interface_name);
+    if (_tf_bridge_used) {
+        _component_manager->AddComponent(_tf_bridge);
+        m_connections.Add(_tf_bridge->GetName(), _interface_name,
+                          _component_name, _interface_name);
+    } else {
+        delete _tf_bridge;
+    }
 
-    std::string _pub_namespace = "stats/publishers_" + _component_name + "_" + _interface_name;
-    clean_namespace(_pub_namespace);
-    std::transform(_pub_namespace.begin(), _pub_namespace.end(), _pub_namespace.begin(), tolower);
-    m_stats_bridge->AddIntervalStatisticsPublisher(_pub_namespace,
-                                                   _pub_bridge->GetName());
+    if (_pub_bridge_used) {
+        _pub_bridge->AddIntervalStatisticsInterface();
+        _component_manager->AddComponent(_pub_bridge);
+        m_connections.Add(_pub_bridge->GetName(), _interface_name,
+                          _component_name, _interface_name);
+
+        std::string _pub_namespace = "stats/publishers_" + _component_name + "_" + _interface_name;
+        clean_namespace(_pub_namespace);
+        std::transform(_pub_namespace.begin(), _pub_namespace.end(), _pub_namespace.begin(), tolower);
+        m_stats_bridge->AddIntervalStatisticsPublisher(_pub_namespace,
+                                                       _pub_bridge->GetName());
+    } else {
+        delete _pub_bridge;
+    }
 }
 
 void mts_ros_crtk_bridge::clean_namespace(std::string & _ros_namespace)
