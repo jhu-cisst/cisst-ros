@@ -740,7 +740,7 @@ protected:
     PublishersType Publishers;
 
     //! ros node
-    ros::NodeHandlePtr mNodeHandlePointer;
+    ros::NodeHandle * mNodeHandlePointer;
 
     //! spin flag, if set call spinOnce() in run
     bool mSpin;

@@ -39,15 +39,15 @@ mtsROSBridge::mtsROSBridge(const std::string & componentName,
     strcpy(argv[0], "mtsROSBridge");
     int argc = 1;
 
-    if (nodeHandle != NULL) {
-        mNodeHandlePointer = ros::NodeHandlePtr(nodeHandle);
+    if (nodeHandle != nullptr) {
+        mNodeHandlePointer = nodeHandle;
     } else {
         if (mSignal) {
             ros::init(argc, argv, componentName);
         } else {
             ros::init(argc, argv, componentName, ros::init_options::NoSigintHandler);
         }
-        mNodeHandlePointer = ros::NodeHandlePtr(new ros::NodeHandle());
+        mNodeHandlePointer = new ros::NodeHandle();
     }
 }
 
@@ -67,7 +67,7 @@ mtsROSBridge::mtsROSBridge(const mtsTaskPeriodicConstructorArg &arg):
     } else {
         ros::init(argc, argv, Name, ros::init_options::NoSigintHandler);
     }
-    mNodeHandlePointer = ros::NodeHandlePtr(new ros::NodeHandle());
+    mNodeHandlePointer = new ros::NodeHandle();
 }
 
 mtsROSBridge::mtsROSBridge(const std::string & componentName,
@@ -77,7 +77,7 @@ mtsROSBridge::mtsROSBridge(const std::string & componentName,
     mSpin(false),
     mSignal(false)
 {
-    mNodeHandlePointer = ros::NodeHandlePtr(nodeHandle);
+    mNodeHandlePointer = nodeHandle;
 }
 
 void mtsROSBridge::Configure(const std::string & CMN_UNUSED(filename))
