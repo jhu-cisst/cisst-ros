@@ -772,7 +772,7 @@ bool mtsROSBridge::AddPublisherFromCommandRead(const std::string & interfaceRequ
         new mtsROSPublisher<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer), queueSize, latch);
     if (!interfaceRequired->AddFunction(functionName, newPublisher->Function)) {
         ROS_ERROR("mtsROSBridge::AddPublisherFromCommandRead: failed to create function.");
-        CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromCommandRead: faild to create function \""
+        CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromCommandRead: failed to create function \""
                                  << functionName << "\"" << std::endl;
         delete newPublisher;
         return false;
@@ -794,7 +794,7 @@ bool mtsROSBridge::AddSubscriberToCommandWrite(const std::string & interfaceRequ
     }
     if (!interfaceRequired) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToCommandWrite: failed to create required interface.");
-        CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandWrite: faild to create required interface \""
+        CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandWrite: failed to create required interface \""
                                  << interfaceRequiredName << "\"" << std::endl;
         return false;
     }
@@ -935,7 +935,7 @@ bool mtsROSBridge::AddServiceFromCommandRead(const std::string & interfaceRequir
     }
     if (!interfaceRequired) {
         ROS_ERROR("mtsROSBridge::AddServiceFromCommandRead: failed to create required interface.");
-        CMN_LOG_CLASS_INIT_ERROR << "AddServiceFromCommandRead: faild to create required interface \""
+        CMN_LOG_CLASS_INIT_ERROR << "AddServiceFromCommandRead: failed to create required interface \""
                                  << interfaceRequiredName << "\"" << std::endl;
         return false;
     }
