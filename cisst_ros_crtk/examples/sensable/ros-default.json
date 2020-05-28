@@ -7,7 +7,9 @@
             "interface-provided": "Default PHANToM",
             "namespace": "blah"
             // , "bridge-only": ["measured_cp", "measured_cv"]
-            , "bridge-only": ["status", "error", "warning"]
+            // , "bridge-only": ["status", "error", "warning"]
+            // , "publish-period": 0.001
+            // , "tf-period": 0.1
         }
     ]
 }

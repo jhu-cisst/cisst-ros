@@ -135,6 +135,18 @@ void mts_ros_crtk_bridge::ConfigureJSON(const Json::Value & _json_config)
         }
         std::string _name = _json_value.asString();
 
+        // optional fields
+        double _publish_period = mts_ros_crtk_bridge_default_publish_period;
+        _json_value = _interfaces[index]["publish-period"];
+        if (!_json_value.empty()) {
+            _publish_period = _json_value.asFloat();
+        }
+        double _tf_period = mts_ros_crtk_bridge_default_tf_period;
+        _json_value = _interfaces[index]["tf-period"];
+        if (!_json_value.empty()) {
+            _tf_period = _json_value.asFloat();
+        }
+
         // if set, only bridge CRTK commands that matches user provided list
         const Json::Value _bridge_only = _interfaces[index]["bridge-only"];
         for (unsigned int bo = 0; bo < _bridge_only.size(); ++bo) {
@@ -142,7 +154,8 @@ void mts_ros_crtk_bridge::ConfigureJSON(const Json::Value & _json_config)
         }
 
         // and now add the bridge
-        bridge_interface_provided(_component_name, _interface_name, _name);
+        bridge_interface_provided(_component_name, _interface_name, _name,
+                                  _publish_period, _tf_period);
     }
 
     // skip connecting interfaces in case users want to add more
