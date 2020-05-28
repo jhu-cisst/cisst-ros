@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -824,16 +824,17 @@ bool mtsROSBridge::AddPublisherFromEventWrite(const std::string & interfaceRequi
         interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
     }
 
-    mtsROSEventWritePublisher<_mtsType, _rosType>* newPublisher
+    mtsROSEventWritePublisher<_mtsType, _rosType> * newPublisher
         = new mtsROSEventWritePublisher<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer), queueSize, latch);
-    if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWritePublisher<_mtsType, _rosType>::EventHandler, newPublisher, eventName))
-        {
-            ROS_ERROR("mtsROSBridge::AddPublisherFromEventWrite: failed to create required interface.");
-            CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromEventWrite: failed to create required interface \""
-                                     << interfaceRequiredName << "\"" << std::endl;
-            delete newPublisher;
-            return false;
-        }
+    if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWritePublisher<_mtsType, _rosType>::EventHandler,
+                                                 newPublisher, eventName)) {
+        ROS_ERROR("mtsROSBridge::AddPublisherFromEventWrite: failed to add event handler to required interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromEventWrite: failed to add event handler for \""
+                                 << eventName << "\" to required interface \""
+                                 << interfaceRequiredName << "\"" << std::endl;
+        delete newPublisher;
+        return false;
+    }
     Publishers.push_back(newPublisher);
     return true;
 }
@@ -852,7 +853,7 @@ bool mtsROSBridge::AddPublisherFromCommandWrite(const std::string & interfacePro
         interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
     }
 
-    mtsROSCommandWritePublisher<_mtsType, _rosType>* newPublisher
+    mtsROSCommandWritePublisher<_mtsType, _rosType> * newPublisher
         = new mtsROSCommandWritePublisher<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer), queueSize, latch);
     if (!interfaceProvided->AddCommandWrite(&mtsROSCommandWritePublisher<_mtsType, _rosType>::Command,
                                             newPublisher, commandName))

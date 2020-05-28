@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -166,13 +166,14 @@ bool mtsROSBridge::AddPublisherFromEventVoid(const std::string & interfaceRequir
     mtsROSEventVoidPublisher* newPublisher =
         new mtsROSEventVoidPublisher(topicName, *(this->mNodeHandlePointer), queueSize, latch);
     if (!interfaceRequired->AddEventHandlerVoid(&mtsROSEventVoidPublisher::EventHandler, newPublisher, eventName))
-    {
-        ROS_ERROR("mtsROSBridge::AddPublisherFromEventVoid: failed to create required interface.");
-        CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromEventVoid: faild to create required interface \""
-                                 << interfaceRequiredName << "\"" << std::endl;
-        delete newPublisher;
-        return false;
-    }
+        {
+            ROS_ERROR("mtsROSBridge::AddPublisherFromEventVoid: failed to add event handler to required interface.");
+            CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromEventVoid: failed to add event handler for \""
+                                     << eventName << "\" to required interface \""
+                                     << interfaceRequiredName << "\"" << std::endl;
+            delete newPublisher;
+            return false;
+        }
     Publishers.push_back(newPublisher);
     return true;
 }
@@ -218,13 +219,15 @@ bool mtsROSBridge::AddLogFromEventWrite(const std::string & interfaceRequiredNam
 
     mtsROSEventWriteLog * newPublisher = new mtsROSEventWriteLog(level);
     if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWriteLog::EventHandler, newPublisher, eventName))
-    {
-        ROS_ERROR("mtsROSBridge::AddLogFromEventWrite: failed to create required interface.");
-        CMN_LOG_CLASS_INIT_ERROR << "mtsROSBridge::AddLogFromEventWrite: failed to create required interface \""
-                                 << interfaceRequiredName << "\"" << std::endl;
-        delete newPublisher;
-        return false;
-    }
+        {
+            ROS_ERROR("mtsROSBridge::AddLogFromEventWrite: failed to add event handler to required interface.");
+            CMN_LOG_CLASS_INIT_ERROR << "AddLogFromEventWrite: failed to add event handler for \""
+                                     << eventName << "\" to required interface \""
+                                     << interfaceRequiredName << "\"" << std::endl;
+
+            delete newPublisher;
+            return false;
+        }
     Publishers.push_back(newPublisher);
     return true;
 }
@@ -271,8 +274,7 @@ bool mtsROSBridge::AddPublisherFromCommandVoid(const std::string & interfaceProv
     mtsROSCommandVoidPublisher* newPublisher =
         new mtsROSCommandVoidPublisher(topicName, *(this->mNodeHandlePointer), queueSize, latch);
     if (!interfaceProvided->AddCommandVoid(&mtsROSCommandVoidPublisher::Command,
-                                           newPublisher, commandName))
-    {
+                                           newPublisher, commandName)) {
         ROS_ERROR("mtsROSBridge::AddPublisherFromCommandVoid: failed to create provided interface.");
         CMN_LOG_CLASS_INIT_ERROR << "mtsROSBridge::AddPublisherFromCommandVoid: failed to create provided interface \""
                                  << interfaceProvidedName << "\"" << std::endl;
@@ -294,7 +296,7 @@ bool mtsROSBridge::AddSubscriberToEventVoid(const std::string & interfaceProvide
 
     mtsROSSubscriberVoid * newSubscriber = new mtsROSSubscriberVoid(topicName, *(this->mNodeHandlePointer));
     if (!interfaceProvided->AddEventVoid(newSubscriber->Function,
-                                          eventName)) {
+                                         eventName)) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToEventVoid: failed to add event to provided interface.");
         CMN_LOG_CLASS_INIT_ERROR << "mtsROSBridge::AddSubscriberToEventVoid: failed to add event \""
                                  << eventName << "\" to provided interface \""
