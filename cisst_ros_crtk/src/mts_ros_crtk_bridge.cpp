@@ -108,7 +108,7 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
 
     bool _pub_bridge_is_new;
     bool _tf_bridge_is_new;
-    
+
     const std::string _pub_bridge_name =  this->GetName() + "_pub_" + _clean_namespace;
     _existing_component = _component_manager->GetComponent(_pub_bridge_name);
     if (_existing_component) {
@@ -128,9 +128,9 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
     } else {
         _tf_bridge_is_new = true;
         _tf_bridge = new mtsROSBridge(_tf_bridge_name,
-                                       _tf_period_in_seconds, m_node_handle_ptr);
+                                      _tf_period_in_seconds, m_node_handle_ptr);
     }
-    
+
     // add trailing / for clean namespace
     if (!_clean_namespace.empty()) {
         _clean_namespace.append("/");
@@ -140,73 +140,65 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
     std::string _ros_topic;
 
     // write commands
-    auto _names = _interface_provided->GetNamesOfCommandsWrite();
-    auto _end = _names.end();
-    for (auto _command = _names.begin();
-         _command != _end;
-         ++_command) {
+    for (auto & _command :  _interface_provided->GetNamesOfCommandsWrite()) {
         // get the CRTK command so we know which template type to use
-        get_crtk_command(*_command, _crtk_command);
-        _ros_topic = _clean_namespace + *_command;
+        get_crtk_command(_command, _crtk_command);
+        _ros_topic = _clean_namespace + _command;
         if ((_crtk_command == "servo_jp")
             || (_crtk_command == "move_jp")) {
             m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionJointSet, sensor_msgs::JointState>
-                (_required_interface_name, *_command, _ros_topic);
+                (_required_interface_name, _command, _ros_topic);
         } else  if (_crtk_command == "servo_jf") {
             m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceTorqueJointSet, sensor_msgs::JointState>
-                (_required_interface_name, *_command, _ros_topic);
+                (_required_interface_name, _command, _ros_topic);
         } else if ((_crtk_command == "servo_cp")
                    || (_crtk_command == "move_cp")) {
             m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionCartesianSet, geometry_msgs::TransformStamped>
-                (_required_interface_name, *_command, _ros_topic);
+                (_required_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "servo_cf") {
             m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceCartesianSet, geometry_msgs::WrenchStamped>
-                (_required_interface_name, *_command, _ros_topic);
+                (_required_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "state_command") {
             m_subscribers_bridge->AddSubscriberToCommandWrite<std::string, crtk_msgs::StringStamped>
-                (_required_interface_name, *_command, _ros_topic);
+                (_required_interface_name, _command, _ros_topic);
         }
     }
 
     // read commands
-    _names = _interface_provided->GetNamesOfCommandsRead();
-    _end = _names.end();
-    for (auto _command = _names.begin();
-         _command != _end;
-         ++_command) {
+    for (auto & _command : _interface_provided->GetNamesOfCommandsRead()) {
         // get the CRTK command so we know which template type to use
-        get_crtk_command(*_command, _crtk_command);
-        _ros_topic = _clean_namespace + *_command;
+        get_crtk_command(_command, _crtk_command);
+        _ros_topic = _clean_namespace + _command;
         if ((_crtk_command == "measured_js")
             || (_crtk_command == "setpoint_js")) {
             _pub_bridge_used = true;
             _pub_bridge->AddPublisherFromCommandRead<prmStateJoint, sensor_msgs::JointState>
-                (_interface_name, *_command, _ros_topic);
+                (_interface_name, _command, _ros_topic);
         } else  if ((_crtk_command == "measured_cp")
                     || (_crtk_command == "setpoint_cp")) {
             _pub_bridge_used = true;
             _pub_bridge->AddPublisherFromCommandRead<prmPositionCartesianGet, geometry_msgs::TransformStamped>
-                (_interface_name, *_command, _ros_topic);
+                (_interface_name, _command, _ros_topic);
             // tf broadcast
             if (_crtk_command == "measured_cp") {
                 _tf_bridge_used = true;
-                _tf_bridge->Addtf2BroadcasterFromCommandRead(_interface_name, *_command);
+                _tf_bridge->Addtf2BroadcasterFromCommandRead(_interface_name, _command);
             }
         } else if (_crtk_command == "measured_cv") {
             _pub_bridge_used = true;
             _pub_bridge->AddPublisherFromCommandRead<prmVelocityCartesianGet, geometry_msgs::TwistStamped>
-                (_interface_name, *_command, _ros_topic);
+                (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "measured_cf") {
             _pub_bridge_used = true;
             _pub_bridge->AddPublisherFromCommandRead<prmForceCartesianGet, geometry_msgs::WrenchStamped>
-                (_interface_name, *_command, _ros_topic);
+                (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "jacobian") {
             _pub_bridge_used = true;
             _pub_bridge->AddPublisherFromCommandRead<vctDoubleMat, std_msgs::Float64MultiArray>
-                (_interface_name, *_command, _ros_topic);
+                (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "operating_state") {
             m_subscribers_bridge->AddServiceFromCommandRead<prmOperatingState, crtk_msgs::trigger_operating_state>
-                (_required_interface_name, *_command, _ros_topic);
+                (_required_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "period_statistics") {
             std::string _namespace = _component_name + "_" + _interface_name;
             std::transform(_namespace.begin(), _namespace.end(), _namespace.begin(), tolower);
@@ -217,31 +209,27 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
     }
 
     // write events
-    _names = _interface_provided->GetNamesOfEventsWrite();
-    _end = _names.end();
-    for (auto _event = _names.begin();
-         _event != _end;
-         ++_event) {
+    for (auto & _event : _interface_provided->GetNamesOfEventsWrite()) {
         // get the CRTK command so we know which template type to use
-        get_crtk_command(*_event, _crtk_command);
-        _ros_topic = _clean_namespace + *_event;
+        get_crtk_command(_event, _crtk_command);
+        _ros_topic = _clean_namespace + _event;
         if (_crtk_command == "operating_state") {
             m_events_bridge->AddPublisherFromEventWrite<prmOperatingState, crtk_msgs::operating_state>
-                (_required_interface_name, *_event, _ros_topic);
+                (_required_interface_name, _event, _ros_topic);
         } else if (_crtk_command == "error") {
             m_events_bridge->AddPublisherFromEventWrite<mtsMessage, std_msgs::String>
-                (_required_interface_name, *_event, _ros_topic);
-            m_events_bridge->AddLogFromEventWrite(_required_interface_name + "-ros-log", *_event,
+                (_required_interface_name, _event, _ros_topic);
+            m_events_bridge->AddLogFromEventWrite(_required_interface_name + "-ros-log", _event,
                                                   mtsROSEventWriteLog::ROS_LOG_ERROR);
         } else if (_crtk_command == "warning") {
             m_events_bridge->AddPublisherFromEventWrite<mtsMessage, std_msgs::String>
-                (_required_interface_name, *_event, _ros_topic);
-            m_events_bridge->AddLogFromEventWrite(_required_interface_name + "-ros-log", *_event,
+                (_required_interface_name, _event, _ros_topic);
+            m_events_bridge->AddLogFromEventWrite(_required_interface_name + "-ros-log", _event,
                                                   mtsROSEventWriteLog::ROS_LOG_WARN);
         } else if (_crtk_command == "status") {
             m_events_bridge->AddPublisherFromEventWrite<mtsMessage, std_msgs::String>
-                (_required_interface_name, *_event, _ros_topic);
-            m_events_bridge->AddLogFromEventWrite(_required_interface_name + "-ros-log", *_event,
+                (_required_interface_name, _event, _ros_topic);
+            m_events_bridge->AddLogFromEventWrite(_required_interface_name + "-ros-log", _event,
                                                   mtsROSEventWriteLog::ROS_LOG_INFO);
         }
     }
@@ -253,31 +241,33 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
     // Falcon00-Left, SensablePhantom left has button leftButton1).
     // So we look at all interfaces on the component that match the
     // interface_name and have an event write called "Button".
-    auto _interfaces = _component->GetNamesOfInterfacesProvided();
     const size_t _prefix_size =_interface_name.size();
-    _end = _interfaces.end();
-    for (auto _iter = _interfaces.begin();
-         _iter != _end;
-         ++_iter) {
+    for (auto & _button_interface : _component->GetNamesOfInterfacesProvided()) {
         // can only be a prefix if shorter
-        if (_iter->size() > _prefix_size) {
+        if (_button_interface.size() > _prefix_size) {
             if (std::equal(_interface_name.begin(),
                            _interface_name.end(),
-                           _iter->begin())) {
-                // remove heading - or _
-                size_t _offset = 0;
-                const char _first_char = _iter->at(_prefix_size);
-                if ((_first_char == '-') || (_first_char == '_')) {
-                    _offset = 1;
+                           _button_interface.begin())) {
+                // this interface qualifies based on the name, does it
+                // contain an event write "Button"?
+                auto _interface_candidate = _component->GetInterfaceProvided(_button_interface);
+                auto _events = _interface_candidate->GetNamesOfEventsWrite();
+                if (std::find(_events.begin(), _events.end(), "Button") != _events.end()) {
+                    // remove heading - or _
+                    size_t _offset = 0;
+                    const char _first_char = _button_interface.at(_prefix_size);
+                    if ((_first_char == '-') || (_first_char == '_')) {
+                        _offset = 1;
+                    }
+                    std::string _button_name = _button_interface.substr(_prefix_size + _offset);
+                    // put all to lower case to be more ROS alike
+                    std::transform(_button_name.begin(), _button_name.end(), _button_name.begin(), tolower);
+                    // add and connect interface to event bridge
+                    m_events_bridge->AddPublisherFromEventWrite<prmEventButton, sensor_msgs::Joy>
+                        (_button_interface, "Button", _clean_namespace + _button_name);
+                    m_connections.Add(m_events_bridge->GetName(), _button_interface,
+                                      _component_name, _button_interface);
                 }
-                std::string _button_name = _iter->substr(_prefix_size + _offset);
-                // put all to lower case to be more ROS alike
-                std::transform(_button_name.begin(), _button_name.end(), _button_name.begin(), tolower);
-                // add and connect interface to event bridge
-                m_events_bridge->AddPublisherFromEventWrite<prmEventButton, sensor_msgs::Joy>
-                    (*_iter, "Button", _clean_namespace + _button_name);
-                m_connections.Add(m_events_bridge->GetName(), *_iter,
-                                  _component_name, *_iter);
             }
         }
     }
@@ -293,7 +283,7 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
     }
     if (m_events_bridge->GetInterfaceRequired(_required_interface_name + "-ros-log")) {
         m_connections.Add(m_events_bridge->GetName(), _required_interface_name + "-ros-log",
-                                    _component_name, _interface_name);
+                          _component_name, _interface_name);
     }
 
     if (_tf_bridge_used) {
