@@ -33,7 +33,7 @@ class mtsROSBridge;
 
 class mts_ros_crtk_bridge: public mtsTaskFromSignal
 {
-    CMN_DECLARE_SERVICES(CMN_NO_DYNAMIC_CREATION, CMN_LOG_ALLOW_DEFAULT);
+    CMN_DECLARE_SERVICES(CMN_DYNAMIC_CREATION_ONEARG, CMN_LOG_ALLOW_DEFAULT);
 
 public:
     /*!  Constructor using an existing ros::NodeHandle.  This
@@ -45,10 +45,13 @@ public:
       provided interface added to this bridge. */
     mts_ros_crtk_bridge(const std::string & component_name,
                         ros::NodeHandle * node_handle);
+    mts_ros_crtk_bridge(const mtsTaskConstructorArg & arg);
 
     ~mts_ros_crtk_bridge();
 
-    inline void Configure(const std::string & CMN_UNUSED(filename) = "") {};
+    void init(void); // called by all ctors
+    void Configure(const std::string & _json_file) override;
+    void ConfigureJSON(const Json::Value & _json_config);
 
     inline void Startup(void) {};
     void Run(void);
@@ -68,7 +71,7 @@ public:
                                    const std::string & _ros_namespace,
                                    const double _publish_period_in_seconds = 10.0 * cmn_ms,
                                    const double _tf_period_in_seconds = 20.0 * cmn_ms);
-    
+
     /*! Same method but used the name of the provided interface as ROS
       namespace. */
     inline void bridge_interface_provided(const std::string & _component_name,
@@ -124,6 +127,10 @@ protected:
     mtsROSBridge * m_stats_bridge = nullptr;
 
     mtsDelayedConnections m_connections;
+
+    //! Explicit list of CRTK commands to bridge
+    std::set<std::string> m_bridge_only;
+    bool should_be_bridged(const std::string & _command);
 };
 
 CMN_DECLARE_SERVICES_INSTANTIATION(mts_ros_crtk_bridge);

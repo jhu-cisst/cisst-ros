@@ -26,14 +26,35 @@ http://www.cisst.org/cisst/license.txt.
 
 #include <cisst_ros_bridge/mtsROSBridge.h>
 
-CMN_IMPLEMENT_SERVICES(mts_ros_crtk_bridge);
+CMN_IMPLEMENT_SERVICES_DERIVED_ONEARG(mts_ros_crtk_bridge, mtsTaskFromSignal, mtsTaskConstructorArg);
 
 mts_ros_crtk_bridge::mts_ros_crtk_bridge(const std::string & _component_name,
                                          ros::NodeHandle * _node_handle):
     mtsTaskFromSignal(_component_name),
     m_node_handle_ptr(_node_handle)
 {
+    init();
+}
+
+mts_ros_crtk_bridge::mts_ros_crtk_bridge(const mtsTaskConstructorArg & arg):
+    mtsTaskFromSignal(arg.Name)
+{
+    // create fake argc/argv for ros::init
+    typedef char * char_pointer;
+    char_pointer * argv = new char_pointer[1];
+    argv[0] = new char[arg.Name.size() + 1];
+    strcpy(argv[0], arg.Name.c_str());
+    int argc = 1;
+
+    ros::init(argc, argv, arg.Name, ros::init_options::AnonymousName);
+    m_node_handle_ptr = new ros::NodeHandle("");
+    init();
+}
+
+void mts_ros_crtk_bridge::init(void)
+{
     mtsManagerLocal * _component_manager = mtsComponentManager::GetInstance();
+    const std::string _component_name = this->GetName();
 
     // subscribers bridge is shared for all subscribers since we only want one
     m_subscribers_bridge =
@@ -58,7 +79,81 @@ mts_ros_crtk_bridge::mts_ros_crtk_bridge(const std::string & _component_name,
 
 mts_ros_crtk_bridge::~mts_ros_crtk_bridge(void)
 {
+    if (m_subscribers_bridge) {
+        delete m_subscribers_bridge;
+    }
+    if (m_events_bridge) {
+        delete m_events_bridge;
+    }
+    if (m_stats_bridge) {
+        delete m_stats_bridge;
+    }
+}
 
+void mts_ros_crtk_bridge::Configure(const std::string & _json_file)
+{
+    std::ifstream _json_stream;
+    _json_stream.open(_json_file.c_str());
+
+    Json::Value _json_config;
+    Json::Reader _json_reader;
+    if (!_json_reader.parse(_json_stream, _json_config)) {
+        CMN_LOG_CLASS_INIT_ERROR << "Configure: failed to parse configuration\n"
+                                 << _json_reader.getFormattedErrorMessages();
+        return;
+    }
+
+    ConfigureJSON(_json_config);
+}
+
+void mts_ros_crtk_bridge::ConfigureJSON(const Json::Value & _json_config)
+{
+    Json::Value _json_value;
+    const Json::Value _interfaces = _json_config["interfaces"];
+    if (_interfaces.empty()) {
+        CMN_LOG_CLASS_INIT_WARNING << "ConfigureJSON: no \"interfaces\" defined, this will not add any IGTL CRTK bridge"
+                                   <<  std::endl;
+    }
+    for (unsigned int index = 0; index < _interfaces.size(); ++index) {
+        _json_value = _interfaces[index]["component"];
+        if (_json_value.empty()) {
+            CMN_LOG_CLASS_INIT_ERROR << "ConfigureJSON: all \"interfaces\" must define \"component\"" << std::endl;
+            return;
+        }
+        // future implementation could also support interface-required
+        std::string _component_name = _json_value.asString();
+        _json_value = _interfaces[index]["interface-provided"];
+        if (_json_value.empty()) {
+            CMN_LOG_CLASS_INIT_ERROR << "ConfigureJSON: all \"interfaces\" must define \"interface-provided\"" << std::endl;
+            return;
+        }
+        std::string _interface_name = _json_value.asString();
+        _json_value = _interfaces[index]["namespace"];
+        if (_json_value.empty()) {
+            CMN_LOG_CLASS_INIT_ERROR << "ConfigureJSON: all \"interfaces\" must define \"namespace\"" << std::endl;
+            return;
+        }
+        std::string _name = _json_value.asString();
+
+        // if set, only bridge CRTK commands that matches user provided list
+        const Json::Value _bridge_only = _interfaces[index]["bridge-only"];
+        for (unsigned int bo = 0; bo < _bridge_only.size(); ++bo) {
+            m_bridge_only.insert(_bridge_only[bo].asString());
+        }
+
+        // and now add the bridge
+        bridge_interface_provided(_component_name, _interface_name, _name);
+    }
+
+    // skip connecting interfaces in case users want to add more
+    // commands/functions/events to bridge before connecting
+    _json_value = _json_config["skip-connect"];
+    if (!_json_value.empty() && _json_value.asBool()) {
+        CMN_LOG_CLASS_INIT_WARNING << "ConfigureJSON: \"skip-connect\" set to \"true\", user is responsible for connecting components" <<  std::endl;
+    } else {
+        mtsComponentManager::GetInstance()->AddComponent(this);
+        Connect();
+    }
 }
 
 void mts_ros_crtk_bridge::Run(void)
@@ -141,96 +236,102 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
 
     // write commands
     for (auto & _command :  _interface_provided->GetNamesOfCommandsWrite()) {
-        // get the CRTK command so we know which template type to use
-        get_crtk_command(_command, _crtk_command);
-        _ros_topic = _clean_namespace + _command;
-        if ((_crtk_command == "servo_jp")
-            || (_crtk_command == "move_jp")) {
-            m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionJointSet, sensor_msgs::JointState>
-                (_required_interface_name, _command, _ros_topic);
-        } else  if (_crtk_command == "servo_jf") {
-            m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceTorqueJointSet, sensor_msgs::JointState>
-                (_required_interface_name, _command, _ros_topic);
-        } else if ((_crtk_command == "servo_cp")
-                   || (_crtk_command == "move_cp")) {
-            m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionCartesianSet, geometry_msgs::TransformStamped>
-                (_required_interface_name, _command, _ros_topic);
-        } else if (_crtk_command == "servo_cf") {
-            m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceCartesianSet, geometry_msgs::WrenchStamped>
-                (_required_interface_name, _command, _ros_topic);
-        } else if (_crtk_command == "state_command") {
-            m_subscribers_bridge->AddSubscriberToCommandWrite<std::string, crtk_msgs::StringStamped>
-                (_required_interface_name, _command, _ros_topic);
+        if (should_be_bridged(_command)) {
+            // get the CRTK command so we know which template type to use
+            get_crtk_command(_command, _crtk_command);
+            _ros_topic = _clean_namespace + _command;
+            if ((_crtk_command == "servo_jp")
+                || (_crtk_command == "move_jp")) {
+                m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionJointSet, sensor_msgs::JointState>
+                    (_required_interface_name, _command, _ros_topic);
+            } else  if (_crtk_command == "servo_jf") {
+                m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceTorqueJointSet, sensor_msgs::JointState>
+                    (_required_interface_name, _command, _ros_topic);
+            } else if ((_crtk_command == "servo_cp")
+                       || (_crtk_command == "move_cp")) {
+                m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionCartesianSet, geometry_msgs::TransformStamped>
+                    (_required_interface_name, _command, _ros_topic);
+            } else if (_crtk_command == "servo_cf") {
+                m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceCartesianSet, geometry_msgs::WrenchStamped>
+                    (_required_interface_name, _command, _ros_topic);
+            } else if (_crtk_command == "state_command") {
+                m_subscribers_bridge->AddSubscriberToCommandWrite<std::string, crtk_msgs::StringStamped>
+                    (_required_interface_name, _command, _ros_topic);
+            }
         }
     }
 
     // read commands
     for (auto & _command : _interface_provided->GetNamesOfCommandsRead()) {
-        // get the CRTK command so we know which template type to use
-        get_crtk_command(_command, _crtk_command);
-        _ros_topic = _clean_namespace + _command;
-        if ((_crtk_command == "measured_js")
-            || (_crtk_command == "setpoint_js")) {
-            _pub_bridge_used = true;
-            _pub_bridge->AddPublisherFromCommandRead<prmStateJoint, sensor_msgs::JointState>
-                (_interface_name, _command, _ros_topic);
-        } else  if ((_crtk_command == "measured_cp")
-                    || (_crtk_command == "setpoint_cp")) {
-            _pub_bridge_used = true;
-            _pub_bridge->AddPublisherFromCommandRead<prmPositionCartesianGet, geometry_msgs::TransformStamped>
-                (_interface_name, _command, _ros_topic);
-            // tf broadcast
-            if (_crtk_command == "measured_cp") {
-                _tf_bridge_used = true;
-                _tf_bridge->Addtf2BroadcasterFromCommandRead(_interface_name, _command);
+        if (should_be_bridged(_command)) {
+            // get the CRTK command so we know which template type to use
+            get_crtk_command(_command, _crtk_command);
+            _ros_topic = _clean_namespace + _command;
+            if ((_crtk_command == "measured_js")
+                || (_crtk_command == "setpoint_js")) {
+                _pub_bridge_used = true;
+                _pub_bridge->AddPublisherFromCommandRead<prmStateJoint, sensor_msgs::JointState>
+                    (_interface_name, _command, _ros_topic);
+            } else  if ((_crtk_command == "measured_cp")
+                        || (_crtk_command == "setpoint_cp")) {
+                _pub_bridge_used = true;
+                _pub_bridge->AddPublisherFromCommandRead<prmPositionCartesianGet, geometry_msgs::TransformStamped>
+                    (_interface_name, _command, _ros_topic);
+                // tf broadcast
+                if (_crtk_command == "measured_cp") {
+                    _tf_bridge_used = true;
+                    _tf_bridge->Addtf2BroadcasterFromCommandRead(_interface_name, _command);
+                }
+            } else if (_crtk_command == "measured_cv") {
+                _pub_bridge_used = true;
+                _pub_bridge->AddPublisherFromCommandRead<prmVelocityCartesianGet, geometry_msgs::TwistStamped>
+                    (_interface_name, _command, _ros_topic);
+            } else if (_crtk_command == "measured_cf") {
+                _pub_bridge_used = true;
+                _pub_bridge->AddPublisherFromCommandRead<prmForceCartesianGet, geometry_msgs::WrenchStamped>
+                    (_interface_name, _command, _ros_topic);
+            } else if (_crtk_command == "jacobian") {
+                _pub_bridge_used = true;
+                _pub_bridge->AddPublisherFromCommandRead<vctDoubleMat, std_msgs::Float64MultiArray>
+                    (_interface_name, _command, _ros_topic);
+            } else if (_crtk_command == "operating_state") {
+                m_subscribers_bridge->AddServiceFromCommandRead<prmOperatingState, crtk_msgs::trigger_operating_state>
+                    (_required_interface_name, _command, _ros_topic);
+            } else if (_crtk_command == "period_statistics") {
+                std::string _namespace = _component_name + "_" + _interface_name;
+                std::transform(_namespace.begin(), _namespace.end(), _namespace.begin(), tolower);
+                clean_namespace(_namespace);
+                m_stats_bridge->AddIntervalStatisticsPublisher("stats/" + _namespace,
+                                                               _component_name, _interface_name);
             }
-        } else if (_crtk_command == "measured_cv") {
-            _pub_bridge_used = true;
-            _pub_bridge->AddPublisherFromCommandRead<prmVelocityCartesianGet, geometry_msgs::TwistStamped>
-                (_interface_name, _command, _ros_topic);
-        } else if (_crtk_command == "measured_cf") {
-            _pub_bridge_used = true;
-            _pub_bridge->AddPublisherFromCommandRead<prmForceCartesianGet, geometry_msgs::WrenchStamped>
-                (_interface_name, _command, _ros_topic);
-        } else if (_crtk_command == "jacobian") {
-            _pub_bridge_used = true;
-            _pub_bridge->AddPublisherFromCommandRead<vctDoubleMat, std_msgs::Float64MultiArray>
-                (_interface_name, _command, _ros_topic);
-        } else if (_crtk_command == "operating_state") {
-            m_subscribers_bridge->AddServiceFromCommandRead<prmOperatingState, crtk_msgs::trigger_operating_state>
-                (_required_interface_name, _command, _ros_topic);
-        } else if (_crtk_command == "period_statistics") {
-            std::string _namespace = _component_name + "_" + _interface_name;
-            std::transform(_namespace.begin(), _namespace.end(), _namespace.begin(), tolower);
-            clean_namespace(_namespace);
-            m_stats_bridge->AddIntervalStatisticsPublisher("stats/" + _namespace,
-                                                           _component_name, _interface_name);
         }
     }
 
     // write events
     for (auto & _event : _interface_provided->GetNamesOfEventsWrite()) {
-        // get the CRTK command so we know which template type to use
-        get_crtk_command(_event, _crtk_command);
-        _ros_topic = _clean_namespace + _event;
-        if (_crtk_command == "operating_state") {
-            m_events_bridge->AddPublisherFromEventWrite<prmOperatingState, crtk_msgs::operating_state>
-                (_required_interface_name, _event, _ros_topic);
-        } else if (_crtk_command == "error") {
-            m_events_bridge->AddPublisherFromEventWrite<mtsMessage, std_msgs::String>
-                (_required_interface_name, _event, _ros_topic);
-            m_events_bridge->AddLogFromEventWrite(_required_interface_name + "-ros-log", _event,
-                                                  mtsROSEventWriteLog::ROS_LOG_ERROR);
-        } else if (_crtk_command == "warning") {
-            m_events_bridge->AddPublisherFromEventWrite<mtsMessage, std_msgs::String>
-                (_required_interface_name, _event, _ros_topic);
-            m_events_bridge->AddLogFromEventWrite(_required_interface_name + "-ros-log", _event,
-                                                  mtsROSEventWriteLog::ROS_LOG_WARN);
-        } else if (_crtk_command == "status") {
-            m_events_bridge->AddPublisherFromEventWrite<mtsMessage, std_msgs::String>
-                (_required_interface_name, _event, _ros_topic);
-            m_events_bridge->AddLogFromEventWrite(_required_interface_name + "-ros-log", _event,
-                                                  mtsROSEventWriteLog::ROS_LOG_INFO);
+        if (should_be_bridged(_event)) {
+            // get the CRTK command so we know which template type to use
+            get_crtk_command(_event, _crtk_command);
+            _ros_topic = _clean_namespace + _event;
+            if (_crtk_command == "operating_state") {
+                m_events_bridge->AddPublisherFromEventWrite<prmOperatingState, crtk_msgs::operating_state>
+                    (_required_interface_name, _event, _ros_topic);
+            } else if (_crtk_command == "error") {
+                m_events_bridge->AddPublisherFromEventWrite<mtsMessage, std_msgs::String>
+                    (_required_interface_name, _event, _ros_topic);
+                m_events_bridge->AddLogFromEventWrite(_required_interface_name + "-ros-log", _event,
+                                                      mtsROSEventWriteLog::ROS_LOG_ERROR);
+            } else if (_crtk_command == "warning") {
+                m_events_bridge->AddPublisherFromEventWrite<mtsMessage, std_msgs::String>
+                    (_required_interface_name, _event, _ros_topic);
+                m_events_bridge->AddLogFromEventWrite(_required_interface_name + "-ros-log", _event,
+                                                      mtsROSEventWriteLog::ROS_LOG_WARN);
+            } else if (_crtk_command == "status") {
+                m_events_bridge->AddPublisherFromEventWrite<mtsMessage, std_msgs::String>
+                    (_required_interface_name, _event, _ros_topic);
+                m_events_bridge->AddLogFromEventWrite(_required_interface_name + "-ros-log", _event,
+                                                      mtsROSEventWriteLog::ROS_LOG_INFO);
+            }
         }
     }
 
@@ -339,4 +440,15 @@ void mts_ros_crtk_bridge::get_crtk_command(const std::string & _full_command,
     } else {
         _crtk_command = _full_command.substr(pos + 1);
     }
+}
+
+bool mts_ros_crtk_bridge::should_be_bridged(const std::string & _command)
+{
+    if (m_bridge_only.empty()) {
+        return true;
+    }
+    if (m_bridge_only.find(_command) != m_bridge_only.end()) {
+        return true;
+    }
+    return false;
 }
