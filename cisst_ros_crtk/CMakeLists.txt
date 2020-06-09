@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(cisst_ros_crtk)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -16,7 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
   cisst_ros_bridge
   )
 
-set (REQUIRED_CISST_LIBRARIES
+set(REQUIRED_CISST_LIBRARIES
   cisstCommon
   cisstVector
   cisstOSAbstraction
@@ -25,16 +29,13 @@ set (REQUIRED_CISST_LIBRARIES
   )
 
 # find cisst and make sure the required libraries have been compiled
-find_package (cisst REQUIRED ${REQUIRED_CISST_LIBRARIES})
-include (${CISST_USE_FILE})
-
-# catkin_python_setup()
+find_package(cisst REQUIRED ${REQUIRED_CISST_LIBRARIES})
+include(${CISST_USE_FILE})
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES cisst_ros_crtk
   CATKIN_DEPENDS geometry_msgs roscpp rospy sensor_msgs std_msgs cisst_msgs crtk_msgs cisst_ros_bridge
-#  DEPENDS system_lib
 )
 
 ###########
@@ -45,13 +46,13 @@ include_directories(include)
 include_directories(${catkin_INCLUDE_DIRS})
 
 # header
-set (HEADER_FILES
+set(HEADER_FILES
   include/cisst_ros_crtk/mts_ros_crtk_bridge.h
   include/cisst_ros_crtk/mtsCISSTToROS.h
   include/cisst_ros_crtk/mtsROSToCISST.h)
 
 # source
-set (SOURCE_FILES
+set(SOURCE_FILES
   src/mts_ros_crtk_bridge.cpp
   src/mtsCISSTToROS.cpp
   src/mtsROSToCISST.cpp)
