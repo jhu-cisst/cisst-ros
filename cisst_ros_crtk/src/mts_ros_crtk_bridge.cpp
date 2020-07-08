@@ -403,6 +403,7 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
     if (_tf_bridge_used) {
         if (_tf_bridge_is_new) {
             _component_manager->AddComponent(_tf_bridge);
+            m_new_components.push_back(_tf_bridge->GetName());
         }
         m_connections.Add(_tf_bridge->GetName(), _interface_name,
                           _component_name, _interface_name);
@@ -420,6 +421,7 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
     if (_pub_bridge_used) {
         if (_pub_bridge_is_new) {
             _component_manager->AddComponent(_pub_bridge);
+            m_new_components.push_back(_pub_bridge->GetName());
         }
         m_connections.Add(_pub_bridge->GetName(), _interface_name,
                           _component_name, _interface_name);
@@ -435,6 +437,72 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
     }
 }
 
+void mts_ros_crtk_bridge::add_factory_source(const std::string & _component_name,
+                                             const std::string & _interface_name,
+                                             const double _publish_period_in_seconds,
+                                             const double _tf_period_in_seconds)
+{
+    decltype(m_factories)::key_type source(_component_name, _interface_name);
+
+    // first, make sure this doesn't already exist
+    auto found = m_factories.find(source);
+    if (found != m_factories.end()) {
+        CMN_LOG_CLASS_INIT_WARNING << "add_factory_source: factory already added for component \""
+                                   << _component_name << "\" with interface \""
+                                   << _interface_name << "\"" << std::endl;
+        return;
+    }
+
+    // save default periods for this interface
+    factory * _new_factory = new factory;
+        _new_factory->m_bridge = this;
+    _new_factory->m_publish_period = _publish_period_in_seconds;
+    _new_factory->m_tf_period = _tf_period_in_seconds;
+    m_factories[source] = _new_factory;
+
+    // create a new interface for the factory
+    std::string _req_interface_name = "_" + _component_name + "_using_" + _interface_name + "_factory";
+    mtsInterfaceRequired * _interface = AddInterfaceRequired(_req_interface_name);
+    if (_interface) {
+        _interface->AddFunction("crtk_interfaces_provided", _new_factory->m_crtk_interfaces_provided);
+        _interface->AddEventHandlerVoid(&factory::crtk_interfaces_provided_updated_handler,
+                                        _new_factory, "crtk_interfaces_provided_updated");
+        // add this interface to required connections
+        m_connections.Add(this->GetName(), _req_interface_name,
+                          _component_name, _interface_name);
+    } else {
+        CMN_LOG_CLASS_INIT_ERROR << "add_factory_source: there's already an interface name \""
+                                 << _req_interface_name << "\"" << std::endl;
+        return;
+    }
+}
+
+void mts_ros_crtk_bridge::CreateStartAndWait(const double & timeoutInSeconds)
+{
+    auto _component_manager = mtsComponentManager::GetInstance();
+    double waitTime = 0.0;
+    for (const auto & _component_name : m_new_components) {
+        auto _component = _component_manager->GetComponent(_component_name);
+        // first make sure connections are finalized
+        bool allConnected;
+        do {
+            allConnected = _component->AreAllInterfacesRequiredConnected();
+            if (!allConnected) {
+                const double busySleep = 10.0 * cmn_ms;
+                waitTime += busySleep;
+                Sleep(busySleep);
+            }
+        } while (waitTime <= timeoutInSeconds && !allConnected);
+        // then create component
+        _component->Create();
+        _component->WaitForState(mtsComponentState::READY, timeoutInSeconds);
+        // finally, start component
+        _component->Start();
+        _component->WaitForState(mtsComponentState::ACTIVE, timeoutInSeconds);
+    }
+    m_new_components.clear();
+}
+
 void mts_ros_crtk_bridge::clean_namespace(std::string & _ros_namespace)
 {
     _ros_namespace = ros::names::clean(_ros_namespace);
@@ -442,7 +510,6 @@ void mts_ros_crtk_bridge::clean_namespace(std::string & _ros_namespace)
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), '-', '_');
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), '.', '_');
 }
-
 
 void mts_ros_crtk_bridge::get_crtk_command(const std::string & _full_command,
                                            std::string & _crtk_command)
@@ -464,4 +531,22 @@ bool mts_ros_crtk_bridge::should_be_bridged(const std::string & _command)
         return true;
     }
     return false;
+}
+
+void mts_ros_crtk_bridge::factory::crtk_interfaces_provided_updated_handler(void)
+{
+    // get all CRTK interfaces
+    std::vector<mtsDescriptionInterfaceFullName> _sources;
+    m_crtk_interfaces_provided(_sources);
+    for (const auto & _source : _sources) {
+        std::string _namespace = _source.ComponentName + "/" + _source.InterfaceName;
+        mts_ros_crtk_bridge::clean_namespace(_namespace);
+        m_bridge->bridge_interface_provided(_source.ComponentName,
+                                            _source.InterfaceName,
+                                            _namespace,
+                                            m_publish_period,
+                                            m_tf_period);
+        m_bridge->Connect();
+        m_bridge->CreateStartAndWait();
+    }
 }

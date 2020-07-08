@@ -91,10 +91,27 @@ public:
                                   _tf_period_in_seconds);
     }
 
+    /*! Connect to an interface that will provide the name of newly
+     created CRTK interfaces.  The interface provided must have an
+     event void called "crtk_interfaces_provided_updated" and a read
+     command to find all existing CRTK interfaces called
+     "crtk_interfaces_provided" */
+    void add_factory_source(const std::string & _component_name,
+                            const std::string & _interface_name,
+                            const double _publish_period_in_seconds
+                            = mts_ros_crtk_bridge_default_publish_period,
+                            const double _tf_period_in_seconds
+                            = mts_ros_crtk_bridge_default_tf_period);
+
     /*! Connect all components created and used so far. */
     inline virtual void Connect(void) {
         m_connections.Connect();
     }
+
+    /*! Create and start all components created so for.  This is
+      useful if a bridge is dynamically added after the main component
+      manager calls for CreateAll and StartAll. */
+    void virtual CreateStartAndWait(const double & timeoutInSeconds = 1.0 * cmn_s);
 
     /*! Access to different bridges to allow users to add custom
       publishers/subscribers */
@@ -134,10 +151,22 @@ protected:
     mtsROSBridge * m_stats_bridge = nullptr;
 
     mtsDelayedConnections m_connections;
+    std::list<std::string> m_new_components;
 
     //! Explicit list of CRTK commands to bridge
     std::set<std::string> m_bridge_only;
     bool should_be_bridged(const std::string & _command);
+
+    class factory {
+    public:
+        mts_ros_crtk_bridge * m_bridge;
+        double m_publish_period;
+        double m_tf_period;
+        mtsFunctionRead m_crtk_interfaces_provided;
+        void crtk_interfaces_provided_updated_handler(void);
+    };
+
+    std::map<std::pair<std::string, std::string>, factory *> m_factories;
 };
 
 CMN_DECLARE_SERVICES_INSTANTIATION(mts_ros_crtk_bridge);
