@@ -22,7 +22,7 @@ http://www.cisst.org/cisst/license.txt.
 
 // cisst include
 #include <cisstCommon/cmnUnits.h>
-#include <cisstMultiTask/mtsTaskFromSignal.h>
+#include <cisstMultiTask/mtsTaskPeriodic.h>
 #include <cisstMultiTask/mtsDelayedConnections.h>
 
 class mtsROSBridge;
@@ -33,21 +33,25 @@ class mtsROSBridge;
 const double mts_ros_crtk_bridge_default_publish_period = 10.0 * cmn_ms;
 const double mts_ros_crtk_bridge_default_tf_period = 20.0 * cmn_ms;
 
-class mts_ros_crtk_bridge: public mtsTaskFromSignal
+class mts_ros_crtk_bridge: public mtsTaskPeriodic
 {
     CMN_DECLARE_SERVICES(CMN_DYNAMIC_CREATION_ONEARG, CMN_LOG_ALLOW_DEFAULT);
 
 public:
     /*!  Constructor using an existing ros::NodeHandle.  This
       construtor creates 2 mtsROSBridge using a high periodicity to
-      reduce latency.  The first one, m_subscribers_bridge is used
-      for all the subscribers added to this CRTK bridge.  It
-      performs the ros::spinOnce().  The second one, m_events_bridge
-      is used for all events and messages coming from all the
-      provided interface added to this bridge. */
-    mts_ros_crtk_bridge(const std::string & component_name,
-                        ros::NodeHandle * node_handle);
-    mts_ros_crtk_bridge(const mtsTaskConstructorArg & arg);
+      reduce latency.  The first one, m_subscribers_bridge is used for
+      all the subscribers added to this CRTK bridge.  It performs the
+      ros::spinOnce().  The second one, m_events_bridge is used for
+      all events and messages coming from all the provided interface
+      added to this bridge.  The period in seconds is for the bridge
+      management itself, i.e. create new bridges dynamically.  It
+      doesn't impact the ROS publish rates.  There is no reason to
+      change the default for most applications. */
+    mts_ros_crtk_bridge(const std::string & _component_name,
+                        ros::NodeHandle * _node_handle,
+                        const double _period_in_seconds = 5.0 * cmn_ms);
+    mts_ros_crtk_bridge(const mtsTaskPeriodicConstructorArg & arg);
 
     ~mts_ros_crtk_bridge();
 
@@ -108,10 +112,10 @@ public:
         m_connections.Connect();
     }
 
-    /*! Create and start all components created so for.  This is
-      useful if a bridge is dynamically added after the main component
-      manager calls for CreateAll and StartAll. */
-    void virtual CreateStartAndWait(const double & timeoutInSeconds = 1.0 * cmn_s);
+    /*! After factory creates new components to bridge ROS topics, we
+      need to wait until they're properly connected to create and
+      start them */ 
+    void add_connection_event_handler(const mtsDescriptionConnection & _connection);
 
     /*! Access to different bridges to allow users to add custom
       publishers/subscribers */

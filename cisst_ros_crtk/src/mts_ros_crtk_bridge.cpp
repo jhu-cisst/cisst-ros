@@ -18,6 +18,8 @@ http://www.cisst.org/cisst/license.txt.
 
 #include <cisst_ros_crtk/mts_ros_crtk_bridge.h>
 
+#include <cisstMultiTask/mtsManagerComponentServices.h>
+
 // conversion methods
 #include <cisst_ros_bridge/mtsCISSTToROS.h>
 #include <cisst_ros_bridge/mtsROSToCISST.h>
@@ -26,18 +28,19 @@ http://www.cisst.org/cisst/license.txt.
 
 #include <cisst_ros_bridge/mtsROSBridge.h>
 
-CMN_IMPLEMENT_SERVICES_DERIVED_ONEARG(mts_ros_crtk_bridge, mtsTaskFromSignal, mtsTaskConstructorArg);
+CMN_IMPLEMENT_SERVICES_DERIVED_ONEARG(mts_ros_crtk_bridge, mtsTaskPeriodic, mtsTaskPeriodicConstructorArg);
 
 mts_ros_crtk_bridge::mts_ros_crtk_bridge(const std::string & _component_name,
-                                         ros::NodeHandle * _node_handle):
-    mtsTaskFromSignal(_component_name),
+                                         ros::NodeHandle * _node_handle,
+                                         const double _period_in_seconds):
+    mtsTaskPeriodic(_component_name, _period_in_seconds),
     m_node_handle_ptr(_node_handle)
 {
     init();
 }
 
-mts_ros_crtk_bridge::mts_ros_crtk_bridge(const mtsTaskConstructorArg & arg):
-    mtsTaskFromSignal(arg.Name)
+mts_ros_crtk_bridge::mts_ros_crtk_bridge(const mtsTaskPeriodicConstructorArg & arg):
+    mtsTaskPeriodic(arg)
 {
     // create fake argc/argv for ros::init
     typedef char * char_pointer;
@@ -55,6 +58,12 @@ void mts_ros_crtk_bridge::init(void)
 {
     mtsManagerLocal * _component_manager = mtsComponentManager::GetInstance();
     const std::string _component_name = this->GetName();
+
+    // component manager interface
+    mtsInterfaceRequired * required = EnableDynamicComponentManagement();
+    if (required) {
+        ManagerComponentServices->AddConnectionEventHandler(&mts_ros_crtk_bridge::add_connection_event_handler, this);
+    }
 
     // subscribers bridge is shared for all subscribers since we only want one
     m_subscribers_bridge =
@@ -477,30 +486,25 @@ void mts_ros_crtk_bridge::add_factory_source(const std::string & _component_name
     }
 }
 
-void mts_ros_crtk_bridge::CreateStartAndWait(const double & timeoutInSeconds)
+void mts_ros_crtk_bridge::add_connection_event_handler(const mtsDescriptionConnection & CMN_UNUSED(_connection))
 {
     auto _component_manager = mtsComponentManager::GetInstance();
-    double waitTime = 0.0;
+    bool _all_connected = true;
     for (const auto & _component_name : m_new_components) {
         auto _component = _component_manager->GetComponent(_component_name);
-        // first make sure connections are finalized
-        bool allConnected;
-        do {
-            allConnected = _component->AreAllInterfacesRequiredConnected();
-            if (!allConnected) {
-                const double busySleep = 10.0 * cmn_ms;
-                waitTime += busySleep;
-                Sleep(busySleep);
-            }
-        } while (waitTime <= timeoutInSeconds && !allConnected);
-        // then create component
-        _component->Create();
-        _component->WaitForState(mtsComponentState::READY, timeoutInSeconds);
-        // finally, start component
-        _component->Start();
-        _component->WaitForState(mtsComponentState::ACTIVE, timeoutInSeconds);
+        _all_connected = _all_connected && _component->AreAllInterfacesRequiredConnected();
     }
-    m_new_components.clear();
+    if (_all_connected) {
+        for (const auto & _component_name : m_new_components) {
+            const double _timeout_create_start = 5.0 * cmn_s;
+            auto _component = _component_manager->GetComponent(_component_name);
+            _component->Create();
+            _component->WaitForState(mtsComponentState::READY, _timeout_create_start);
+            _component->Start();
+            _component->WaitForState(mtsComponentState::ACTIVE, _timeout_create_start);
+        }
+        m_new_components.clear();
+    }
 }
 
 void mts_ros_crtk_bridge::clean_namespace(std::string & _ros_namespace)
@@ -547,6 +551,6 @@ void mts_ros_crtk_bridge::factory::crtk_interfaces_provided_updated_handler(void
                                             m_publish_period,
                                             m_tf_period);
         m_bridge->Connect();
-        m_bridge->CreateStartAndWait();
+        // after connect, we rely on the new connection event handler to create and start components
     }
 }
