@@ -62,6 +62,7 @@ void mts_ros_crtk_bridge::init(void)
     // component manager interface
     mtsInterfaceRequired * required = EnableDynamicComponentManagement();
     if (required) {
+        required->SetMailBoxAndArgumentQueuesSize(1000);
         ManagerComponentServices->AddConnectionEventHandler(&mts_ros_crtk_bridge::add_connection_event_handler, this);
     }
 
