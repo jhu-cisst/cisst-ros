@@ -205,6 +205,26 @@ bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pos
     return false;
 }
 
+bool mtsCISSTToROS(const prmPositionCartesianArrayGet & cisstData, geometry_msgs::PoseArray & rosData,
+                   const std::string & debugInfo)
+{
+    if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
+        rosData.header.frame_id = cisstData.ReferenceFrame();
+        typedef std::vector<vctFrm3>::const_iterator IteratorType;
+        const IteratorType end = cisstData.Positions().end();
+        IteratorType iter;
+        size_t index = 0;
+        rosData.poses.resize(cisstData.Positions().size());
+        for (iter = cisstData.Positions().begin();
+             iter != end;
+             ++iter, ++index) {
+            mtsCISSTToROSPose(*iter, rosData.poses[index]);
+        }
+        return true;
+    }
+    return false;
+}
+
 bool mtsCISSTToROS(const prmPositionCartesianSet & cisstData, geometry_msgs::Pose & rosData,
                    const std::string &)
 {

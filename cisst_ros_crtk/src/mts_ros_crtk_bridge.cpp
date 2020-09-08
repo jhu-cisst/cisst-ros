@@ -305,6 +305,11 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
                     _tf_bridge_used = true;
                     _tf_bridge->Addtf2BroadcasterFromCommandRead(_interface_name, _command);
                 }
+            } else  if ((_crtk_command == "measured_cp_array")
+                        || (_crtk_command == "setpoint_cp_array")) {
+                _pub_bridge_used = true;
+                _pub_bridge->AddPublisherFromCommandRead<prmPositionCartesianArrayGet, geometry_msgs::PoseArray>
+                    (_interface_name, _command, _ros_topic);
             } else if (_crtk_command == "measured_cv") {
                 _pub_bridge_used = true;
                 _pub_bridge->AddPublisherFromCommandRead<prmVelocityCartesianGet, geometry_msgs::TwistStamped>

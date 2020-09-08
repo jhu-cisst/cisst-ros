@@ -33,6 +33,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmVelocityJointGet.h>
 #include <cisstParameterTypes/prmStateJoint.h>
 #include <cisstParameterTypes/prmPositionCartesianGet.h>
+#include <cisstParameterTypes/prmPositionCartesianArrayGet.h>
 #include <cisstParameterTypes/prmPositionCartesianSet.h>
 #include <cisstParameterTypes/prmVelocityCartesianGet.h>
 #include <cisstParameterTypes/prmForceCartesianGet.h>
@@ -53,6 +54,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <geometry_msgs/Vector3Stamped.h>
 #include <geometry_msgs/QuaternionStamped.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/WrenchStamped.h>
@@ -152,6 +154,7 @@ bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Tra
 bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::TransformStamped & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::PoseStamped & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const prmPositionCartesianArrayGet & cisstData, geometry_msgs::PoseArray & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmPositionCartesianSet & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
