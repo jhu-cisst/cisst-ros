@@ -25,11 +25,16 @@ http://www.cisst.org/cisst/license.txt.
 
 // crtk
 #include <crtk_msgs/operating_state.h>
+#include <crtk_msgs/StringStamped.h>
 #include <crtk_msgs/trigger_operating_state.h>
 
 // crtk_msgs
 bool mtsCISSTToROS(const prmOperatingState & cisstData,
                    crtk_msgs::operating_state & rosData,
+                   const std::string & debugInfo);
+
+bool mtsCISSTToROS(const std::string & cisstData,
+                   crtk_msgs::StringStamped & rosData,
                    const std::string & debugInfo);
 
 // crtk_srvs

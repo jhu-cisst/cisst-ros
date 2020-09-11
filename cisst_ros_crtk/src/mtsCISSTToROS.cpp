@@ -44,6 +44,14 @@ bool mtsCISSTToROS(const prmOperatingState & cisstData,
     return mtsCISSTToROSOperatingState(cisstData, rosData, debugInfo);
 }
 
+bool mtsCISSTToROS(const std::string & cisstData,
+                   crtk_msgs::StringStamped & rosData,
+                   const std::string & CMN_UNUSED(debugInfo))
+{
+    rosData.string = cisstData;
+    return true;
+}
+
 bool mtsCISSTToROS(const prmOperatingState & cisstData,
                    crtk_msgs::trigger_operating_state::Response & rosData,
                    const std::string & debugInfo)

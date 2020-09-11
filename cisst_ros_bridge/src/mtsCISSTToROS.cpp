@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -265,6 +265,16 @@ bool mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::Transform & rosDa
 {
     mtsCISSTToROSTransform(cisstData, rosData);
     return true;
+}
+
+bool mtsCISSTToROS(const prmPositionCartesianSet & cisstData, geometry_msgs::TransformStamped & rosData,
+                   const std::string & debugInfo)
+{
+    if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
+        mtsCISSTToROSTransform(cisstData.Goal(), rosData.transform);
+        return true;
+    }
+    return false;
 }
 
 bool mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::TransformStamped & rosData,
