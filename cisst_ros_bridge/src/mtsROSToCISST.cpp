@@ -246,6 +246,24 @@ void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmStateJoint & ciss
               cisstData.Effort().begin());
 }
 
+void mtsROSToCISST(const sensor_msgs::Joy & rosData, prmEventButton & cisstData)
+{
+    mtsROSToCISSTHeader(rosData, cisstData);
+    if (rosData.buttons.size() < 1) {
+        cisstData.Type() = prmEventButton::ERROR;
+        return;
+    }
+    if (rosData.buttons[0] == 1) {
+        cisstData.Type() = prmEventButton::PRESSED;
+    } else if (rosData.buttons[0] == 0) {
+        cisstData.Type() = prmEventButton::RELEASED;
+    } else if (rosData.buttons[0] == 2) {
+        cisstData.Type() = prmEventButton::CLICKED;
+    } else {
+        cisstData.Type() = prmEventButton::ERROR;
+    }
+}
+
 void mtsROSToCISST(const diagnostic_msgs::KeyValue & rosData, prmKeyValue & cisstData)
 {
     cisstData.Key = rosData.key;

@@ -38,6 +38,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmCartesianImpedanceGains.h>
 #include <cisstParameterTypes/prmVelocityJointSet.h>
 #include <cisstParameterTypes/prmVelocityCartesianSet.h>
+#include <cisstParameterTypes/prmEventButton.h>
 #include <cisstParameterTypes/prmKeyValue.h>
 #include <cisstParameterTypes/prmStateJoint.h>
 #include <cisstParameterTypes/prmOperatingState.h>
@@ -54,6 +55,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <geometry_msgs/WrenchStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <sensor_msgs/JointState.h>
+#include <sensor_msgs/Joy.h>
 #include <diagnostic_msgs/KeyValue.h>
 
 // non standard messages
@@ -159,6 +161,7 @@ void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet 
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmForceTorqueJointSet & cisstData);
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmVelocityJointSet & cisstData);
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmStateJoint & cisstData);
+void mtsROSToCISST(const sensor_msgs::Joy & rosData, prmEventButton & cisstData);
 
 // diagnostic_msgs
 void mtsROSToCISST(const diagnostic_msgs::KeyValue & rosData, prmKeyValue & cisstData);
