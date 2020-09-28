@@ -375,15 +375,15 @@ protected:
 
 
 // ----------------------------------------------------
-// Service
+// Services
 // ----------------------------------------------------
 template <typename _mtsResponseType,
-          typename _rosType>
+          typename _rosQueryType>
 class mtsROSCommandReadService
 {
 public:
     typedef mtsROSCommandReadService<_mtsResponseType,
-                                     _rosType> ThisType;
+                                     _rosQueryType> ThisType;
 
     mtsFunctionRead Function;
 
@@ -395,11 +395,11 @@ public:
                                                &ThisType::Callback, this);
     }
 
-    bool Callback(typename _rosType::Request & CMN_UNUSED(request),
-                  typename _rosType::Response & response) {
-        mtsExecutionResult result = Function(mCISSTData);
+    bool Callback(typename _rosQueryType::Request & CMN_UNUSED(request),
+                  typename _rosQueryType::Response & response) {
+        mtsExecutionResult result = Function(mResponse);
         if (result) {
-            if (mtsCISSTToROS(mCISSTData, response, mName)) {
+            if (mtsCISSTToROS(mResponse, response, mName)) {
                 return true;
             }
         } else {
@@ -411,7 +411,51 @@ public:
     }
 
 protected:
-    _mtsResponseType mCISSTData;
+    _mtsResponseType mResponse;
+    ros::ServiceServer mServiceServer;
+    std::string mName;
+};
+
+
+template <typename _mtsRequestType,
+          typename _mtsResponseType,
+          typename _rosQueryType>
+class mtsROSCommandQualifiedReadService
+{
+public:
+    typedef mtsROSCommandQualifiedReadService<_mtsRequestType,
+                                              _mtsResponseType,
+                                              _rosQueryType> ThisType;
+
+    mtsFunctionQualifiedRead Function;
+
+    mtsROSCommandQualifiedReadService(const std::string rosServiceName,
+                                      ros::NodeHandle & node)
+    {
+        mName = rosServiceName;
+        mServiceServer = node.advertiseService(rosServiceName,
+                                               &ThisType::Callback, this);
+    }
+
+    bool Callback(typename _rosQueryType::Request & request,
+                  typename _rosQueryType::Response & response) {
+        mtsROSToCISST(request, mRequest);
+        mtsExecutionResult result = Function(mRequest, mResponse);
+        if (result) {
+            if (mtsCISSTToROS(mResponse, response, mName)) {
+                return true;
+            }
+        } else {
+            ROS_ERROR("mtsROSCommandQualifiedReadService::Callback: mtsFunction call failed");
+            CMN_LOG_RUN_ERROR << "mtsROSCommandReadService::Callback: " << result
+                              << " for topic " << mServiceServer.getService() << std::endl;
+        }
+        return false;
+    }
+
+protected:
+    _mtsRequestType mRequest;
+    _mtsResponseType mResponse;
     ros::ServiceServer mServiceServer;
     std::string mName;
 };
@@ -729,10 +773,14 @@ public:
                                    const std::string & eventName,
                                    const std::string & topicName);
 
-    template <typename _mtsResponseType, typename _rosType>
+    template <typename _mtsResponseType, typename _rosQueryType>
     bool AddServiceFromCommandRead(const std::string & interfaceRequiredName,
                                    const std::string & functionName,
                                    const std::string & serviceName);
+    template <typename _mtsRequestType, typename _mtsResponseType, typename _rosQueryType>
+    bool AddServiceFromCommandQualifiedRead(const std::string & interfaceRequiredName,
+                                            const std::string & functionName,
+                                            const std::string & serviceName);
 
 protected:
     //! list of publishers
@@ -926,7 +974,7 @@ bool mtsROSBridge::AddSubscriberToEventWrite(const std::string & interfaceProvid
 
 
 
-template <typename _mtsResponseType, typename _rosType>
+template <typename _mtsResponseType, typename _rosQueryType>
 bool mtsROSBridge::AddServiceFromCommandRead(const std::string & interfaceRequiredName,
                                              const std::string & functionName,
                                              const std::string & serviceName)
@@ -943,12 +991,44 @@ bool mtsROSBridge::AddServiceFromCommandRead(const std::string & interfaceRequir
         return false;
     }
 
-    mtsROSCommandReadService<_mtsResponseType, _rosType>  * newService
-        = new mtsROSCommandReadService<_mtsResponseType, _rosType>(serviceName, *(this->mNodeHandlePointer));
+    typedef mtsROSCommandReadService<_mtsResponseType, _rosQueryType> serviceType;
+    serviceType * newService
+        = new serviceType(serviceName, *(this->mNodeHandlePointer));
 
     if (!interfaceRequired->AddFunction(functionName, newService->Function)) {
         ROS_ERROR("mtsROSBridge::AddServiceFromCommandRead: failed to create function.");
         CMN_LOG_CLASS_INIT_ERROR << "AddServiceFromCommandRead: failed to create function \""
+                                 << functionName << "\"" << std::endl;
+        delete newService;
+        return false;
+    }
+    return true;
+}
+
+template <typename _mtsRequestType, typename _mtsResponseType, typename _rosQueryType>
+bool mtsROSBridge::AddServiceFromCommandQualifiedRead(const std::string & interfaceRequiredName,
+                                                      const std::string & functionName,
+                                                      const std::string & serviceName)
+{
+    // check if the interface exists of try to create one
+    mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
+    if (!interfaceRequired) {
+        interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
+    }
+    if (!interfaceRequired) {
+        ROS_ERROR("mtsROSBridge::AddServiceFromCommandQualifiedRead: failed to create required interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "AddServiceFromCommandQualifiedRead: failed to create required interface \""
+                                 << interfaceRequiredName << "\"" << std::endl;
+        return false;
+    }
+
+    typedef mtsROSCommandQualifiedReadService<_mtsRequestType, _mtsResponseType, _rosQueryType> serviceType;
+    serviceType * newService
+        = new serviceType(serviceName, *(this->mNodeHandlePointer));
+
+    if (!interfaceRequired->AddFunction(functionName, newService->Function)) {
+        ROS_ERROR("mtsROSBridge::AddServiceFromCommandQualifiedRead: failed to create function.");
+        CMN_LOG_CLASS_INIT_ERROR << "AddServiceFromCommandQualifiedRead: failed to create function \""
                                  << functionName << "\"" << std::endl;
         delete newService;
         return false;

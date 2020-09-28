@@ -728,3 +728,10 @@ bool mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
     }
     return false;
 }
+
+bool mtsCISSTToROS(const vctFrm4x4 & cisstData,
+                   cisst_msgs::QueryForwardKinematics::Response & rosData,
+                   const std::string & CMN_UNUSED(debugInfo))
+{
+    mtsCISSTToROSPose(cisstData, rosData.cp.pose);
+}

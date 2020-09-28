@@ -335,6 +335,20 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
         }
     }
 
+    // qualified read commands
+    for (auto & _command : _interface_provided->GetNamesOfCommandsQualifiedRead()) {
+        if (should_be_bridged(_command)) {
+            // get the CRTK command so we know which template type to use
+            get_crtk_command(_command, _crtk_command);
+            _ros_topic = _clean_namespace + _command;
+            if (_crtk_command == "query_cp") {
+                m_subscribers_bridge->AddServiceFromCommandQualifiedRead<vctDoubleVec, vctFrm4x4,
+                                                                         cisst_msgs::QueryForwardKinematics>
+                    (_required_interface_name, _command, _ros_topic);
+            }
+        }
+    }
+
     // write events
     for (auto & _event : _interface_provided->GetNamesOfEventsWrite()) {
         if (should_be_bridged(_event)) {

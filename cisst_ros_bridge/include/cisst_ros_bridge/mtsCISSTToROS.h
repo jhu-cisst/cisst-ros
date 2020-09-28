@@ -69,10 +69,11 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_msgs/prmCartesianImpedanceGains.h>
 #include <cisst_msgs/mtsIntervalStatistics.h>
 #include <cisst_msgs/BoolStamped.h>
+#include <cisst_msgs/QueryForwardKinematics.h>
 
 // helper functions
-template <typename _cisstFrame>
-void mtsCISSTToROSPose(const _cisstFrame & cisstFrame, geometry_msgs::Pose & rosPose)
+template <typename _cisstFrame, typename _rosPose>
+void mtsCISSTToROSPose(const _cisstFrame & cisstFrame, _rosPose & rosPose)
 {
     vctQuatRot3 quat(cisstFrame.Rotation(), VCT_NORMALIZE);
     rosPose.orientation.x = quat.X();
@@ -84,8 +85,8 @@ void mtsCISSTToROSPose(const _cisstFrame & cisstFrame, geometry_msgs::Pose & ros
     rosPose.position.z = cisstFrame.Translation().Z();
 }
 
-template <typename _cisstFrame>
-void mtsCISSTToROSTransform(const _cisstFrame & cisstFrame, geometry_msgs::Transform & rosTransform)
+template <typename _cisstFrame, typename _rosTransform>
+void mtsCISSTToROSTransform(const _cisstFrame & cisstFrame, _rosTransform & rosTransform)
 {
     vctQuatRot3 quat(cisstFrame.Rotation(), VCT_NORMALIZE);
     rosTransform.rotation.x = quat.X();
@@ -208,6 +209,9 @@ bool mtsCISSTToROS(const prmCartesianImpedanceGains & cisstData,
                    const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
                    cisst_msgs::mtsIntervalStatistics & rosData,
+                   const std::string & debugInfo);
+bool mtsCISSTToROS(const vctFrm4x4 & cisstData,
+                   cisst_msgs::QueryForwardKinematics::Response & rosData,
                    const std::string & debugInfo);
 
 #endif // _mtsCISSTToROS_h

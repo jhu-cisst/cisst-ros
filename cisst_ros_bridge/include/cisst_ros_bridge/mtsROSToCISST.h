@@ -62,6 +62,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_msgs/vctDoubleVec.h>
 #include <cisst_msgs/mtsIntervalStatistics.h>
 #include <cisst_msgs/prmCartesianImpedanceGains.h>
+#include <cisst_msgs/QueryForwardKinematics.h>
 
 // helper functions
 template <typename _cisstFrame>
@@ -171,5 +172,7 @@ void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, prmPositionJointSet
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & cisstData);
 void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData, prmCartesianImpedanceGains & cisstData);
 void mtsROSToCISST(const cisst_msgs::mtsIntervalStatistics & rosData, mtsIntervalStatistics & cisstData);
+void mtsROSToCISST(const cisst_msgs::QueryForwardKinematics::Request & rosData,
+                   vctDoubleVec & cisstData);
 
 #endif // _mtsROSToCISST_h

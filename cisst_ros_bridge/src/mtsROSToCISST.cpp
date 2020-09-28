@@ -352,3 +352,11 @@ void mtsROSToCISST(const cisst_msgs::mtsIntervalStatistics & rosData, mtsInterva
                               rosData.NumberOfOverruns,
                               rosData.StatisticsInterval);
 }
+
+void mtsROSToCISST(const cisst_msgs::QueryForwardKinematics::Request & rosData,
+                   vctDoubleVec & cisstData)
+{
+    cisstData.SetSize(rosData.jp.position.size());
+    std::copy(rosData.jp.position.begin(), rosData.jp.position.end(),
+              cisstData.begin());
+}
