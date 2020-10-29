@@ -98,8 +98,8 @@ class mtsROSEventVoidPublisher: public mtsROSPublisherBase
 public:
     mtsROSEventVoidPublisher(const std::string & rosTopicName,
                              ros::NodeHandle & node,
-                             const uint32_t queueSize = 5,
-                             const bool latch = false)
+                             const uint32_t queueSize = 100,
+                             const bool latch = true)
     {
         mPublisher = node.advertise<std_msgs::Empty>(rosTopicName, queueSize, latch);
     }
@@ -124,8 +124,8 @@ class mtsROSEventWritePublisher: public mtsROSPublisherBase
 public:
     mtsROSEventWritePublisher(const std::string & rosTopicName,
                               ros::NodeHandle & node,
-                              const uint32_t queueSize = 5,
-                              const bool latch = false)
+                              const uint32_t queueSize = 100,
+                              const bool latch = true)
     {
         mName = rosTopicName;
         mPublisher = node.advertise<_rosType>(rosTopicName, queueSize, latch);
@@ -323,7 +323,7 @@ class mtsROSCommandWritePublisher
 public:
     mtsROSCommandWritePublisher(const std::string & rosTopicName,
                                 ros::NodeHandle & node,
-                                const uint32_t queueSize = 5,
+                                const uint32_t queueSize = 100,
                                 const bool latch = false)
     {
         mName = rosTopicName;
@@ -354,7 +354,7 @@ class mtsROSCommandVoidPublisher
 public:
     mtsROSCommandVoidPublisher(const std::string & rosTopicName,
                                ros::NodeHandle & node,
-                               const uint32_t queueSize = 5,
+                               const uint32_t queueSize = 100,
                                const bool latch = false)
     {
         mPublisher = node.advertise<std_msgs::Empty>(rosTopicName, queueSize, latch);
@@ -601,7 +601,7 @@ public:
     bool AddPublisherFromCommandRead(const std::string & interfaceRequiredName,
                                      const std::string & functionName,
                                      const std::string & topicName,
-                                     const uint32_t queueSize = 5,
+                                     const uint32_t queueSize = 100,
                                      const bool latch = false);
 
     /*! Add an event handler (void) to a cisstMultiTask required
@@ -616,7 +616,7 @@ public:
     bool AddPublisherFromEventVoid(const std::string & interfaceRequiredName,
                                    const std::string & eventName,
                                    const std::string & topicName,
-                                   const uint32_t queueSize = 1,
+                                   const uint32_t queueSize = 100,
                                    const bool latch = true);
 
     /*! Add an event handler (write) to a cisstMultiTask required
@@ -633,7 +633,7 @@ public:
     bool AddPublisherFromEventWrite(const std::string & interfaceRequiredName,
                                     const std::string & eventName,
                                     const std::string & topicName,
-                                    const uint32_t queueSize = 1,
+                                    const uint32_t queueSize = 100,
                                     const bool latch = true);
 
     // --------- Subscriber ------------------
@@ -705,7 +705,7 @@ public:
     bool AddPublisherFromCommandWrite(const std::string & interfaceProvidedName,
                                       const std::string & commandName,
                                       const std::string & topicName,
-                                      const uint32_t queueSize = 5,
+                                      const uint32_t queueSize = 100,
                                       const bool latch = false);
 
     /*! Add a command (void) to a cisstMultiTask provided interface.
@@ -720,7 +720,7 @@ public:
     bool AddPublisherFromCommandVoid(const std::string & interfaceProvidedName,
                                      const std::string & commandName,
                                      const std::string & topicName,
-                                     const uint32_t queueSize = 5,
+                                     const uint32_t queueSize = 100,
                                      const bool latch = false);
 
     // --------- Subscriber ------------------
