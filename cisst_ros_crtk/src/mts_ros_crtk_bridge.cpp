@@ -264,14 +264,18 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
             get_crtk_command(_command, _crtk_command);
             _ros_topic = _clean_namespace + _command;
             if ((_crtk_command == "servo_jp")
-                || (_crtk_command == "move_jp")) {
+                || (_crtk_command == "servo_jr")
+                || (_crtk_command == "move_jp")
+                || (_crtk_command == "move_jr")) {
                 m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionJointSet, sensor_msgs::JointState>
                     (_required_interface_name, _command, _ros_topic);
             } else  if (_crtk_command == "servo_jf") {
                 m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceTorqueJointSet, sensor_msgs::JointState>
                     (_required_interface_name, _command, _ros_topic);
             } else if ((_crtk_command == "servo_cp")
-                       || (_crtk_command == "move_cp")) {
+                       || (_crtk_command == "servo_cr")
+                       || (_crtk_command == "move_cp")
+                       || (_crtk_command == "move_cr")) {
                 m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionCartesianSet, geometry_msgs::TransformStamped>
                     (_required_interface_name, _command, _ros_topic);
             } else if (_crtk_command == "servo_cf") {
