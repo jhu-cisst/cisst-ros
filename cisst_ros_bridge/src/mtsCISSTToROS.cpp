@@ -734,4 +734,5 @@ bool mtsCISSTToROS(const vctFrm4x4 & cisstData,
                    const std::string & CMN_UNUSED(debugInfo))
 {
     mtsCISSTToROSPose(cisstData, rosData.cp.pose);
+    return true;
 }
