@@ -250,7 +250,7 @@ void mtsROSToCISST(const sensor_msgs::Joy & rosData, prmEventButton & cisstData)
 {
     mtsROSToCISSTHeader(rosData, cisstData);
     if (rosData.buttons.size() < 1) {
-        cisstData.Type() = prmEventButton::ERROR;
+        cisstData.Type() = prmEventButton::UNDEFINED;
         return;
     }
     if (rosData.buttons[0] == 1) {
@@ -260,7 +260,7 @@ void mtsROSToCISST(const sensor_msgs::Joy & rosData, prmEventButton & cisstData)
     } else if (rosData.buttons[0] == 2) {
         cisstData.Type() = prmEventButton::CLICKED;
     } else {
-        cisstData.Type() = prmEventButton::ERROR;
+        cisstData.Type() = prmEventButton::UNDEFINED;
     }
 }
 
