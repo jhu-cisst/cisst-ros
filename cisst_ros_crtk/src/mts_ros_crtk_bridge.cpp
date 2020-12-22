@@ -510,24 +510,28 @@ void mts_ros_crtk_bridge::add_factory_source(const std::string & _component_name
     }
 }
 
-void mts_ros_crtk_bridge::add_connection_event_handler(const mtsDescriptionConnection & CMN_UNUSED(_connection))
+void mts_ros_crtk_bridge::add_connection_event_handler(const mtsDescriptionConnection & _connection)
 {
     auto _component_manager = mtsComponentManager::GetInstance();
     bool _all_connected = true;
+    std::list<std::string> _started;
     for (const auto & _component_name : m_new_components) {
         auto _component = _component_manager->GetComponent(_component_name);
         _all_connected = _all_connected && _component->AreAllInterfacesRequiredConnected();
-    }
-    if (_all_connected) {
-        for (const auto & _component_name : m_new_components) {
+        if (_all_connected) {
             const double _timeout_create_start = 5.0 * cmn_s;
             auto _component = _component_manager->GetComponent(_component_name);
             _component->Create();
             _component->WaitForState(mtsComponentState::READY, _timeout_create_start);
             _component->Start();
             _component->WaitForState(mtsComponentState::ACTIVE, _timeout_create_start);
+            _started.push_back(_component_name);
         }
-        m_new_components.clear();
+    }
+    for (const auto & _component_name : _started) {
+        m_new_components.erase(std::find(m_new_components.begin(),
+                                         m_new_components.end(),
+                                         _component_name));
     }
 }
 
