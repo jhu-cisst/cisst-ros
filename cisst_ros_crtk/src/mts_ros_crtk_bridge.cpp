@@ -359,7 +359,10 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
             // get the CRTK command so we know which template type to use
             get_crtk_command(_event, _crtk_command);
             _ros_topic = _clean_namespace + _event;
-            if (_crtk_command == "operating_state") {
+            if (_crtk_command == "input_data") {
+                m_subscribers_bridge->AddPublisherFromEventWrite<prmInputData, sensor_msgs::Joy>
+                    (_required_interface_name, _event, _ros_topic);
+            } else if (_crtk_command == "operating_state") {
                 m_events_bridge->AddPublisherFromEventWrite<prmOperatingState, crtk_msgs::operating_state>
                     (_required_interface_name, _event, _ros_topic);
             } else if (_crtk_command == "error") {
