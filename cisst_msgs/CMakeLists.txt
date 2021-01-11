@@ -7,6 +7,7 @@ project(cisst_msgs)
 find_package(catkin REQUIRED COMPONENTS
   std_msgs
   geometry_msgs
+  sensor_msgs
   message_generation
   )
 
@@ -21,11 +22,18 @@ add_message_files(
   StringStamped.msg
   )
 
+## Generate services in the 'srv' folder
+add_service_files(
+  FILES
+  QueryForwardKinematics.srv
+)
+
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
   std_msgs  # Or other packages containing msgs
   geometry_msgs
+  sensor_msgs
   )
 
 

@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -29,15 +29,19 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstMultiTask/mtsIntervalStatistics.h>
 
 #include <cisstParameterTypes/prmPositionJointGet.h>
+#include <cisstParameterTypes/prmPositionJointSet.h>
 #include <cisstParameterTypes/prmVelocityJointGet.h>
 #include <cisstParameterTypes/prmStateJoint.h>
 #include <cisstParameterTypes/prmPositionCartesianGet.h>
+#include <cisstParameterTypes/prmPositionCartesianArrayGet.h>
+#include <cisstParameterTypes/prmPositionCartesianSet.h>
 #include <cisstParameterTypes/prmVelocityCartesianGet.h>
 #include <cisstParameterTypes/prmForceCartesianGet.h>
 #include <cisstParameterTypes/prmEventButton.h>
 #include <cisstParameterTypes/prmCartesianImpedanceGains.h>
 #include <cisstParameterTypes/prmInputData.h>
 #include <cisstParameterTypes/prmKeyValue.h>
+#include <cisstParameterTypes/prmOperatingState.h>
 
 // ros include
 #include <ros/ros.h>
@@ -48,7 +52,9 @@ http://www.cisst.org/cisst/license.txt.
 #include <std_msgs/String.h>
 #include <std_msgs/Float64MultiArray.h>
 #include <geometry_msgs/Vector3Stamped.h>
+#include <geometry_msgs/QuaternionStamped.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/WrenchStamped.h>
@@ -63,10 +69,11 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_msgs/prmCartesianImpedanceGains.h>
 #include <cisst_msgs/mtsIntervalStatistics.h>
 #include <cisst_msgs/BoolStamped.h>
+#include <cisst_msgs/QueryForwardKinematics.h>
 
 // helper functions
-template <typename _cisstFrame>
-void mtsCISSTToROSPose(const _cisstFrame & cisstFrame, geometry_msgs::Pose & rosPose)
+template <typename _cisstFrame, typename _rosPose>
+void mtsCISSTToROSPose(const _cisstFrame & cisstFrame, _rosPose & rosPose)
 {
     vctQuatRot3 quat(cisstFrame.Rotation(), VCT_NORMALIZE);
     rosPose.orientation.x = quat.X();
@@ -78,8 +85,8 @@ void mtsCISSTToROSPose(const _cisstFrame & cisstFrame, geometry_msgs::Pose & ros
     rosPose.position.z = cisstFrame.Translation().Z();
 }
 
-template <typename _cisstFrame>
-void mtsCISSTToROSTransform(const _cisstFrame & cisstFrame, geometry_msgs::Transform & rosTransform)
+template <typename _cisstFrame, typename _rosTransform>
+void mtsCISSTToROSTransform(const _cisstFrame & cisstFrame, _rosTransform & rosTransform)
 {
     vctQuatRot3 quat(cisstFrame.Rotation(), VCT_NORMALIZE);
     rosTransform.rotation.x = quat.X();
@@ -148,15 +155,19 @@ bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Tra
 bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::TransformStamped & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::PoseStamped & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const prmPositionCartesianArrayGet & cisstData, geometry_msgs::PoseArray & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const prmPositionCartesianSet & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Transform & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::Transform & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const prmPositionCartesianSet & cisstData, geometry_msgs::TransformStamped & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::TransformStamped & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Transform & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vct3 & cisstData, geometry_msgs::Vector3 & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::Quaternion & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::QuaternionStamped & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Wrench & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::WrenchStamped & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Vector3Stamped & rosData, const std::string & debugInfo);
@@ -168,6 +179,7 @@ bool mtsCISSTToROS(const prmForceCartesianGet & cisstData, geometry_msgs::Wrench
 // sensor_msgs
 bool mtsCISSTToROS(const vctDoubleVec & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const prmPositionJointSet & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmVelocityJointGet & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmStateJoint & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vctDoubleMat & cisstData, sensor_msgs::PointCloud & rosData, const std::string & debugInfo);
@@ -178,15 +190,28 @@ bool mtsCISSTToROS(const prmInputData & cisstData, sensor_msgs::Joy & rosData, c
 bool mtsCISSTToROS(const prmKeyValue & cisstData, diagnostic_msgs::KeyValue & rosData, const std::string & debugInfo);
 
 // std_srvs
-bool mtsCISSTToROS(const bool & cisstData, std_srvs::Trigger::Response & rosData, const std::string & debugInfo);
-bool mtsCISSTToROS(const std::string & cisstData, std_srvs::Trigger::Response & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const bool & cisstData,
+                   std_srvs::Trigger::Response & rosData,
+                   const std::string & debugInfo);
+bool mtsCISSTToROS(const std::string & cisstData,
+                   std_srvs::Trigger::Response & rosData,
+                   const std::string & debugInfo);
 
 // cisst_msgs
-bool mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::vctDoubleVec & rosData, const std::string & debugInfo);
-bool mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const prmPositionJointGet & cisstData,
+                   cisst_msgs::vctDoubleVec & rosData,
+                   const std::string & debugInfo);
+bool mtsCISSTToROS(const vctDoubleVec & cisstData,
+                   cisst_msgs::vctDoubleVec & rosData,
+                   const std::string & debugInfo);
 bool mtsCISSTToROS(const prmCartesianImpedanceGains & cisstData,
-                   cisst_msgs::prmCartesianImpedanceGains & rosData, const std::string & debugInfo);
+                   cisst_msgs::prmCartesianImpedanceGains & rosData,
+                   const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
-                   cisst_msgs::mtsIntervalStatistics & rosData, const std::string & debugInfo);
+                   cisst_msgs::mtsIntervalStatistics & rosData,
+                   const std::string & debugInfo);
+bool mtsCISSTToROS(const vctFrm4x4 & cisstData,
+                   cisst_msgs::QueryForwardKinematics::Response & rosData,
+                   const std::string & debugInfo);
 
 #endif // _mtsCISSTToROS_h

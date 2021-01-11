@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -67,7 +67,7 @@ public:
         mPublisher = node.advertise<_rosType>(rosTopicName, queueSize, latch);
     }
     virtual ~mtsROSPublisher() {
-        //! \todo, how to remove the topic from the node?
+        mPublisher.shutdown();
     }
 
     bool Execute(void) {
@@ -98,13 +98,13 @@ class mtsROSEventVoidPublisher: public mtsROSPublisherBase
 public:
     mtsROSEventVoidPublisher(const std::string & rosTopicName,
                              ros::NodeHandle & node,
-                             const uint32_t queueSize = 5,
-                             const bool latch = false)
+                             const uint32_t queueSize = 100,
+                             const bool latch = true)
     {
         mPublisher = node.advertise<std_msgs::Empty>(rosTopicName, queueSize, latch);
     }
     virtual ~mtsROSEventVoidPublisher() {
-        //! \todo remove the topic from the node
+        mPublisher.shutdown();
     }
     bool Execute(void) {
         return true;
@@ -124,13 +124,15 @@ class mtsROSEventWritePublisher: public mtsROSPublisherBase
 public:
     mtsROSEventWritePublisher(const std::string & rosTopicName,
                               ros::NodeHandle & node,
-                              const uint32_t queueSize = 5,
-                              const bool latch = false)
+                              const uint32_t queueSize = 100,
+                              const bool latch = true)
     {
         mName = rosTopicName;
         mPublisher = node.advertise<_rosType>(rosTopicName, queueSize, latch);
     }
-    virtual ~mtsROSEventWritePublisher() {}
+    virtual ~mtsROSEventWritePublisher() {
+        mPublisher.shutdown();
+    }
 
     bool Execute(void) {
         return true;
@@ -158,7 +160,6 @@ public:
         mName = name;
     }
     virtual ~mtsROStf2Broadcaster() {
-        //! \todo, how to remove the topic from the node?
     }
 
     bool Execute(void) {
@@ -238,7 +239,7 @@ public:
         mSubscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
     }
     virtual ~mtsROSSubscriberWrite() {
-        // \todo, how to remove the subscriber from the node?
+        mSubscriber.shutdown();
     }
 
     void Callback(const _rosType & rosData) {
@@ -262,10 +263,12 @@ protected:
 class mtsROSSubscriberVoid
 {
 public:
-    mtsROSSubscriberVoid(const std::string & rosTopicName, ros::NodeHandle & node){
+    mtsROSSubscriberVoid(const std::string & rosTopicName, ros::NodeHandle & node) {
         mSubscriber = node.subscribe(rosTopicName, 1, &mtsROSSubscriberVoid::Callback, this);
     }
-    virtual ~mtsROSSubscriberVoid(){}
+    virtual ~mtsROSSubscriberVoid() {
+        mSubscriber.shutdown();
+    }
 
     void Callback(const std_msgs::Empty & CMN_UNUSED(rosData)) {
         mtsExecutionResult result = Function();
@@ -293,11 +296,11 @@ public:
                                const size_t & tableSize):
         StateTable(tableSize, rosTopicName)
     {
-        Subscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
+        mSubscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
         StateTable.AddData(CISSTData, rosTopicName);
     }
     virtual ~mtsROSSubscriberStateTable() {
-        // \todo, how to remove the subscriber from the node?
+        mSubscriber.shutdown();
     }
 
     void Callback(const _rosType & rosData) {
@@ -310,7 +313,7 @@ public:
     _mtsType CISSTData;
 
 protected:
-    ros::Subscriber Subscriber;
+    ros::Subscriber mSubscriber;
 };
 
 
@@ -320,13 +323,15 @@ class mtsROSCommandWritePublisher
 public:
     mtsROSCommandWritePublisher(const std::string & rosTopicName,
                                 ros::NodeHandle & node,
-                                const uint32_t queueSize = 5,
+                                const uint32_t queueSize = 100,
                                 const bool latch = false)
     {
         mName = rosTopicName;
         mPublisher = node.advertise<_rosType>(rosTopicName, queueSize, latch);
     }
-    virtual ~mtsROSCommandWritePublisher() {}
+    virtual ~mtsROSCommandWritePublisher() {
+        mPublisher.shutdown();
+    }
 
     void Command(const _mtsType & CISSTData) {
         if ((mPublisher.getNumSubscribers() == 0) && !mPublisher.isLatched()) {
@@ -349,34 +354,36 @@ class mtsROSCommandVoidPublisher
 public:
     mtsROSCommandVoidPublisher(const std::string & rosTopicName,
                                ros::NodeHandle & node,
-                               const uint32_t queueSize = 5,
+                               const uint32_t queueSize = 100,
                                const bool latch = false)
     {
-        Publisher = node.advertise<std_msgs::Empty>(rosTopicName, queueSize, latch);
+        mPublisher = node.advertise<std_msgs::Empty>(rosTopicName, queueSize, latch);
     }
-    virtual ~mtsROSCommandVoidPublisher() {}
+    virtual ~mtsROSCommandVoidPublisher() {
+        mPublisher.shutdown();
+    }
 
     void Command(void)
     {
-        Publisher.publish(mEmptyMsg);
+        mPublisher.publish(mEmptyMsg);
     }
 
 protected:
-    ros::Publisher Publisher;
+    ros::Publisher mPublisher;
     std_msgs::Empty mEmptyMsg;
 };
 
 
 // ----------------------------------------------------
-// Service
+// Services
 // ----------------------------------------------------
 template <typename _mtsResponseType,
-          typename _rosType>
+          typename _rosQueryType>
 class mtsROSCommandReadService
 {
 public:
     typedef mtsROSCommandReadService<_mtsResponseType,
-                                     _rosType> ThisType;
+                                     _rosQueryType> ThisType;
 
     mtsFunctionRead Function;
 
@@ -388,11 +395,11 @@ public:
                                                &ThisType::Callback, this);
     }
 
-    bool Callback(typename _rosType::Request & CMN_UNUSED(request),
-                  typename _rosType::Response & response) {
-        mtsExecutionResult result = Function(mCISSTData);
+    bool Callback(typename _rosQueryType::Request & CMN_UNUSED(request),
+                  typename _rosQueryType::Response & response) {
+        mtsExecutionResult result = Function(mResponse);
         if (result) {
-            if (mtsCISSTToROS(mCISSTData, response, mName)) {
+            if (mtsCISSTToROS(mResponse, response, mName)) {
                 return true;
             }
         } else {
@@ -404,7 +411,51 @@ public:
     }
 
 protected:
-    _mtsResponseType mCISSTData;
+    _mtsResponseType mResponse;
+    ros::ServiceServer mServiceServer;
+    std::string mName;
+};
+
+
+template <typename _mtsRequestType,
+          typename _mtsResponseType,
+          typename _rosQueryType>
+class mtsROSCommandQualifiedReadService
+{
+public:
+    typedef mtsROSCommandQualifiedReadService<_mtsRequestType,
+                                              _mtsResponseType,
+                                              _rosQueryType> ThisType;
+
+    mtsFunctionQualifiedRead Function;
+
+    mtsROSCommandQualifiedReadService(const std::string rosServiceName,
+                                      ros::NodeHandle & node)
+    {
+        mName = rosServiceName;
+        mServiceServer = node.advertiseService(rosServiceName,
+                                               &ThisType::Callback, this);
+    }
+
+    bool Callback(typename _rosQueryType::Request & request,
+                  typename _rosQueryType::Response & response) {
+        mtsROSToCISST(request, mRequest);
+        mtsExecutionResult result = Function(mRequest, mResponse);
+        if (result) {
+            if (mtsCISSTToROS(mResponse, response, mName)) {
+                return true;
+            }
+        } else {
+            ROS_ERROR("mtsROSCommandQualifiedReadService::Callback: mtsFunction call failed");
+            CMN_LOG_RUN_ERROR << "mtsROSCommandReadService::Callback: " << result
+                              << " for topic " << mServiceServer.getService() << std::endl;
+        }
+        return false;
+    }
+
+protected:
+    _mtsRequestType mRequest;
+    _mtsResponseType mResponse;
     ros::ServiceServer mServiceServer;
     std::string mName;
 };
@@ -492,22 +543,44 @@ public:
       set to false, either install your own handler or
       rely on cisst cleanup()
     */
+    CISST_DEPRECATED mtsROSBridge(const std::string & componentName,
+                                  const double periodInSeconds,
+                                  const bool spin = false,
+                                  const bool sig = true,
+                                  ros::NodeHandle * nodeHandle = NULL);
+
+    mtsROSBridge(const mtsTaskPeriodicConstructorArg & arg);
+
+    /*!  Constructor using an existing ros::NodeHandle.  By default,
+      spin is set to false (see also PerformsSpin) and this
+      constructor doesn't redefine the signal handler.
+    */
     mtsROSBridge(const std::string & componentName,
                  const double periodInSeconds,
-                 const bool spin = false,
-                 const bool sig = true,
-                 ros::NodeHandle* nh = NULL);
-    inline ~mtsROSBridge() {}
+                 ros::NodeHandle * nodeHandle);
+
+    ~mtsROSBridge();
 
     // taskPeriodic
     void Configure(const std::string & CMN_UNUSED(filename) = "");
-    void AddIntervalStatisticsInterface(const std::string & interfaceName = "IntervalStatistics");
+    bool AddIntervalStatisticsInterface(const std::string & interfaceName = "IntervalStatistics");
     void AddIntervalStatisticsPublisher(const std::string & rosNamespace,
                                         const std::string & componentName,
                                         const std::string & interfaceName = "IntervalStatistics");
     void Startup(void);
     void Run(void);
     void Cleanup(void);
+
+    /*! Request that the bridge calls ros::spinOnce in its Run method.
+      This allows to piggy back on the existing thread/periodicity
+      instead of using ros::spin in your main.  This can be used if
+      you also have another library or toolkit that has its own event
+      loop (i.e. Qt with QApplication.exec()).  If you use multiple
+      mtsROSBridge, make sure there's only one bridge with spin turned
+      on. */
+    inline void PerformsSpin(const bool spin) {
+        mSpin = spin;
+    }
 
     // --------- Required interface
 
@@ -528,7 +601,7 @@ public:
     bool AddPublisherFromCommandRead(const std::string & interfaceRequiredName,
                                      const std::string & functionName,
                                      const std::string & topicName,
-                                     const uint32_t queueSize = 5,
+                                     const uint32_t queueSize = 100,
                                      const bool latch = false);
 
     /*! Add an event handler (void) to a cisstMultiTask required
@@ -543,7 +616,7 @@ public:
     bool AddPublisherFromEventVoid(const std::string & interfaceRequiredName,
                                    const std::string & eventName,
                                    const std::string & topicName,
-                                   const uint32_t queueSize = 1,
+                                   const uint32_t queueSize = 100,
                                    const bool latch = true);
 
     /*! Add an event handler (write) to a cisstMultiTask required
@@ -560,7 +633,7 @@ public:
     bool AddPublisherFromEventWrite(const std::string & interfaceRequiredName,
                                     const std::string & eventName,
                                     const std::string & topicName,
-                                    const uint32_t queueSize = 1,
+                                    const uint32_t queueSize = 100,
                                     const bool latch = true);
 
     // --------- Subscriber ------------------
@@ -632,7 +705,7 @@ public:
     bool AddPublisherFromCommandWrite(const std::string & interfaceProvidedName,
                                       const std::string & commandName,
                                       const std::string & topicName,
-                                      const uint32_t queueSize = 5,
+                                      const uint32_t queueSize = 100,
                                       const bool latch = false);
 
     /*! Add a command (void) to a cisstMultiTask provided interface.
@@ -647,7 +720,7 @@ public:
     bool AddPublisherFromCommandVoid(const std::string & interfaceProvidedName,
                                      const std::string & commandName,
                                      const std::string & topicName,
-                                     const uint32_t queueSize = 5,
+                                     const uint32_t queueSize = 100,
                                      const bool latch = false);
 
     // --------- Subscriber ------------------
@@ -700,10 +773,14 @@ public:
                                    const std::string & eventName,
                                    const std::string & topicName);
 
-    template <typename _mtsResponseType, typename _rosType>
+    template <typename _mtsResponseType, typename _rosQueryType>
     bool AddServiceFromCommandRead(const std::string & interfaceRequiredName,
                                    const std::string & functionName,
                                    const std::string & serviceName);
+    template <typename _mtsRequestType, typename _mtsResponseType, typename _rosQueryType>
+    bool AddServiceFromCommandQualifiedRead(const std::string & interfaceRequiredName,
+                                            const std::string & functionName,
+                                            const std::string & serviceName);
 
 protected:
     //! list of publishers
@@ -711,7 +788,7 @@ protected:
     PublishersType Publishers;
 
     //! ros node
-    ros::NodeHandle * Node;
+    ros::NodeHandle * mNodeHandlePointer;
 
     //! spin flag, if set call spinOnce() in run
     bool mSpin;
@@ -740,11 +817,12 @@ bool mtsROSBridge::AddPublisherFromCommandRead(const std::string & interfaceRequ
         return false;
     }
     mtsROSPublisherBase * newPublisher =
-        new mtsROSPublisher<_mtsType, _rosType>(topicName, *(this->Node), queueSize, latch);
+        new mtsROSPublisher<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer), queueSize, latch);
     if (!interfaceRequired->AddFunction(functionName, newPublisher->Function)) {
         ROS_ERROR("mtsROSBridge::AddPublisherFromCommandRead: failed to create function.");
-        CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromCommandRead: faild to create function \""
-                                 << functionName << "\"" << std::endl;
+        CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromCommandRead: failed to add function \""
+                                 << functionName << "\" to interface required \""
+                                 << interfaceRequiredName << "\"" << std::endl;
         delete newPublisher;
         return false;
     }
@@ -765,16 +843,17 @@ bool mtsROSBridge::AddSubscriberToCommandWrite(const std::string & interfaceRequ
     }
     if (!interfaceRequired) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToCommandWrite: failed to create required interface.");
-        CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandWrite: faild to create required interface \""
+        CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandWrite: failed to create required interface \""
                                  << interfaceRequiredName << "\"" << std::endl;
         return false;
     }
     mtsROSSubscriberWrite<_mtsType, _rosType> * newSubscriber
-        = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->Node));
+        = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer));
     if (!interfaceRequired->AddFunction(functionName, newSubscriber->Function)) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToCommandWrite: failed to create function.");
-        CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandWrite: failed to create function \""
-                                 << functionName << "\"" << std::endl;
+        CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandWrite: failed to add function \""
+                                 << functionName << "\" to interface required \""
+                                 << interfaceRequiredName << "\"" << std::endl;
         delete newSubscriber;
         return false;
     }
@@ -795,16 +874,17 @@ bool mtsROSBridge::AddPublisherFromEventWrite(const std::string & interfaceRequi
         interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
     }
 
-    mtsROSEventWritePublisher<_mtsType, _rosType>* newPublisher
-        = new mtsROSEventWritePublisher<_mtsType, _rosType>(topicName, *(this->Node), queueSize, latch);
-    if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWritePublisher<_mtsType, _rosType>::EventHandler, newPublisher, eventName))
-        {
-            ROS_ERROR("mtsROSBridge::AddPublisherFromEventWrite: failed to create required interface.");
-            CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromEventWrite: failed to create required interface \""
-                                     << interfaceRequiredName << "\"" << std::endl;
-            delete newPublisher;
-            return false;
-        }
+    mtsROSEventWritePublisher<_mtsType, _rosType> * newPublisher
+        = new mtsROSEventWritePublisher<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer), queueSize, latch);
+    if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWritePublisher<_mtsType, _rosType>::EventHandler,
+                                                 newPublisher, eventName)) {
+        ROS_ERROR("mtsROSBridge::AddPublisherFromEventWrite: failed to add event handler to required interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromEventWrite: failed to add event handler for \""
+                                 << eventName << "\" to required interface \""
+                                 << interfaceRequiredName << "\"" << std::endl;
+        delete newPublisher;
+        return false;
+    }
     Publishers.push_back(newPublisher);
     return true;
 }
@@ -823,8 +903,8 @@ bool mtsROSBridge::AddPublisherFromCommandWrite(const std::string & interfacePro
         interfaceProvided = this->AddInterfaceProvided(interfaceProvidedName);
     }
 
-    mtsROSCommandWritePublisher<_mtsType, _rosType>* newPublisher
-        = new mtsROSCommandWritePublisher<_mtsType, _rosType>(topicName, *(this->Node), queueSize, latch);
+    mtsROSCommandWritePublisher<_mtsType, _rosType> * newPublisher
+        = new mtsROSCommandWritePublisher<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer), queueSize, latch);
     if (!interfaceProvided->AddCommandWrite(&mtsROSCommandWritePublisher<_mtsType, _rosType>::Command,
                                             newPublisher, commandName))
         {
@@ -851,7 +931,7 @@ bool mtsROSBridge::AddSubscriberToCommandRead(const std::string & interfaceProvi
     }
 
     mtsROSSubscriberStateTable<_mtsType, _rosType> * newSubscriber
-        = new mtsROSSubscriberStateTable<_mtsType, _rosType>(topicName, *(this->Node), tableSize);
+        = new mtsROSSubscriberStateTable<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer), tableSize);
     if (!interfaceProvided->AddCommandReadState(newSubscriber->StateTable,
                                                 newSubscriber->CISSTData,
                                                 commandName)) {
@@ -878,7 +958,7 @@ bool mtsROSBridge::AddSubscriberToEventWrite(const std::string & interfaceProvid
     }
 
     mtsROSSubscriberWrite<_mtsType, _rosType> * newSubscriber
-        = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->Node));
+        = new mtsROSSubscriberWrite<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer));
     if (!interfaceProvided->AddEventWrite(newSubscriber->Function,
                                           eventName, _mtsType())) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToEventWrite: failed to add event to provided interface.");
@@ -894,7 +974,7 @@ bool mtsROSBridge::AddSubscriberToEventWrite(const std::string & interfaceProvid
 
 
 
-template <typename _mtsResponseType, typename _rosType>
+template <typename _mtsResponseType, typename _rosQueryType>
 bool mtsROSBridge::AddServiceFromCommandRead(const std::string & interfaceRequiredName,
                                              const std::string & functionName,
                                              const std::string & serviceName)
@@ -906,17 +986,49 @@ bool mtsROSBridge::AddServiceFromCommandRead(const std::string & interfaceRequir
     }
     if (!interfaceRequired) {
         ROS_ERROR("mtsROSBridge::AddServiceFromCommandRead: failed to create required interface.");
-        CMN_LOG_CLASS_INIT_ERROR << "AddServiceFromCommandRead: faild to create required interface \""
+        CMN_LOG_CLASS_INIT_ERROR << "AddServiceFromCommandRead: failed to create required interface \""
                                  << interfaceRequiredName << "\"" << std::endl;
         return false;
     }
 
-    mtsROSCommandReadService<_mtsResponseType, _rosType>  * newService
-        = new mtsROSCommandReadService<_mtsResponseType, _rosType>(serviceName, *(this->Node));
+    typedef mtsROSCommandReadService<_mtsResponseType, _rosQueryType> serviceType;
+    serviceType * newService
+        = new serviceType(serviceName, *(this->mNodeHandlePointer));
 
     if (!interfaceRequired->AddFunction(functionName, newService->Function)) {
         ROS_ERROR("mtsROSBridge::AddServiceFromCommandRead: failed to create function.");
         CMN_LOG_CLASS_INIT_ERROR << "AddServiceFromCommandRead: failed to create function \""
+                                 << functionName << "\"" << std::endl;
+        delete newService;
+        return false;
+    }
+    return true;
+}
+
+template <typename _mtsRequestType, typename _mtsResponseType, typename _rosQueryType>
+bool mtsROSBridge::AddServiceFromCommandQualifiedRead(const std::string & interfaceRequiredName,
+                                                      const std::string & functionName,
+                                                      const std::string & serviceName)
+{
+    // check if the interface exists of try to create one
+    mtsInterfaceRequired * interfaceRequired = this->GetInterfaceRequired(interfaceRequiredName);
+    if (!interfaceRequired) {
+        interfaceRequired = this->AddInterfaceRequired(interfaceRequiredName);
+    }
+    if (!interfaceRequired) {
+        ROS_ERROR("mtsROSBridge::AddServiceFromCommandQualifiedRead: failed to create required interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "AddServiceFromCommandQualifiedRead: failed to create required interface \""
+                                 << interfaceRequiredName << "\"" << std::endl;
+        return false;
+    }
+
+    typedef mtsROSCommandQualifiedReadService<_mtsRequestType, _mtsResponseType, _rosQueryType> serviceType;
+    serviceType * newService
+        = new serviceType(serviceName, *(this->mNodeHandlePointer));
+
+    if (!interfaceRequired->AddFunction(functionName, newService->Function)) {
+        ROS_ERROR("mtsROSBridge::AddServiceFromCommandQualifiedRead: failed to create function.");
+        CMN_LOG_CLASS_INIT_ERROR << "AddServiceFromCommandQualifiedRead: failed to create function \""
                                  << functionName << "\"" << std::endl;
         delete newService;
         return false;

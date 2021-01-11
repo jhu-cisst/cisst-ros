@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2021 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -42,6 +42,11 @@ void mtsROSToCISST(const std_msgs::Bool & rosData, bool & cisstData)
 void mtsROSToCISST(const std_msgs::String & rosData, std::string & cisstData)
 {
     cisstData = rosData.data;
+}
+
+void mtsROSToCISST(const std_msgs::String & rosData, mtsMessage & cisstData)
+{
+    cisstData.Message = rosData.data;
 }
 
 void mtsROSToCISST(const std_msgs::Float64MultiArray & rosData, vctDoubleVec & cisstData)
@@ -96,6 +101,12 @@ void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, prmPositionCartes
     mtsROSToCISST(rosData.pose, cisstData);
 }
 
+void mtsROSToCISST(const geometry_msgs::TransformStamped & rosData, prmPositionCartesianGet & cisstData)
+{
+    mtsROSToCISSTHeader(rosData, cisstData);
+    mtsROSToCISST(rosData.transform, cisstData.Position());
+}
+
 void mtsROSToCISST(const geometry_msgs::TransformStamped & rosData, prmPositionCartesianSet & cisstData)
 {
     mtsROSToCISSTHeader(rosData, cisstData);
@@ -103,6 +114,11 @@ void mtsROSToCISST(const geometry_msgs::TransformStamped & rosData, prmPositionC
 }
 
 void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, vctFrm3 & cisstData)
+{
+    mtsROSPoseToCISST(rosData.pose, cisstData);
+}
+
+void mtsROSToCISST(const geometry_msgs::PoseStamped & rosData, vctFrm4x4 & cisstData)
 {
     mtsROSPoseToCISST(rosData.pose, cisstData);
 }
@@ -223,6 +239,41 @@ void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmVelocityJointSet 
               cisstData.Goal().begin());
 }
 
+void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmStateJoint & cisstData)
+{
+    mtsROSToCISSTHeader(rosData, cisstData);
+    cisstData.Name().SetSize(rosData.name.size());
+    std::copy(rosData.name.begin(), rosData.name.end(),
+              cisstData.Name().begin());
+    cisstData.Position().SetSize(rosData.position.size());
+    std::copy(rosData.position.begin(), rosData.position.end(),
+              cisstData.Position().begin());
+    cisstData.Velocity().SetSize(rosData.velocity.size());
+    std::copy(rosData.velocity.begin(), rosData.velocity.end(),
+              cisstData.Velocity().begin());
+    cisstData.Effort().SetSize(rosData.effort.size());
+    std::copy(rosData.effort.begin(), rosData.effort.end(),
+              cisstData.Effort().begin());
+}
+
+void mtsROSToCISST(const sensor_msgs::Joy & rosData, prmEventButton & cisstData)
+{
+    mtsROSToCISSTHeader(rosData, cisstData);
+    if (rosData.buttons.size() < 1) {
+        cisstData.Type() = prmEventButton::UNDEFINED;
+        return;
+    }
+    if (rosData.buttons[0] == 1) {
+        cisstData.Type() = prmEventButton::PRESSED;
+    } else if (rosData.buttons[0] == 0) {
+        cisstData.Type() = prmEventButton::RELEASED;
+    } else if (rosData.buttons[0] == 2) {
+        cisstData.Type() = prmEventButton::CLICKED;
+    } else {
+        cisstData.Type() = prmEventButton::UNDEFINED;
+    }
+}
+
 void mtsROSToCISST(const diagnostic_msgs::KeyValue & rosData, prmKeyValue & cisstData)
 {
     cisstData.Key = rosData.key;
@@ -294,4 +345,28 @@ void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData,
                   cisstData.TorqueBiasPos());
     mtsROSToCISST(rosData.TorqueBiasNeg,
                   cisstData.TorqueBiasNeg());
+}
+
+void mtsROSToCISST(const cisst_msgs::mtsIntervalStatistics & rosData, mtsIntervalStatistics & cisstData)
+{
+    mtsROSToCISSTHeader(rosData, cisstData);
+    cisstData.SetFromExisting(rosData.PeriodAvg,
+                              rosData.PeriodStdDev,
+                              rosData.PeriodMin,
+                              rosData.PeriodMax,
+                              rosData.ComputeTimeAvg,
+                              rosData.ComputeTimeStdDev,
+                              rosData.ComputeTimeMin,
+                              rosData.ComputeTimeMax,
+                              rosData.NumberOfSamples,
+                              rosData.NumberOfOverruns,
+                              rosData.StatisticsInterval);
+}
+
+void mtsROSToCISST(const cisst_msgs::QueryForwardKinematics::Request & rosData,
+                   vctDoubleVec & cisstData)
+{
+    cisstData.SetSize(rosData.jp.position.size());
+    std::copy(rosData.jp.position.begin(), rosData.jp.position.end(),
+              cisstData.begin());
 }

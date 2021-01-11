@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -113,13 +113,15 @@ bool mtsCISSTToROS(const prmEventButton & cisstData, cisst_msgs::BoolStamped & r
 bool mtsCISSTToROS(const prmEventButton & cisstData, sensor_msgs::Joy & rosData,
                    const std::string & debugInfo)
 {
+    rosData.axes.resize(0);
+    rosData.buttons.resize(1);
     if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
-        rosData.axes.resize(0);
-        rosData.buttons.resize(1);
         if (cisstData.Type() == prmEventButton::PRESSED) {
             rosData.buttons[0] = 1;
         } else if (cisstData.Type() == prmEventButton::RELEASED) {
             rosData.buttons[0] = 0;
+        } else if (cisstData.Type() == prmEventButton::CLICKED) {
+            rosData.buttons[0] = 2;
         }
         return true;
     }
@@ -196,13 +198,39 @@ bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pos
                    const std::string & debugInfo)
 {
     if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
-        rosData.header.frame_id = cisstData.MovingFrame();
+        rosData.header.frame_id = cisstData.ReferenceFrame();
         mtsCISSTToROSPose(cisstData.Position(), rosData.pose);
         return true;
     }
     return false;
 }
 
+bool mtsCISSTToROS(const prmPositionCartesianArrayGet & cisstData, geometry_msgs::PoseArray & rosData,
+                   const std::string & debugInfo)
+{
+    if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
+        rosData.header.frame_id = cisstData.ReferenceFrame();
+        typedef std::vector<vctFrm3>::const_iterator IteratorType;
+        const IteratorType end = cisstData.Positions().end();
+        IteratorType iter;
+        size_t index = 0;
+        rosData.poses.resize(cisstData.Positions().size());
+        for (iter = cisstData.Positions().begin();
+             iter != end;
+             ++iter, ++index) {
+            mtsCISSTToROSPose(*iter, rosData.poses[index]);
+        }
+        return true;
+    }
+    return false;
+}
+
+bool mtsCISSTToROS(const prmPositionCartesianSet & cisstData, geometry_msgs::Pose & rosData,
+                   const std::string &)
+{
+    mtsCISSTToROSPose(cisstData.Goal(), rosData);
+    return true;
+}
 
 bool mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Pose & rosData,
                    const std::string &)
@@ -239,6 +267,16 @@ bool mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::Transform & rosDa
     return true;
 }
 
+bool mtsCISSTToROS(const prmPositionCartesianSet & cisstData, geometry_msgs::TransformStamped & rosData,
+                   const std::string & debugInfo)
+{
+    if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
+        mtsCISSTToROSTransform(cisstData.Goal(), rosData.transform);
+        return true;
+    }
+    return false;
+}
+
 bool mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::TransformStamped & rosData,
                    const std::string & debugInfo)
 {
@@ -273,6 +311,18 @@ bool mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::Quaternion & ros
     rosData.y = quat.Y();
     rosData.z = quat.Z();
     rosData.w = quat.W();
+    return true;
+}
+
+bool mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::QuaternionStamped & rosData,
+                   const std::string & debugInfo)
+{
+    mtsCISSTToROSHeader(rosData, debugInfo);
+    vctQuatRot3 quat(cisstData, VCT_NORMALIZE);
+    rosData.quaternion.x = quat.X();
+    rosData.quaternion.y = quat.Y();
+    rosData.quaternion.z = quat.Z();
+    rosData.quaternion.w = quat.W();
     return true;
 }
 
@@ -413,6 +463,24 @@ bool mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointStat
         if (size != 0) {
             rosData.position.resize(size);
             std::copy(cisstData.Position().begin(), cisstData.Position().end(),
+                      rosData.position.begin());
+        }
+        return true;
+    }
+    return false;
+}
+
+bool mtsCISSTToROS(const prmPositionJointSet & cisstData, sensor_msgs::JointState & rosData,
+                   const std::string & debugInfo)
+{
+    if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
+        rosData.name.resize(0);
+        rosData.velocity.resize(0);
+        rosData.effort.resize(0);
+        const size_t size = cisstData.Goal().size();
+        if (size != 0) {
+            rosData.position.resize(size);
+            std::copy(cisstData.Goal().begin(), cisstData.Goal().end(),
                       rosData.position.begin());
         }
         return true;
@@ -659,4 +727,12 @@ bool mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
         return true;
     }
     return false;
+}
+
+bool mtsCISSTToROS(const vctFrm4x4 & cisstData,
+                   cisst_msgs::QueryForwardKinematics::Response & rosData,
+                   const std::string & CMN_UNUSED(debugInfo))
+{
+    mtsCISSTToROSPose(cisstData, rosData.cp.pose);
+    return true;
 }
