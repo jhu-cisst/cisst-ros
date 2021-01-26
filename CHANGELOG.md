@@ -1,6 +1,28 @@
 Change log
 ==========
 
+2.0.0 (2021-01-xx)
+==================
+
+* API changes:
+  * Now depends on crtk_msgs package (https://github.com/collaborative-robotics/crtk_msgs)
+  * Use CRTK snake_case for default commands (e.g. `error`, `period_statistics`...)
+  * Changed `prmEventButton::ERROR` to `UNDEFINED` (for Windows compatibility)
+* Deprecated features:
+  * Removed `cisst_conversions` package since it wasn't used
+* New features:
+  * cisst_ros_crtk bridge:
+    * Class using multiple `mtsROSBridge` instances to publish/subscribe to topics compatible with CRTK (names and payloads)
+    * Can be used to bridge a given provided interface
+    * Can monitor new interfaces at runtime to then bridge them (e.g. optical tracker tools plugged while the component is running, sawNDITracker)
+  * cisst_ros_bridge:
+    * Added support for CRTK
+    * Added constructor using an existing ros node (this allows to create a node using argc to set namespace)
+    * Added support for services using qualified read command
+    * More conversion methods (cisst to ros and ros to cisst)
+* Bug fixes:
+  * CMake explicitely requires CXX 14 (for older compilers)
+
 1.5.0 (2019-04-09)
 ==================
 
