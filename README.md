@@ -1,68 +1,32 @@
-# About
+# cisst-ros
 
-cisst/ROS integration packages 
+cisst/ROS integration package.  This package contains components that can be used to provide a bridge between [cisstMultiTask components](https://github.com/jhu-cisst/cisst/wiki/cisstMultiTask-concepts) and ROS 1.  These components can be used to map a cisstMultiTask command or event to ROS topics and services.
 
-# Dependencies:
- * cisst libraries: see https://github.com/jhu-cisst/cisst/wiki to download and install the cisst libraries and SAW components
- * ROS: you can check if ROS is installed by checking the content of `/opt/ros`.  If ROS is not installed, follow instructions from http://www.ros.org.
+# Links
+ * License: http://github.com/jhu-cisst/cisst/blob/master/license.txt
+ * JHU-LCSR software: http://jhu-lcsr.github.io/software/
 
-# Initialize your catkin ROS workspace
+# Dependencies
+ * cisst libraries: https://github.com/jhu-cisst/cisst
+ * ROS 1 (tested with Kinetic, Melodic and Noetic)
+ * CRTK ROS messages: https://github.com/collaborative-robotics/crtk_msgs
 
-As of October 2015, we strongly recommend to install cisst/SAW using the ROS catkin build tools:
-https://github.com/jhu-cisst/cisst/wiki/Compiling-cisst-and-SAW-with-CMake#13-building-using-catkin-build-tools-for-ros
+# Build
 
-Make sure ROS is in your path.  You can also "source" the setup script that comes with your ROS distribution (example for ROS hydro):
-```sh
-source /opt/ros/hydro/setup.bash
-```
+You can find some documentation re. compiling cisst and SAW components in the [dVRK wiki](https://github.com/jhu-dvrk/sawIntuitiveResearchKit/wiki/CatkinBuild#catkin-build-and-rosinstall).  All packages can be cloned in your catkin workspace and built using `catkin build` (Python Catkin Build Tools).  `catkin make` is not supported.
 
-Create the main directories for ROS and initialize the workspace:
-```sh
-mkdir -p ~/catkin_ws/src
-cd ~/catkin_ws/src
-catkin init
-```
+# Main packages
 
-First build to initialize the environment:
-```sh
-cd ~/catkin_ws/
-catkin build
-```
+The main three ROS packages in this repository are:
+* `cisst_msgs`: a collection of messages matching `cisst` data types with no obvious equivalent in ROS
+* `cisst_ros_bridge`: base class to bridge between cisst and ROS (`mtsROSBridge`).  This library also includes methods to convert bach and forth between cisst and ROS data types
+* `cisst_ros_crtk`: component using multiple instances of `mtsROSBridge` to automatically bridge a [CRTK](https://github.com/collaborative-robotics/documentation/wiki/Robot-API) compatible cisst interface to ROS
 
-To setup your path and find the ROS commands easily:
-```sh
-source ~/catkin_ws/devel/setup.bash
-```
+# Examples
 
-# Install cisst-ROS
+The cisst-ros package for the following applications to create ROS interfaces:
+* dVRK: https://github.com/jhu-dvrk/sawIntuitiveResearchKit/wiki (da Vinci Research Kit)
+* sawNDITracker: https://github.com/jhu-saw/sawNDITracker (NDI serial port based optical and magnetic trackers)
+* sawForceDimensionSDK: https://github.com/jhu-saw/sawForceDimensionSDK (Force Dimension haptic devices and Novint Falcon)
+* ... and many more cisst/SAW components found in https://github.com/jhu-saw
 
-This part is not needed if you installed _cisst/SAW_ using the catkin build tools.   _cisst-ros_ comes with _cisst/SAW_.
-
-Get the sources:
-```sh
-cd ~/catkin_ws/src  
-git clone http://github.com/jhu-cisst/cisst-ros.git
-```
-
-Build:
-```sh 
-cd ~/catkin_ws
-catkin build   # you may need to specify cisst build path using cmake 
-               # default cisst\_DIR path: PATH/TO/CISST/build/cisst/
-```
-**NOTE**   
-If you have a catkin_make error complaining about not finding cisst, please 
-specify cisst path manually. 
-```sh
-# cd to build dir
-cd ~/catkin_ws/build
-# start ccmake 
-ccmake .
-```
-In CMake, set `cisst_DIR` to PATH/TO/CISST/build/cisst/
-
-# Package Description for cisst/ROS
-* cisst_msgs: ros messages for cisst data types
-* cisst_ros_bridge:
-   * bridge component for cisst to ros
-   * data type conversion methods 
