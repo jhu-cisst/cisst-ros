@@ -1,3 +1,6 @@
+<!--ts-->
+<!--te-->
+
 # cisst-ros
 
 cisst/ROS integration package.  This package contains components that can be used to provide a bridge between  and ROS 1.  These components can be used to map a cisstMultiTask command or event to ROS topics and services.
@@ -45,7 +48,7 @@ manager->StartAll();
 ```
 At runtime, the `Run` method from `mtsROSBridge` will be called periodically.  At each call, the bridge will:
 * read the data using the *C++/cisst* data type used by the device (e.g. `std::string` in example above)
-* convert the data from *cisst* to *ROS* format using the overloaded global function `mtsCISSTToROS`.  The function `mtsCISSTToROS` also converts the timestamps (if any) and checks if the *cisst* data is valid (if the *cisst* data type has a `Valid` flag)
+* convert the data from *cisst* to *ROS* format using the include/cisst_ros_bridge/mtsROSBridge.hoverloaded global function `mtsCISSTToROS`.  The function `mtsCISSTToROS` also converts the timestamps (if any) and checks if the *cisst* data is valid (if the *cisst* data type has a `Valid` flag)
 * if the data can be converted to *ROS* (e.g. `std_msgs::String`) and is valid, it is published on the ROS topic defined in `AddPublisherFromCommandRead` (in this example, "/my_device/status")
 
 The most common conversions are implemented in the `cisst_ros_bridge` package.  They are declared in the file ` cisst_ros_bridge/include/cisst_ros_bridge/mtsCISSTToROS.h`.  If you need to add your own conversions (i.e. overload the global function `mtsCISSTTOROS`), make sure you include (as in `#include`) your overloaded definitions before including the `mtsROSBridge.h` header file.  Otherwise the compiler will ignore your overloaded definitions.
@@ -77,7 +80,7 @@ The class `mtsROSBridge` (see header file `include/cisst_ros_bridge/mtsROSBridge
 
 # Examples
 
-The cisst-ros package for the following applications to create ROS interfaces:
+The cisst-ros package is used by the following components to create ROS interfaces:
 * dVRK: https://github.com/jhu-dvrk/sawIntuitiveResearchKit/wiki (da Vinci Research Kit)
 * sawNDITracker: https://github.com/jhu-saw/sawNDITracker (NDI serial port based optical and magnetic trackers)
 * sawForceDimensionSDK: https://github.com/jhu-saw/sawForceDimensionSDK (Force Dimension haptic devices and Novint Falcon)
