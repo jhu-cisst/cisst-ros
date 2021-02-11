@@ -284,6 +284,9 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
             } else if (_crtk_command == "state_command") {
                 m_subscribers_bridge->AddSubscriberToCommandWrite<std::string, crtk_msgs::StringStamped>
                     (_required_interface_name, _command, _ros_topic);
+            } else if (_crtk_command == "use_gravity_compensation") {
+                m_subscribers_bridge->AddSubscriberToCommandWrite<bool, std_msgs::Bool>
+                    (_required_interface_name, _command, _ros_topic);
             }
         }
     }
