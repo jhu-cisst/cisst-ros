@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2021 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -63,6 +63,16 @@ public:
     void Run(void);
     inline void Cleanup(void) {};
 
+    /*! This method will look at all the provided interfaces of a
+      given component.  It will then call `bridge_interface_provided`
+      for each interface found.  The name of the interface will be
+      used as sub ROS namespace (using _snake_case_). */
+    void bridge_all_interfaces_provided(const std::string & _component_name,
+                                        const std::string & _ros_namespace,
+                                        const double _publish_period_in_seconds
+                                        = mts_ros_crtk_bridge_default_publish_period,
+                                        const double _tf_period_in_seconds
+                                        = mts_ros_crtk_bridge_default_tf_period);
 
     /*! This method will look at all the provided functions and events
       that match the CRTK convention and automatically create the

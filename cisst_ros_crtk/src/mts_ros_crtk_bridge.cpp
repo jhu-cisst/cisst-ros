@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2021 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -183,6 +183,32 @@ void mts_ros_crtk_bridge::Run(void)
 {
     ProcessQueuedCommands();
     ProcessQueuedEvents();
+}
+
+void mts_ros_crtk_bridge::bridge_all_interfaces_provided(const std::string & _component_name,
+                                                         const std::string & _ros_namespace,
+                                                         const double _publish_period_in_seconds,
+                                                         const double _tf_period_in_seconds)
+{
+    // first make sure we can find the component to bridge
+    mtsManagerLocal * _component_manager = mtsComponentManager::GetInstance();
+    mtsComponent * _component = _component_manager->GetComponent(_component_name);
+    if (!_component) {
+        CMN_LOG_CLASS_INIT_ERROR << "bridge_all_interfaces_provided: unable to find component \""
+                                 << _component_name << "\"" << std::endl;
+        return;
+    }
+    // search for all interfaces provided
+    std::vector<std::string> _interfaces = _component->GetNamesOfInterfacesProvided();
+    for (const auto & _interface : _interfaces) {
+        auto _ros_sub_namespace = _interface;
+        clean_namespace(_ros_sub_namespace);
+        bridge_interface_provided(_component_name,
+                                  _interface,
+                                  _ros_namespace + '/' + _ros_sub_namespace,
+                                  _publish_period_in_seconds,
+                                  _tf_period_in_seconds);
+    }
 }
 
 void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _component_name,
@@ -365,6 +391,9 @@ void mts_ros_crtk_bridge::bridge_interface_provided(const std::string & _compone
             if (_crtk_command == "input_data") {
                 m_subscribers_bridge->AddPublisherFromEventWrite<prmInputData, sensor_msgs::Joy>
                     (_required_interface_name, _event, _ros_topic);
+            } else if (_crtk_command == "Button") {
+                m_subscribers_bridge->AddPublisherFromEventWrite<prmEventButton, sensor_msgs::Joy>
+                    (_required_interface_name, _event, _clean_namespace); // for buttons, we just use the interface name
             } else if (_crtk_command == "operating_state") {
                 m_events_bridge->AddPublisherFromEventWrite<prmOperatingState, crtk_msgs::operating_state>
                     (_required_interface_name, _event, _ros_topic);
@@ -546,7 +575,7 @@ void mts_ros_crtk_bridge::clean_namespace(std::string & _ros_namespace)
     _ros_namespace = ros::names::clean(_ros_namespace);
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), ' ', '_');
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), '-', '_');
-    std::replace(_ros_namespace.begin(), _ros_namespace.end(), '.', '_');
+    std::replace(_ros_namespace.begin(), _ros_namespace.end(), '.', '_');    
 }
 
 void mts_ros_crtk_bridge::get_crtk_command(const std::string & _full_command,
