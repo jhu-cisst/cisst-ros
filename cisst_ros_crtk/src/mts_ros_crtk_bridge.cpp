@@ -554,12 +554,9 @@ void mts_ros_crtk_bridge::add_connection_event_handler(const mtsDescriptionConne
         auto _component = _component_manager->GetComponent(_component_name);
         _all_connected = _all_connected && _component->AreAllInterfacesRequiredConnected();
         if (_all_connected) {
-            const double _timeout_create_start = 5.0 * cmn_s;
             auto _component = _component_manager->GetComponent(_component_name);
             _component->Create();
-            _component->WaitForState(mtsComponentState::READY, _timeout_create_start);
             _component->Start();
-            _component->WaitForState(mtsComponentState::ACTIVE, _timeout_create_start);
             _started.push_back(_component_name);
         }
     }
@@ -575,7 +572,7 @@ void mts_ros_crtk_bridge::clean_namespace(std::string & _ros_namespace)
     _ros_namespace = ros::names::clean(_ros_namespace);
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), ' ', '_');
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), '-', '_');
-    std::replace(_ros_namespace.begin(), _ros_namespace.end(), '.', '_');    
+    std::replace(_ros_namespace.begin(), _ros_namespace.end(), '.', '_');
 }
 
 void mts_ros_crtk_bridge::get_crtk_command(const std::string & _full_command,
