@@ -118,7 +118,7 @@ bool mtsCISSTToROSHeader(const _cisstType & cisstData, _rosType & rosData, const
         } else {
             rosData.header.stamp = ros::Time::now();
         }
-    } catch (std::exception e) {
+    } catch (std::exception & e) {
         CMN_LOG_RUN_ERROR << "mtsCISSTToROSHeader caught exception \""
                           << e.what()
                           << "\"while computing timestamp for \"" << debugInfo

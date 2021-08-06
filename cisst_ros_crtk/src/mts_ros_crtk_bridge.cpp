@@ -545,7 +545,7 @@ void mts_ros_crtk_bridge::add_factory_source(const std::string & _component_name
     }
 }
 
-void mts_ros_crtk_bridge::add_connection_event_handler(const mtsDescriptionConnection & _connection)
+void mts_ros_crtk_bridge::add_connection_event_handler(const mtsDescriptionConnection & CMN_UNUSED(_connection))
 {
     auto _component_manager = mtsComponentManager::GetInstance();
     bool _all_connected = true;
