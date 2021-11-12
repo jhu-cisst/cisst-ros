@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2021 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -435,6 +435,31 @@ bool mtsCISSTToROS(const prmForceCartesianGet & cisstData, geometry_msgs::Wrench
     return false;
 }
 
+bool mtsCISSTToROS(const prmForceCartesianSet & cisstData, geometry_msgs::Wrench & rosData,
+                   const std::string &)
+{
+    if (cisstData.Valid()) {
+        rosData.force.x = cisstData.Force().Element(0);
+        rosData.force.y = cisstData.Force().Element(1);
+        rosData.force.z = cisstData.Force().Element(2);
+        rosData.torque.x = cisstData.Force().Element(3);
+        rosData.torque.y = cisstData.Force().Element(4);
+        rosData.torque.z = cisstData.Force().Element(5);
+        return true;
+    }
+    return false;
+}
+
+bool mtsCISSTToROS(const prmForceCartesianSet & cisstData, geometry_msgs::WrenchStamped & rosData,
+                   const std::string & debugInfo)
+{
+    if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
+        mtsCISSTToROS(cisstData, rosData.wrench, debugInfo);
+        return true;
+    }
+    return false;
+}
+
 // ---------------------------------------------
 // sensor_msgs
 // ---------------------------------------------
@@ -500,6 +525,24 @@ bool mtsCISSTToROS(const prmVelocityJointGet & cisstData, sensor_msgs::JointStat
             rosData.velocity.resize(size);
             std::copy(cisstData.Velocity().begin(), cisstData.Velocity().end(),
                       rosData.velocity.begin());
+        }
+        return true;
+    }
+    return false;
+}
+
+bool mtsCISSTToROS(const prmForceTorqueJointSet & cisstData, sensor_msgs::JointState & rosData,
+                   const std::string & debugInfo)
+{
+    if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
+        rosData.name.resize(0);
+        rosData.position.resize(0);
+        rosData.velocity.resize(0);
+        const size_t size = cisstData.ForceTorque().size();
+        if (size != 0) {
+            rosData.effort.resize(size);
+            std::copy(cisstData.ForceTorque().begin(), cisstData.ForceTorque().end(),
+                      rosData.effort.begin());
         }
         return true;
     }

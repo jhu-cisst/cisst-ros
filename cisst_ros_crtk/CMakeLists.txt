@@ -48,12 +48,16 @@ include_directories(${catkin_INCLUDE_DIRS})
 # header
 set(HEADER_FILES
   include/cisst_ros_crtk/mts_ros_crtk_bridge.h
+  include/cisst_ros_crtk/mts_ros_crtk_bridge_provided.h
+  include/cisst_ros_crtk/mts_ros_crtk_bridge_required.h
   include/cisst_ros_crtk/mtsCISSTToROS.h
   include/cisst_ros_crtk/mtsROSToCISST.h)
 
 # source
 set(SOURCE_FILES
   src/mts_ros_crtk_bridge.cpp
+  src/mts_ros_crtk_bridge_provided.cpp
+  src/mts_ros_crtk_bridge_required.cpp
   src/mtsCISSTToROS.cpp
   src/mtsROSToCISST.cpp)
 

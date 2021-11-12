@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2021 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -31,12 +31,14 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmPositionJointGet.h>
 #include <cisstParameterTypes/prmPositionJointSet.h>
 #include <cisstParameterTypes/prmVelocityJointGet.h>
+#include <cisstParameterTypes/prmForceTorqueJointSet.h>
 #include <cisstParameterTypes/prmStateJoint.h>
 #include <cisstParameterTypes/prmPositionCartesianGet.h>
 #include <cisstParameterTypes/prmPositionCartesianArrayGet.h>
 #include <cisstParameterTypes/prmPositionCartesianSet.h>
 #include <cisstParameterTypes/prmVelocityCartesianGet.h>
 #include <cisstParameterTypes/prmForceCartesianGet.h>
+#include <cisstParameterTypes/prmForceCartesianSet.h>
 #include <cisstParameterTypes/prmEventButton.h>
 #include <cisstParameterTypes/prmCartesianImpedanceGains.h>
 #include <cisstParameterTypes/prmInputData.h>
@@ -175,12 +177,15 @@ bool mtsCISSTToROS(const prmVelocityCartesianGet & cisstData, geometry_msgs::Twi
 bool mtsCISSTToROS(const prmVelocityCartesianGet & cisstData, geometry_msgs::TwistStamped & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmForceCartesianGet & cisstData, geometry_msgs::Wrench & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmForceCartesianGet & cisstData, geometry_msgs::WrenchStamped & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const prmForceCartesianSet & cisstData, geometry_msgs::Wrench & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const prmForceCartesianSet & cisstData, geometry_msgs::WrenchStamped & rosData, const std::string & debugInfo);
 
 // sensor_msgs
 bool mtsCISSTToROS(const vctDoubleVec & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmPositionJointSet & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmVelocityJointGet & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const prmForceTorqueJointSet & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmStateJoint & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vctDoubleMat & cisstData, sensor_msgs::PointCloud & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const std::vector<vct3> & cisstData, sensor_msgs::PointCloud & rosData, const std::string & debugInfo);

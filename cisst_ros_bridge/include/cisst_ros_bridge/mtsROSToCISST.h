@@ -24,6 +24,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstMultiTask/mtsManagerLocal.h>
 
 #include <cisstVector/vctDynamicVectorTypes.h>
+#include <cisstVector/vctDynamicMatrixTypes.h>
 
 #include <cisstMultiTask/mtsVector.h>
 #include <cisstMultiTask/mtsTransformationTypes.h>
@@ -34,11 +35,14 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmPositionJointGet.h>
 #include <cisstParameterTypes/prmPositionJointSet.h>
 #include <cisstParameterTypes/prmForceTorqueJointSet.h>
+#include <cisstParameterTypes/prmForceCartesianGet.h>
 #include <cisstParameterTypes/prmForceCartesianSet.h>
 #include <cisstParameterTypes/prmCartesianImpedanceGains.h>
 #include <cisstParameterTypes/prmVelocityJointSet.h>
+#include <cisstParameterTypes/prmVelocityCartesianGet.h>
 #include <cisstParameterTypes/prmVelocityCartesianSet.h>
 #include <cisstParameterTypes/prmEventButton.h>
+#include <cisstParameterTypes/prmInputData.h>
 #include <cisstParameterTypes/prmKeyValue.h>
 #include <cisstParameterTypes/prmStateJoint.h>
 #include <cisstParameterTypes/prmOperatingState.h>
@@ -132,6 +136,7 @@ void mtsROSToCISST(const std_msgs::Bool & rosData, bool & cisstData);
 void mtsROSToCISST(const std_msgs::String & rosData, std::string & cisstData);
 void mtsROSToCISST(const std_msgs::String & rosData, mtsMessage & cisstData);
 void mtsROSToCISST(const std_msgs::Float64MultiArray & rosData, vctDoubleVec & cisstData);
+void mtsROSToCISST(const std_msgs::Float64MultiArray & rosData, vctDoubleMat & cisstData);
 
 // geometry_msgs
 void mtsROSToCISST(const geometry_msgs::Vector3 & rosData, vct3 & cisstData);
@@ -152,10 +157,14 @@ void mtsROSToCISST(const geometry_msgs::Transform & rosData, vctFrm3 & cisstData
 void mtsROSToCISST(const geometry_msgs::Transform & rosData, vctFrm4x4 & cisstData);
 void mtsROSToCISST(const geometry_msgs::Transform & rosData, mtsFrm4x4 & cisstData);
 void mtsROSToCISST(const geometry_msgs::TransformStamped & rosData, mtsFrm4x4 & cisstData);
+void mtsROSToCISST(const geometry_msgs::Wrench & rosData, prmForceCartesianGet & cisstData);
+void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, prmForceCartesianGet & cisstData);
 void mtsROSToCISST(const geometry_msgs::Wrench & rosData, prmForceCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, prmForceCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::Wrench & rosData, mtsDoubleVec & cisstData);
 void mtsROSToCISST(const geometry_msgs::WrenchStamped & rosData, mtsDoubleVec & cisstData);
+void mtsROSToCISST(const geometry_msgs::Twist & rosData, prmVelocityCartesianGet & cisstData);
+void mtsROSToCISST(const geometry_msgs::TwistStamped & rosData, prmVelocityCartesianGet & cisstData);
 void mtsROSToCISST(const geometry_msgs::Twist & rosData, prmVelocityCartesianSet & cisstData);
 void mtsROSToCISST(const geometry_msgs::TwistStamped & rosData, prmVelocityCartesianSet & cisstData);
 
@@ -165,6 +174,7 @@ void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmForceTorqueJointS
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmVelocityJointSet & cisstData);
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmStateJoint & cisstData);
 void mtsROSToCISST(const sensor_msgs::Joy & rosData, prmEventButton & cisstData);
+void mtsROSToCISST(const sensor_msgs::Joy & rosData, prmInputData & cisstData);
 
 // diagnostic_msgs
 void mtsROSToCISST(const diagnostic_msgs::KeyValue & rosData, prmKeyValue & cisstData);
