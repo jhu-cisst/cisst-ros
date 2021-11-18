@@ -16,7 +16,6 @@ http://www.cisst.org/cisst/license.txt.
 --- end cisst license ---
 */
 
-#include <cisst_ros_crtk/mts_ros_crtk_bridge.h>
 #include <cisstMultiTask/mtsManagerComponentServices.h>
 
 // conversion methods
@@ -25,6 +24,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_ros_crtk/mtsCISSTToROS.h>
 #include <cisst_ros_crtk/mtsROSToCISST.h>
 
+#include <cisst_ros_crtk/mts_ros_crtk_bridge_provided.h>
 #include <cisst_ros_bridge/mtsROSBridge.h>
 
 CMN_IMPLEMENT_SERVICES_DERIVED_ONEARG(mts_ros_crtk_bridge_provided, mtsTaskPeriodic, mtsTaskPeriodicConstructorArg);
@@ -41,7 +41,7 @@ mts_ros_crtk_bridge_provided::mts_ros_crtk_bridge_provided(const std::string & _
 mts_ros_crtk_bridge_provided::mts_ros_crtk_bridge_provided(const mtsTaskPeriodicConstructorArg & arg):
     mtsTaskPeriodic(arg)
 {
-    m_node_handle_ptr = mts_ros_crtk::ros_init(arg.Name);
+    m_node_handle_ptr = cisst_ros_crtk::ros_init(arg.Name);
     init();
 }
 
@@ -137,12 +137,12 @@ void mts_ros_crtk_bridge_provided::ConfigureJSON(const Json::Value & _json_confi
         std::string _name = _json_value.asString();
 
         // optional fields
-        double _publish_period = mts_ros_crtk_bridge_default_publish_period;
+        double _publish_period = cisst_ros_crtk::bridge_provided_default_publish_period;
         _json_value = _interfaces[index]["publish-period"];
         if (!_json_value.empty()) {
             _publish_period = _json_value.asFloat();
         }
-        double _tf_period = mts_ros_crtk_bridge_default_tf_period;
+        double _tf_period = cisst_ros_crtk::bridge_provided_default_tf_period;
         _json_value = _interfaces[index]["tf-period"];
         if (!_json_value.empty()) {
             _tf_period = _json_value.asFloat();
@@ -193,7 +193,7 @@ void mts_ros_crtk_bridge_provided::bridge_all_interfaces_provided(const std::str
     std::vector<std::string> _interfaces = _component->GetNamesOfInterfacesProvided();
     for (const auto & _interface : _interfaces) {
         auto _ros_sub_namespace = _interface;
-        mts_ros_crtk::clean_namespace(_ros_sub_namespace);
+        cisst_ros_crtk::clean_namespace(_ros_sub_namespace);
         bridge_interface_provided(_component_name,
                                   _interface,
                                   _ros_namespace + '/' + _ros_sub_namespace,
@@ -227,7 +227,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
 
     // clean ROS namespace
     std::string _clean_namespace = _ros_namespace;
-    mts_ros_crtk::clean_namespace(_clean_namespace);
+    cisst_ros_crtk::clean_namespace(_clean_namespace);
 
     // required interface for bridges shared across components being
     // bridged (e.g. subscribers and events)
@@ -278,7 +278,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
     for (auto & _command :  _interface_provided->GetNamesOfCommandsWrite()) {
         if (should_be_bridged(_command)) {
             // get the CRTK command so we know which template type to use
-            mts_ros_crtk::get_crtk_command(_command, _crtk_command);
+            cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
             _ros_topic = _clean_namespace + _command;
             if ((_crtk_command == "servo_jp")
                 || (_crtk_command == "servo_jr")
@@ -312,7 +312,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
     for (auto & _command : _interface_provided->GetNamesOfCommandsRead()) {
         if (should_be_bridged(_command)) {
             // get the CRTK command so we know which template type to use
-            mts_ros_crtk::get_crtk_command(_command, _crtk_command);
+            cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
             _ros_topic = _clean_namespace + _command;
             if ((_crtk_command == "measured_js")
                 || (_crtk_command == "setpoint_js")) {
@@ -352,7 +352,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
             } else if (_crtk_command == "period_statistics") {
                 std::string _namespace = _component_name + "_" + _interface_name;
                 std::transform(_namespace.begin(), _namespace.end(), _namespace.begin(), tolower);
-                mts_ros_crtk::clean_namespace(_namespace);
+                cisst_ros_crtk::clean_namespace(_namespace);
                 m_stats_bridge->AddIntervalStatisticsPublisher("stats/" + _namespace,
                                                                _component_name, _interface_name);
             }
@@ -363,7 +363,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
     for (auto & _command : _interface_provided->GetNamesOfCommandsQualifiedRead()) {
         if (should_be_bridged(_command)) {
             // get the CRTK command so we know which template type to use
-            mts_ros_crtk::get_crtk_command(_command, _crtk_command);
+            cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
             _ros_topic = _clean_namespace + _command;
             if (_crtk_command == "query_cp") {
                 m_subscribers_bridge->AddServiceFromCommandQualifiedRead<vctDoubleVec, vctFrm4x4,
@@ -377,7 +377,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
     for (auto & _event : _interface_provided->GetNamesOfEventsWrite()) {
         if (should_be_bridged(_event)) {
             // get the CRTK command so we know which template type to use
-            mts_ros_crtk::get_crtk_command(_event, _crtk_command);
+            cisst_ros_crtk::get_crtk_command(_event, _crtk_command);
             _ros_topic = _clean_namespace + _event;
             if (_crtk_command == "input_data") {
                 m_events_bridge->AddPublisherFromEventWrite<prmInputData, sensor_msgs::Joy>
@@ -468,7 +468,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                           _component_name, _interface_name);
         if (_tf_bridge->AddIntervalStatisticsInterface()) {
             std::string _tf_namespace = "stats/tf_" + _component_name + "_" + _interface_name;
-            mts_ros_crtk::clean_namespace(_tf_namespace);
+            cisst_ros_crtk::clean_namespace(_tf_namespace);
             std::transform(_tf_namespace.begin(), _tf_namespace.end(), _tf_namespace.begin(), tolower);
             m_stats_bridge->AddIntervalStatisticsPublisher(_tf_namespace,
                                                            _tf_bridge->GetName());
@@ -486,7 +486,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                           _component_name, _interface_name);
         if (_pub_bridge->AddIntervalStatisticsInterface()) {
             std::string _pub_namespace = "stats/publishers_" + _component_name + "_" + _interface_name;
-            mts_ros_crtk::clean_namespace(_pub_namespace);
+            cisst_ros_crtk::clean_namespace(_pub_namespace);
             std::transform(_pub_namespace.begin(), _pub_namespace.end(), _pub_namespace.begin(), tolower);
             m_stats_bridge->AddIntervalStatisticsPublisher(_pub_namespace,
                                                            _pub_bridge->GetName());
@@ -536,7 +536,7 @@ void mts_ros_crtk_bridge_provided::add_factory_source(const std::string & _compo
     }
 }
 
-void mts_ros_crtk_bridge::add_connection_event_handler(const mtsDescriptionConnection & _connection)
+void mts_ros_crtk_bridge_provided::add_connection_event_handler(const mtsDescriptionConnection & _connection)
 {
     auto _component_manager = mtsComponentManager::GetInstance();
     bool _all_connected = true;
@@ -576,7 +576,7 @@ void mts_ros_crtk_bridge_provided::factory::crtk_interfaces_provided_updated_han
     m_crtk_interfaces_provided(_sources);
     for (const auto & _source : _sources) {
         std::string _namespace = _source.ComponentName + "/" + _source.InterfaceName;
-        mts_ros_crtk::clean_namespace(_namespace);
+        cisst_ros_crtk::clean_namespace(_namespace);
         m_bridge->bridge_interface_provided(_source.ComponentName,
                                             _source.InterfaceName,
                                             _namespace,

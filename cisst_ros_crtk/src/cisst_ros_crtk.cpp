@@ -16,9 +16,10 @@ http://www.cisst.org/cisst/license.txt.
 --- end cisst license ---
 */
 
-#include <cisst_ros_crtk/mts_ros_crtk_bridge.h>
+#include <cisst_ros_crtk/cisst_ros_crtk.h>
+#include <ros/ros.h>
 
-void mts_ros_crtk::clean_namespace(std::string & _ros_namespace)
+void cisst_ros_crtk::clean_namespace(std::string & _ros_namespace)
 {
     _ros_namespace = ros::names::clean(_ros_namespace);
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), ' ', '_');
@@ -26,7 +27,7 @@ void mts_ros_crtk::clean_namespace(std::string & _ros_namespace)
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), '.', '_');
 }
 
-void mts_ros_crtk::get_crtk_command(const std::string & _full_command,
+void cisst_ros_crtk::get_crtk_command(const std::string & _full_command,
                                     std::string & _crtk_command)
 {
     size_t pos = _full_command.find_last_of("/");
@@ -37,7 +38,7 @@ void mts_ros_crtk::get_crtk_command(const std::string & _full_command,
     }
 }
 
-ros::NodeHandle * mts_ros_crtk::ros_init(const std::string & name)
+ros::NodeHandle * cisst_ros_crtk::ros_init(const std::string & name)
 {
     // create fake argc/argv for ros::init
     typedef char * char_pointer;

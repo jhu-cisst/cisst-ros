@@ -23,7 +23,6 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_ros_crtk/mtsROSToCISST.h>
 
 #include <cisst_ros_crtk/mts_ros_crtk_bridge_required.h>
-#include <cisst_ros_crtk/mts_ros_crtk_bridge.h>
 
 CMN_IMPLEMENT_SERVICES_DERIVED_ONEARG(mts_ros_crtk_bridge_required, mtsROSBridge, mtsTaskPeriodicConstructorArg);
 
@@ -36,7 +35,7 @@ mts_ros_crtk_bridge_required::mts_ros_crtk_bridge_required(const std::string & _
 }
 
 mts_ros_crtk_bridge_required::mts_ros_crtk_bridge_required(const mtsTaskPeriodicConstructorArg & arg):
-    mtsROSBridge(arg.Name, arg.Period, mts_ros_crtk::ros_init(arg.Name))
+    mtsROSBridge(arg.Name, arg.Period, cisst_ros_crtk::ros_init(arg.Name))
 {
     init();
 }
@@ -119,7 +118,7 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
 
     // clean ROS namespace
     std::string _clean_namespace = _ros_namespace;
-    mts_ros_crtk::clean_namespace(_clean_namespace);
+    cisst_ros_crtk::clean_namespace(_clean_namespace);
 
     // add trailing / for clean namespace
     if (!_clean_namespace.empty()) {
@@ -133,7 +132,7 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
     for (auto & _command :  _write_commands) {
         std::cerr << "w cmd: " << _command << std::endl;
         // get the CRTK command so we know which template type to use
-        mts_ros_crtk::get_crtk_command(_command, _crtk_command);
+        cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
         _ros_topic = _clean_namespace + _command;
         if ((_crtk_command == "servo_jp")
             || (_crtk_command == "servo_jr")
@@ -170,7 +169,7 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
     // read commands
     for (auto & _command : _read_commands) {
         // get the CRTK command so we know which template type to use
-        mts_ros_crtk::get_crtk_command(_command, _crtk_command);
+        cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
         _ros_topic = _clean_namespace + _command;
         if ((_crtk_command == "measured_js")
             || (_crtk_command == "setpoint_js")) {
@@ -205,7 +204,7 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
     // write events
     for (auto & _event : _write_events) {
         // get the CRTK command so we know which template type to use
-        mts_ros_crtk::get_crtk_command(_event, _crtk_command);
+        cisst_ros_crtk::get_crtk_command(_event, _crtk_command);
         _ros_topic = _clean_namespace + _event;
         if (_crtk_command == "input_data") {
             this->AddSubscriberToEventWrite<prmInputData, sensor_msgs::Joy>

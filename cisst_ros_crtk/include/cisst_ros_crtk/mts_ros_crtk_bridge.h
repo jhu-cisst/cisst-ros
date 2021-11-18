@@ -24,22 +24,4 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_ros_crtk/mts_ros_crtk_bridge_provided.h>
 typedef mts_ros_crtk_bridge_provided mts_ros_crtk_bridge;
 
-namespace mts_ros_crtk
-{
-    /*! Replaces characters that can't be used in ROS namespace by '_'
-      (e.g. space, '.', '-') */
-    void clean_namespace(std::string & _ros_namespace);
-
-    /*! Extract the CRTK command from an mts command that might
-      include a namespace.  E.g. if the full command is
-      "gripper/measured_js", the corresponding crtk command is
-      "measures_js" */
-    void get_crtk_command(const std::string & _full_command,
-                          std::string & _crtk_command);
-
-    /*! Dummy ROS init for bridge components created using dynamic
-      creation and no access to argc and argv. */
-    ros::NodeHandle * ros_init(const std::string & name);
-}
-
 #endif // _mts_ros_crtk_bridge_h

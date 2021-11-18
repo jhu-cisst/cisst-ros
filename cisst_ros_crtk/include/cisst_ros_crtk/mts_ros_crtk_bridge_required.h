@@ -24,7 +24,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstCommon/cmnUnits.h>
 #include <cisstMultiTask/mtsTaskPeriodic.h>
 #include <cisstMultiTask/mtsDelayedConnections.h>
-
+#include <cisst_ros_crtk/cisst_ros_crtk.h>
 #include <cisst_ros_bridge/mtsROSBridge.h>
 
 class mts_ros_crtk_bridge_required: public mtsROSBridge
@@ -74,7 +74,7 @@ public:
                                      const std::vector<std::string> & _write_commands,
                                      const std::vector<std::string> & _read_commands,
                                      const std::vector<std::string> & _write_events);
-    
+
     /*! Connect all components created and used so far. */
     inline virtual void Connect(void) {
         m_connections.Connect();

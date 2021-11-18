@@ -23,14 +23,11 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstCommon/cmnUnits.h>
 #include <cisstMultiTask/mtsTaskPeriodic.h>
 #include <cisstMultiTask/mtsDelayedConnections.h>
+#include <cisst_ros_crtk/cisst_ros_crtk.h>
+
+#include <set>
 
 class mtsROSBridge;
-
-// ROS
-#include <ros/ros.h>
-
-const double mts_ros_crtk_bridge_default_publish_period = 10.0 * cmn_ms;
-const double mts_ros_crtk_bridge_default_tf_period = 20.0 * cmn_ms;
 
 class mts_ros_crtk_bridge_provided: public mtsTaskPeriodic
 {
@@ -69,9 +66,9 @@ public:
     void bridge_all_interfaces_provided(const std::string & _component_name,
                                         const std::string & _ros_namespace,
                                         const double _publish_period_in_seconds
-                                        = mts_ros_crtk_bridge_default_publish_period,
+                                        = cisst_ros_crtk::bridge_provided_default_publish_period,
                                         const double _tf_period_in_seconds
-                                        = mts_ros_crtk_bridge_default_tf_period);
+                                        = cisst_ros_crtk::bridge_provided_default_tf_period);
 
     /*! This method will look at all the provided functions and events
       that match the CRTK convention and automatically create the
@@ -86,18 +83,18 @@ public:
                                    const std::string & _interface_name,
                                    const std::string & _ros_namespace,
                                    const double _publish_period_in_seconds
-                                   = mts_ros_crtk_bridge_default_publish_period,
+                                   = cisst_ros_crtk::bridge_provided_default_publish_period,
                                    const double _tf_period_in_seconds
-                                   = mts_ros_crtk_bridge_default_tf_period);
+                                   = cisst_ros_crtk::bridge_provided_default_tf_period);
 
     /*! Same method but used the name of the provided interface as ROS
       namespace. */
     inline void bridge_interface_provided(const std::string & _component_name,
                                           const std::string & _interface_name,
                                           const double _publish_period_in_seconds
-                                          = mts_ros_crtk_bridge_default_publish_period,
+                                          = cisst_ros_crtk::bridge_provided_default_publish_period,
                                           const double _tf_period_in_seconds
-                                          = mts_ros_crtk_bridge_default_tf_period) {
+                                          = cisst_ros_crtk::bridge_provided_default_tf_period) {
         bridge_interface_provided(_component_name, _interface_name,
                                   _interface_name, // use interface names as ROS namespace
                                   _publish_period_in_seconds,
@@ -112,9 +109,9 @@ public:
     void add_factory_source(const std::string & _component_name,
                             const std::string & _interface_name,
                             const double _publish_period_in_seconds
-                            = mts_ros_crtk_bridge_default_publish_period,
+                            = cisst_ros_crtk::bridge_provided_default_publish_period,
                             const double _tf_period_in_seconds
-                            = mts_ros_crtk_bridge_default_tf_period);
+                            = cisst_ros_crtk::bridge_provided_default_tf_period);
 
     /*! Connect all components created and used so far. */
     inline virtual void Connect(void) {
