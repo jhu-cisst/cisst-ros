@@ -165,9 +165,14 @@ public:
     bool Execute(void) {
         mtsExecutionResult result = Function(mCISSTData);
         if (result) {
-            if (mtsCISSTToROS(mCISSTData, mROSData, mName)) {
-                mBroadcaster.sendTransform(mROSData);
-                return true;
+            // first check if it's new
+            if (mCISSTData.Timestamp() > mLastTimestamp) {
+                mLastTimestamp = mCISSTData.Timestamp();
+                // then convert and check if the data is valid
+                if (mtsCISSTToROS(mCISSTData, mROSData, mName)) {
+                    mBroadcaster.sendTransform(mROSData);
+                    return true;
+                }
             }
         } else if (result.Value() != mtsExecutionResult::FUNCTION_NOT_BOUND) {
             ROS_ERROR("mtsROStf2Broadcaster::Execute: mtsFunction call failed");
@@ -182,6 +187,7 @@ protected:
     tf2_ros::TransformBroadcaster mBroadcaster;
     geometry_msgs::TransformStamped mROSData;
     prmPositionCartesianGet mCISSTData;
+    double mLastTimestamp = 0.0;
 };
 
 
