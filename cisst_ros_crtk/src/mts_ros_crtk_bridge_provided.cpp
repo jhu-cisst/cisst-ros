@@ -324,8 +324,12 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                 _pub_bridge_used = true;
                 _pub_bridge->AddPublisherFromCommandRead<prmPositionCartesianGet, geometry_msgs::TransformStamped>
                     (_interface_name, _command, _ros_topic);
-                // tf broadcast
-                if (_crtk_command == "measured_cp") {
+                // tf broadcast if not local/ since local will have
+                // the same child id and tf2 will complain about
+                // duplicates - even though they have different
+                // reference frames
+                if ((_crtk_command == "measured_cp")
+                    && (_command.find("local/measured_cp") == std::string::npos)) {
                     _tf_bridge_used = true;
                     _tf_bridge->Addtf2BroadcasterFromCommandRead(_interface_name, _command);
                 }
