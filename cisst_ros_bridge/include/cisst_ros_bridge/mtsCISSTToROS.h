@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2021 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2022 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -159,6 +159,7 @@ bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pos
 bool mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::PoseStamped & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmPositionCartesianArrayGet & cisstData, geometry_msgs::PoseArray & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const prmPositionCartesianSet & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const prmPositionCartesianSet & cisstData, geometry_msgs::PoseStamped & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);

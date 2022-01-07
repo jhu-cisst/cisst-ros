@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2021 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2022 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -293,7 +293,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                        || (_crtk_command == "servo_cr")
                        || (_crtk_command == "move_cp")
                        || (_crtk_command == "move_cr")) {
-                m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionCartesianSet, geometry_msgs::TransformStamped>
+                m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionCartesianSet, geometry_msgs::PoseStamped>
                     (_required_interface_name, _command, _ros_topic);
             } else if (_crtk_command == "servo_cf") {
                 m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceCartesianSet, geometry_msgs::WrenchStamped>
@@ -322,7 +322,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
             } else  if ((_crtk_command == "measured_cp")
                         || (_crtk_command == "setpoint_cp")) {
                 _pub_bridge_used = true;
-                _pub_bridge->AddPublisherFromCommandRead<prmPositionCartesianGet, geometry_msgs::TransformStamped>
+                _pub_bridge->AddPublisherFromCommandRead<prmPositionCartesianGet, geometry_msgs::PoseStamped>
                     (_interface_name, _command, _ros_topic);
                 // tf broadcast if not local/ since local will have
                 // the same child id and tf2 will complain about

@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2021 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2022 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -147,8 +147,7 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
                    || (_crtk_command == "servo_cr")
                    || (_crtk_command == "move_cp")
                    || (_crtk_command == "move_cr")) {
-            std::cerr << "adding " << _crtk_command << " to itf " << _interface_name << std::endl;
-            this->AddPublisherFromCommandWrite<prmPositionCartesianSet, geometry_msgs::TransformStamped>
+            this->AddPublisherFromCommandWrite<prmPositionCartesianSet, geometry_msgs::PoseStamped>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "servo_cf") {
             this->AddPublisherFromCommandWrite<prmForceCartesianSet, geometry_msgs::WrenchStamped>
@@ -177,7 +176,7 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
                 (_interface_name, _command, _ros_topic);
         } else  if ((_crtk_command == "measured_cp")
                     || (_crtk_command == "setpoint_cp")) {
-            this->AddSubscriberToCommandRead<prmPositionCartesianGet, geometry_msgs::TransformStamped>
+            this->AddSubscriberToCommandRead<prmPositionCartesianGet, geometry_msgs::PoseStamped>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "measured_cv") {
             this->AddSubscriberToCommandRead<prmVelocityCartesianGet, geometry_msgs::TwistStamped>
