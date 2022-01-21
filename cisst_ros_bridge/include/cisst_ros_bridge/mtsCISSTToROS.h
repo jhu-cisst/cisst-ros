@@ -100,6 +100,17 @@ void mtsCISSTToROSTransform(const _cisstFrame & cisstFrame, _rosTransform & rosT
     rosTransform.translation.z = cisstFrame.Translation().Z();
 }
 
+template <typename _cisstVector, typename _rosWrench>
+void mtsCISSTToROSWrench(const _cisstVector & cisstVector, _rosWrench & rosWrench)
+{
+    rosWrench.force.x = cisstVector.Element(0);
+    rosWrench.force.y = cisstVector.Element(1);
+    rosWrench.force.z = cisstVector.Element(2);
+    rosWrench.torque.x = cisstVector.Element(3);
+    rosWrench.torque.y = cisstVector.Element(4);
+    rosWrench.torque.z = cisstVector.Element(5);
+}
+
 template <typename _cisstType, typename _rosType>
 bool mtsCISSTToROSHeader(const _cisstType & cisstData, _rosType & rosData, const std::string & debugInfo)
 {
@@ -171,6 +182,8 @@ bool mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Transform & rosData
 bool mtsCISSTToROS(const vct3 & cisstData, geometry_msgs::Vector3 & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::Quaternion & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::QuaternionStamped & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const vct6 & cisstData, geometry_msgs::Wrench & rosData, const std::string & debugInfo);
+bool mtsCISSTToROS(const vct6 & cisstData, geometry_msgs::WrenchStamped & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Wrench & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::WrenchStamped & rosData, const std::string & debugInfo);
 bool mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Vector3Stamped & rosData, const std::string & debugInfo);
