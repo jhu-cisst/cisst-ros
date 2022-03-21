@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(cisst_msgs)
+cmake_minimum_required(VERSION 3.1)
+project(cisst_msgs VERSION 2.0.0)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -52,4 +52,3 @@ catkin_package(
 # include_directories(
 #   ${catkin_INCLUDE_DIRS}
 # )
-
