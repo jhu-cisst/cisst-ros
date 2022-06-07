@@ -257,13 +257,6 @@ bool mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::Pose & rosData,
     return true;
 }
 
-bool mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Pose & rosData,
-                   const std::string &)
-{
-    mtsCISSTToROSPose(cisstData, rosData);
-    return true;
-}
-
 bool mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Transform & rosData,
                    const std::string &)
 {
@@ -302,6 +295,21 @@ bool mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Transform & rosData
                    const std::string &)
 {
     mtsCISSTToROSTransform(cisstData, rosData);
+    return true;
+}
+
+bool mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::PoseStamped & rosData,
+                   const std::string & debugInfo)
+{
+    mtsCISSTToROSHeader(rosData, debugInfo);
+    mtsCISSTToROSPose(cisstData, rosData.pose);
+    return true;
+}
+
+bool mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Pose & rosData,
+                   const std::string &)
+{
+    mtsCISSTToROSPose(cisstData, rosData);
     return true;
 }
 
