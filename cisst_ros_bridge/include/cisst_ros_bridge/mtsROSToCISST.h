@@ -110,7 +110,7 @@ void mtsROSToCISSTNoHeader(_cisstType & cisstData)
 }
 
 template <typename _rosType, typename _cisstType>
-void mtsROSToCISSTHeader(const _rosType & rosData, _cisstType & cisstData)
+void mtsROSToCISSTHeader_common(const _rosType & rosData, _cisstType & cisstData)
 {
     const double cisstNow = mtsManagerLocal::GetInstance()->GetTimeServer().GetRelativeTime();
     // first check that header.stamp is not zero
@@ -127,6 +127,36 @@ void mtsROSToCISSTHeader(const _rosType & rosData, _cisstType & cisstData)
     // always set as valid for now
     cisstData.SetValid(true);
 }
+
+// Choice<N> is preferred to Choice<N-1>, but overload resolution will fallback
+// to Choice<N-1> (then Choice<N-2> etc.) since it's a base class
+template<std::size_t N>
+class Choice : public Choice<N-1> {};
+
+template<>
+class Choice<0> {};
+
+// Try to use this overload, if SetReferenceFrame exists...
+template <typename _rosType, typename _cisstType>
+auto mtsROSToCISSTHeader_impl(Choice<1>, const _rosType & rosData, _cisstType & cisstData) -> decltype(cisstData.SetReferenceFrame(""), void())
+{
+    mtsROSToCISSTHeader_common<_rosType, _cisstType>(rosData, cisstData);
+    // set reference frame name
+    cisstData.SetReferenceFrame(rosData.header.frame_id);
+}
+// otherwise, use this overload
+template <typename _rosType, typename _cisstType>
+void mtsROSToCISSTHeader_impl(Choice<0>, const _rosType & rosData, _cisstType & cisstData)
+{
+    mtsROSToCISSTHeader_common<_rosType, _cisstType>(rosData, cisstData);
+}
+
+template <typename _rosType, typename _cisstType>
+void mtsROSToCISSTHeader(const _rosType & rosData, _cisstType & cisstData)
+{
+    mtsROSToCISSTHeader_impl<_rosType, _cisstType>(Choice<1>(), rosData, cisstData);
+}
+
 
 // std_msgs
 void mtsROSToCISST(const std_msgs::Float32 & rosData, double & cisstData);
