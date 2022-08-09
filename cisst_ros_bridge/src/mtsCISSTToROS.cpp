@@ -545,6 +545,23 @@ bool mtsCISSTToROS(const prmVelocityJointGet & cisstData, sensor_msgs::JointStat
     return false;
 }
 
+bool mtsCISSTToROS(const prmVelocityJointSet & cisstData, sensor_msgs::JointState & rosData,
+                   const std::string & debugInfo)
+{
+    if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
+        rosData.name.resize(0);
+        rosData.effort.resize(0);
+        const size_t size = cisstData.Goal().size();
+        if (size != 0) {
+            rosData.velocity.resize(size);
+            std::copy(cisstData.Goal().begin(), cisstData.Goal().end(),
+                      rosData.velocity.begin());
+        }
+        return true;
+    }
+    return false;
+}
+
 bool mtsCISSTToROS(const prmForceTorqueJointSet & cisstData, sensor_msgs::JointState & rosData,
                    const std::string & debugInfo)
 {

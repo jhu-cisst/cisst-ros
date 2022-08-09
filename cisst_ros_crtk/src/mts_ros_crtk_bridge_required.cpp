@@ -106,6 +106,8 @@ void mts_ros_crtk_bridge_required::bridge_interface_required(const std::string &
                                 _interface_required->GetNamesOfFunctionsWrite(),
                                 _interface_required->GetNamesOfFunctionsRead(),
                                 _interface_required->GetNamesOfEventHandlersWrite());
+    m_connections.Add(this->GetName(), _provided_interface_name,
+                      _component_name, _interface_name);
 }
 
 void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string & _interface_name,
@@ -139,6 +141,9 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
             || (_crtk_command == "move_jp")
             || (_crtk_command == "move_jr")) {
             this->AddPublisherFromCommandWrite<prmPositionJointSet, sensor_msgs::JointState>
+                (_interface_name, _command, _ros_topic);
+        } else  if (_crtk_command == "servo_jv") {
+            this->AddPublisherFromCommandWrite<prmVelocityJointSet, sensor_msgs::JointState>
                 (_interface_name, _command, _ros_topic);
         } else  if (_crtk_command == "servo_jf") {
             this->AddPublisherFromCommandWrite<prmForceTorqueJointSet, sensor_msgs::JointState>
