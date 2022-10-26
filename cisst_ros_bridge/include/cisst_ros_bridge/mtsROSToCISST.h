@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2021 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2022 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -69,6 +69,98 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_msgs/prmCartesianImpedanceGains.h>
 #include <cisst_msgs/QueryForwardKinematics.h>
 
+namespace mts_ros_to_cisst {
+
+    // cases for automatic header conversions
+    // -3- ROS has header, cisst has timestamp, valid and reference frame
+    // -2- ROS has header, cisst has timestamp, valid
+    // -1- ROS has no header, cisst has timestamp, valid and reference frame
+    // -0- ROS has no header, cisst has nothing
+
+    template <typename _rosType, typename _cisstType>
+    void ros_header_to_cisst_header(const _rosType & rosData, _cisstType & cisstData)
+    {
+        const double cisstNow = mtsManagerLocal::GetInstance()->GetTimeServer().GetRelativeTime();
+        // first check that header.stamp is not zero
+        if (rosData.header.stamp.isZero()) {
+            cisstData.SetTimestamp(cisstNow);
+        } else {
+            const double ageInSeconds = (ros::Time::now() - rosData.header.stamp).toSec();
+            if (ageInSeconds > 0.0) {
+                cisstData.SetTimestamp(cisstNow - ageInSeconds);
+            } else {
+                cisstData.SetTimestamp(cisstNow);
+            }
+        }
+        // always set as valid for now
+        cisstData.SetValid(true);
+    }
+
+    // mts_ros_to_cisst_header_choice<N> is preferred to
+    // mts_ros_to_cisst_header_choice<N-1>, but overload resolution will
+    // fallback to mts_ros_to_cisst_header_choice<N-1> (then
+    // mts_ros_to_cisst_header_choice<N-2> etc.) since it's a base class
+    template<std::size_t _n>
+    class header_choice: public header_choice<_n-1> {};
+    template<>
+    class header_choice<0> {};
+
+    template <typename _rosType, typename _cisstType>
+    auto header_impl(header_choice<3>,
+                     const _rosType & rosData,
+                     _cisstType & cisstData)
+        -> decltype(rosData.header,
+                    cisstData.SetTimestamp(0.0),
+                    cisstData.SetValid(true),
+                    cisstData.SetReferenceFrame(""),
+                    void())
+    {
+        ros_header_to_cisst_header<_rosType, _cisstType>(rosData, cisstData);
+        // set reference frame name
+        cisstData.SetReferenceFrame(rosData.header.frame_id);
+    }
+
+    template <typename _rosType, typename _cisstType>
+    auto header_impl(header_choice<2>,
+                     const _rosType & rosData,
+                     _cisstType & cisstData)
+        -> decltype(rosData.header,
+                    cisstData.SetTimestamp(0.0),
+                    cisstData.SetValid(true),
+                    void())
+    {
+        ros_header_to_cisst_header<_rosType, _cisstType>(rosData, cisstData);
+    }
+
+    template <typename _rosType, typename _cisstType>
+    auto header_impl(header_choice<1>,
+                     const _rosType & rosData,
+                     _cisstType & cisstData)
+        -> decltype(cisstData.SetTimestamp(0.0),
+                    cisstData.SetValid(true),
+                    void())
+    {
+        const double cisstNow = mtsManagerLocal::GetInstance()->GetTimeServer().GetRelativeTime();
+        cisstData.SetTimestamp(cisstNow);
+        // always set as valid for now
+        cisstData.SetValid(true);
+    }
+
+    // last case, nothing to do
+    template <typename _rosType, typename _cisstType>
+    void header_impl(header_choice<0>,
+                     const _rosType &, _cisstType &)
+    {
+    }
+
+    template <typename _rosType, typename _cisstType>
+    void header(const _rosType & rosData, _cisstType & cisstData)
+    {
+        header_impl<_rosType, _cisstType>(header_choice<3>(), rosData, cisstData);
+    }
+}
+
+
 // helper functions
 template <typename _cisstFrame>
 void mtsROSTransformToCISST(const geometry_msgs::Transform & rosTransform, _cisstFrame & cisstFrame)
@@ -98,34 +190,6 @@ void mtsROSPoseToCISST(const geometry_msgs::Pose & rosPose, _cisstFrame & cisstF
     quat.W() = rosPose.orientation.w;
     vctMatRot3 rotation(quat, VCT_NORMALIZE);
     cisstFrame.Rotation().Assign(rotation);
-}
-
-template <typename _cisstType>
-void mtsROSToCISSTNoHeader(_cisstType & cisstData)
-{
-    const double cisstNow = mtsManagerLocal::GetInstance()->GetTimeServer().GetRelativeTime();
-    cisstData.SetTimestamp(cisstNow);
-    // always set as valid for now
-    cisstData.SetValid(true);
-}
-
-template <typename _rosType, typename _cisstType>
-void mtsROSToCISSTHeader(const _rosType & rosData, _cisstType & cisstData)
-{
-    const double cisstNow = mtsManagerLocal::GetInstance()->GetTimeServer().GetRelativeTime();
-    // first check that header.stamp is not zero
-    if (rosData.header.stamp.isZero()) {
-        cisstData.SetTimestamp(cisstNow);
-    } else {
-        const double ageInSeconds = (ros::Time::now() - rosData.header.stamp).toSec();
-        if (ageInSeconds > 0.0) {
-            cisstData.SetTimestamp(cisstNow - ageInSeconds);
-        } else {
-            cisstData.SetTimestamp(cisstNow);
-        }
-    }
-    // always set as valid for now
-    cisstData.SetValid(true);
 }
 
 // std_msgs

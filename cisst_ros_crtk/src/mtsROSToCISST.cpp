@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2022 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -23,7 +23,6 @@ http://www.cisst.org/cisst/license.txt.
 void mtsROSToCISST(const crtk_msgs::operating_state & rosData,
                    prmOperatingState & cisstData)
 {
-    mtsROSToCISSTHeader(rosData, cisstData);
     try {
         cisstData.State() = prmOperatingState::StateTypeFromString(rosData.state);
     } catch (...) {

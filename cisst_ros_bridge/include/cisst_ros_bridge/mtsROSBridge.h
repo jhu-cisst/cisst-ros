@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2022 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -249,6 +249,7 @@ public:
     }
 
     void Callback(const _rosType & rosData) {
+        mts_ros_to_cisst::header(rosData, mCISSTData);
         mtsROSToCISST(rosData, mCISSTData);
         mtsExecutionResult result = Function(mCISSTData);
         if (!result) {
@@ -303,7 +304,7 @@ public:
         StateTable(tableSize, rosTopicName)
     {
         mSubscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
-        StateTable.AddData(CISSTData, rosTopicName);
+        StateTable.AddData(mCISSTData, rosTopicName);
     }
     virtual ~mtsROSSubscriberStateTable() {
         mSubscriber.shutdown();
@@ -311,12 +312,13 @@ public:
 
     void Callback(const _rosType & rosData) {
         StateTable.Start();
-        mtsROSToCISST(rosData, CISSTData);
+        mts_ros_to_cisst::header(rosData, mCISSTData);
+        mtsROSToCISST(rosData, mCISSTData);
         StateTable.Advance();
     }
 
     mtsStateTable StateTable;
-    _mtsType CISSTData;
+    _mtsType mCISSTData;
 
 protected:
     ros::Subscriber mSubscriber;
@@ -445,6 +447,7 @@ public:
 
     bool Callback(typename _rosQueryType::Request & request,
                   typename _rosQueryType::Response & response) {
+        mts_ros_to_cisst::header(request, mResponse);
         mtsROSToCISST(request, mRequest);
         mtsExecutionResult result = Function(mRequest, mResponse);
         if (result) {
@@ -939,7 +942,7 @@ bool mtsROSBridge::AddSubscriberToCommandRead(const std::string & interfaceProvi
     mtsROSSubscriberStateTable<_mtsType, _rosType> * newSubscriber
         = new mtsROSSubscriberStateTable<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer), tableSize);
     if (!interfaceProvided->AddCommandReadState(newSubscriber->StateTable,
-                                                newSubscriber->CISSTData,
+                                                newSubscriber->mCISSTData,
                                                 commandName)) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToCommandRead: failed to add command read to provided interface.");
         CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandRead: failed to add command read \""
