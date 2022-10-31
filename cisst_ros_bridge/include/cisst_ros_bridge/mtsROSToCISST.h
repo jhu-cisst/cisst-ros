@@ -72,9 +72,10 @@ http://www.cisst.org/cisst/license.txt.
 namespace mts_ros_to_cisst {
 
     // cases for automatic header conversions
+    // -4- ROS has header and child_frame_id, cisst has timestamp, valid, reference frame and moving frame
     // -3- ROS has header, cisst has timestamp, valid and reference frame
     // -2- ROS has header, cisst has timestamp, valid
-    // -1- ROS has no header, cisst has timestamp, valid and reference frame
+    // -1- ROS has no header, cisst has timestamp, valid
     // -0- ROS has no header, cisst has nothing
 
     template <typename _rosType, typename _cisstType>
@@ -106,6 +107,24 @@ namespace mts_ros_to_cisst {
     class header_choice<0> {};
 
     template <typename _rosType, typename _cisstType>
+    auto header_impl(header_choice<4>,
+                     const _rosType & rosData,
+                     _cisstType & cisstData)
+        -> decltype(rosData.header,
+                    rosData.child_frame_id,
+                    cisstData.SetTimestamp(0.0),
+                    cisstData.SetValid(true),
+                    cisstData.SetReferenceFrame(""),
+                    cisstData.SetMovingFrame(""),
+                    void())
+    {
+        ros_header_to_cisst_header<_rosType, _cisstType>(rosData, cisstData);
+        // set reference frame name
+        cisstData.SetReferenceFrame(rosData.header.frame_id);
+        cisstData.SetMovingFrame(rosData.child_frame_id);
+    }
+
+    template <typename _rosType, typename _cisstType>
     auto header_impl(header_choice<3>,
                      const _rosType & rosData,
                      _cisstType & cisstData)
@@ -134,7 +153,7 @@ namespace mts_ros_to_cisst {
 
     template <typename _rosType, typename _cisstType>
     auto header_impl(header_choice<1>,
-                     const _rosType & rosData,
+                     const _rosType &,
                      _cisstType & cisstData)
         -> decltype(cisstData.SetTimestamp(0.0),
                     cisstData.SetValid(true),
@@ -156,7 +175,7 @@ namespace mts_ros_to_cisst {
     template <typename _rosType, typename _cisstType>
     void header(const _rosType & rosData, _cisstType & cisstData)
     {
-        header_impl<_rosType, _cisstType>(header_choice<3>(), rosData, cisstData);
+        header_impl<_rosType, _cisstType>(header_choice<4>(), rosData, cisstData);
     }
 }
 
