@@ -76,7 +76,8 @@ public:
         }
         mtsExecutionResult result = Function(mCISSTData);
         if (result) {
-            if (mtsCISSTToROS(mCISSTData, mROSData, mName)) {
+            if (mts_cisst_to_ros::header(mCISSTData, mROSData, mName)) {
+                mtsCISSTToROS(mCISSTData, mROSData, mName);
                 mPublisher.publish(mROSData);
                 return true;
             }
@@ -142,7 +143,8 @@ public:
         if ((mPublisher.getNumSubscribers() == 0) && !mPublisher.isLatched()) {
             return;
         }
-        if (mtsCISSTToROS(CISSTData, mROSData, mName)) {
+        if (mts_cisst_to_ros::header(CISSTData, mROSData, mName)) {
+            mtsCISSTToROS(CISSTData, mROSData, mName);
             mPublisher.publish(mROSData);
         }
     }
@@ -169,7 +171,8 @@ public:
             if (mCISSTData.Timestamp() > mLastTimestamp) {
                 mLastTimestamp = mCISSTData.Timestamp();
                 // then convert and check if the data is valid
-                if (mtsCISSTToROS(mCISSTData, mROSData, mName)) {
+                if (mts_cisst_to_ros::header(mCISSTData, mROSData, mName)) {
+                    mtsCISSTToROS(mCISSTData, mROSData, mName);
                     mBroadcaster.sendTransform(mROSData);
                     return true;
                 }
@@ -345,7 +348,8 @@ public:
         if ((mPublisher.getNumSubscribers() == 0) && !mPublisher.isLatched()) {
             return;
         }
-        if (mtsCISSTToROS(CISSTData, mROSData, mName)) {
+        if (mts_cisst_to_ros::header(CISSTData, mROSData, mName)) {
+            mtsCISSTToROS(CISSTData, mROSData, mName);
             mPublisher.publish(mROSData);
         }
     }
@@ -407,7 +411,8 @@ public:
                   typename _rosQueryType::Response & response) {
         mtsExecutionResult result = Function(mResponse);
         if (result) {
-            if (mtsCISSTToROS(mResponse, response, mName)) {
+            if (mts_cisst_to_ros::header(mResponse, response, mName)) {
+                mtsCISSTToROS(mResponse, response, mName);
                 return true;
             }
         } else {
@@ -451,7 +456,8 @@ public:
         mtsROSToCISST(request, mRequest);
         mtsExecutionResult result = Function(mRequest, mResponse);
         if (result) {
-            if (mtsCISSTToROS(mResponse, response, mName)) {
+            if (mts_cisst_to_ros::header(mResponse, response, mName)) {
+                mtsCISSTToROS(mResponse, response, mName);
                 return true;
             }
         } else {
@@ -530,8 +536,8 @@ protected:
   command, the second parameter is the ROS type used to publish.  At
   compilation time, the compiler will look for one of the following
   overloaded method:
-  - bool mtsCISSTToROS(const _cisstType & in, _rosType out, const std::string & debugInfo)
-  - bool mtsROSToCISST(const _rosType & in, _cisstType out, const std::string & debugInfo)
+  - void mtsCISSTToROS(const _cisstType & in, _rosType out, const std::string & debugInfo)
+  - void mtsROSToCISST(const _rosType & in, _cisstType out, const std::string & debugInfo)
 
   Some default conversion methods are provided in mtsROSToCISST.h
   and mtsCISSTToROS.h.
