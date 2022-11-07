@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2022 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -29,16 +29,16 @@ http://www.cisst.org/cisst/license.txt.
 #include <crtk_msgs/trigger_operating_state.h>
 
 // crtk_msgs
-bool mtsCISSTToROS(const prmOperatingState & cisstData,
+void mtsCISSTToROS(const prmOperatingState & cisstData,
                    crtk_msgs::operating_state & rosData,
                    const std::string & debugInfo);
 
-bool mtsCISSTToROS(const std::string & cisstData,
+void mtsCISSTToROS(const std::string & cisstData,
                    crtk_msgs::StringStamped & rosData,
                    const std::string & debugInfo);
 
 // crtk_srvs
-bool mtsCISSTToROS(const prmOperatingState & cisstData,
+void mtsCISSTToROS(const prmOperatingState & cisstData,
                    crtk_msgs::trigger_operating_state::Response & rosData,
                    const std::string & debugInfo);
 
