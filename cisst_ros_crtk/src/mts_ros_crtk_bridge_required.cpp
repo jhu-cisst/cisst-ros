@@ -103,6 +103,7 @@ void mts_ros_crtk_bridge_required::bridge_interface_required(const std::string &
     // populate the newly created provided interface
     populate_interface_provided(_provided_interface_name,
                                 _ros_namespace,
+                                _interface_required->GetNamesOfFunctionsVoid(),
                                 _interface_required->GetNamesOfFunctionsWrite(),
                                 _interface_required->GetNamesOfFunctionsRead(),
                                 _interface_required->GetNamesOfEventHandlersWrite());
@@ -112,12 +113,11 @@ void mts_ros_crtk_bridge_required::bridge_interface_required(const std::string &
 
 void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string & _interface_name,
                                                                const std::string & _ros_namespace,
+                                                               const std::vector<std::string> & _void_commands,
                                                                const std::vector<std::string> & _write_commands,
                                                                const std::vector<std::string> & _read_commands,
                                                                const std::vector<std::string> & _write_events)
 {
-    std::cerr << "--------------------\ninterface: " << _interface_name << std::endl;
-
     // clean ROS namespace
     std::string _clean_namespace = _ros_namespace;
     cisst_ros_crtk::clean_namespace(_clean_namespace);
@@ -130,9 +130,18 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
     std::string _crtk_command;
     std::string _ros_topic;
 
+    // void commands, using event bridge for low latence
+    for (auto & _command :  _void_commands) {
+        // get the CRTK command so we know which template type to use
+        cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
+        _ros_topic = _clean_namespace + _command;
+        if ("hold") {
+            this->AddPublisherFromCommandVoid(_interface_name, _command, _ros_topic);
+        }
+    }
+
     // write commands, using event bridge for low latence
     for (auto & _command :  _write_commands) {
-        std::cerr << "w cmd: " << _command << std::endl;
         // get the CRTK command so we know which template type to use
         cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
         _ros_topic = _clean_namespace + _command;

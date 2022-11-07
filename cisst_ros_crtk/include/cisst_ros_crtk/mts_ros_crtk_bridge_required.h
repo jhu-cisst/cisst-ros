@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2021 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2022 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -71,6 +71,7 @@ public:
 
     void populate_interface_provided(const std::string & _interface_name,
                                      const std::string & _ros_namespace,
+                                     const std::vector<std::string> & _void_commands,
                                      const std::vector<std::string> & _write_commands,
                                      const std::vector<std::string> & _read_commands,
                                      const std::vector<std::string> & _write_events);

@@ -274,6 +274,18 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
     std::string _crtk_command;
     std::string _ros_topic;
 
+    // void commands
+    for (auto & _command :  _interface_provided->GetNamesOfCommandsVoid()) {
+        if (should_be_bridged(_command)) {
+            // get the CRTK command so we know which template type to use
+            cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
+            _ros_topic = _clean_namespace + _command;
+            if (_crtk_command == "hold") {
+                m_subscribers_bridge->AddSubscriberToCommandVoid(_required_interface_name, _command, _ros_topic);
+            }
+        }
+    }
+
     // write commands
     for (auto & _command :  _interface_provided->GetNamesOfCommandsWrite()) {
         if (should_be_bridged(_command)) {
