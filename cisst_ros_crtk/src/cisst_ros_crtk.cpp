@@ -25,6 +25,10 @@ void cisst_ros_crtk::clean_namespace(std::string & _ros_namespace)
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), ' ', '_');
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), '-', '_');
     std::replace(_ros_namespace.begin(), _ros_namespace.end(), '.', '_');
+    std::replace(_ros_namespace.begin(), _ros_namespace.end(), '(', '_');
+    std::replace(_ros_namespace.begin(), _ros_namespace.end(), ')', '_');
+    std::replace(_ros_namespace.begin(), _ros_namespace.end(), '[', '_');
+    std::replace(_ros_namespace.begin(), _ros_namespace.end(), ']', '_');
 }
 
 void cisst_ros_crtk::get_crtk_command(const std::string & _full_command,
