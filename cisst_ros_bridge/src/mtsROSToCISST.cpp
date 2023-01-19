@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2022 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2023 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -257,6 +257,12 @@ void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmPositionJointSet 
     cisstData.Goal().SetSize(rosData.position.size());
     std::copy(rosData.position.begin(), rosData.position.end(),
               cisstData.Goal().begin());
+    const auto velocitySize = rosData.velocity.size();
+    if (velocitySize > 0) {
+        cisstData.Velocity().SetSize(velocitySize);
+        std::copy(rosData.velocity.begin(), rosData.velocity.end(),
+                  cisstData.Velocity().begin());
+    }
 }
 
 void mtsROSToCISST(const sensor_msgs::JointState & rosData, prmForceTorqueJointSet & cisstData)
