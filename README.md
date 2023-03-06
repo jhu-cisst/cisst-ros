@@ -89,6 +89,11 @@ The class `mtsROSBridge` (see header file `include/cisst_ros_bridge/mtsROSBridge
 
 ## cisst ROS CRTK bridge
 
+The CRTK ROS bridge manages multiple cisst ROS bridges as suggested in the previous section to handle different "refresh" rates.  I also adds some cisst ROS bridges to publish some interval statistics for the cisst ROS bridges so user can check at which frequencies messages are published.  More importantly, the CRTK bridge will automatically detect CRTK commands from a provided interface (or functions from a required interface).  Based on the set of CRTK commands found, the bridge is automatically populated.  The detection also includes namespaces so if the command `jaw/measured_js` is found, the bridge will add the topic `jaw/measured_js`.   For this to work well, users have to make sure they follow the [CRTK naming convention](https://github.com/collaborative-robotics/documentation/wiki/Robot-API) (and payload types).  You can find examples of use in:
+* [sawForceDimension](https://github.com/jhu-saw/sawForceDimensionSDK), in `ros/src/force_dimension.cpp`.  This is a simple case with no custom topic.
+* [sawNDITracker](https://github.com/jhu-saw/sawNDITracker), in `ros/mts_ros_crtk_ndi_bridge.h`.  This is a more complex example that dynamically adds bridges based on which tools are found.
+* [dVRK](https://github.com/jhu-dvrk/dvrk-ros), in `dvrk_robot/src/dvrk_console.cpp`.  This shows how to bridge some extra (non-CRTK) commands on top of the commands bridged automatically.
+
 # Examples
 
 The cisst-ros package is used by the following components to create ROS interfaces:
