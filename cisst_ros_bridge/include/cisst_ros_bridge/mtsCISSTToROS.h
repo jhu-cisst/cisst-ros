@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2022 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2023 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -72,6 +72,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_msgs/prmCartesianImpedanceGains.h>
 #include <cisst_msgs/mtsIntervalStatistics.h>
 #include <cisst_msgs/BoolStamped.h>
+#include <cisst_msgs/ConvertFloat64Array.h>
 #include <cisst_msgs/QueryForwardKinematics.h>
 
 
@@ -328,6 +329,9 @@ void mtsCISSTToROS(const prmCartesianImpedanceGains & cisstData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
                    cisst_msgs::mtsIntervalStatistics & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vctDoubleVec & cisstData,
+                   cisst_msgs::ConvertFloat64Array::Response & rosData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const vctFrm4x4 & cisstData,
                    cisst_msgs::QueryForwardKinematics::Response & rosData,

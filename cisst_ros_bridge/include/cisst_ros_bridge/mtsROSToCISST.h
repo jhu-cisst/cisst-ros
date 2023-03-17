@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2022 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2023 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -67,6 +67,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_msgs/vctDoubleVec.h>
 #include <cisst_msgs/mtsIntervalStatistics.h>
 #include <cisst_msgs/prmCartesianImpedanceGains.h>
+#include <cisst_msgs/ConvertFloat64Array.h>
 #include <cisst_msgs/QueryForwardKinematics.h>
 
 namespace mts_ros_to_cisst {
@@ -267,6 +268,8 @@ void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, prmPositionJointSet
 void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & cisstData);
 void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData, prmCartesianImpedanceGains & cisstData);
 void mtsROSToCISST(const cisst_msgs::mtsIntervalStatistics & rosData, mtsIntervalStatistics & cisstData);
+void mtsROSToCISST(const cisst_msgs::ConvertFloat64Array::Request & rosData,
+                   vctDoubleVec & cisstData);
 void mtsROSToCISST(const cisst_msgs::QueryForwardKinematics::Request & rosData,
                    vctDoubleVec & cisstData);
 

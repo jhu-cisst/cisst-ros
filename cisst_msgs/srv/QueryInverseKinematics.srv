@@ -1,0 +1,5 @@
+sensor_msgs/JointState initial
+geometry_msgs/PoseStamped cp
+---
+sensor_msgs/JointState final
+

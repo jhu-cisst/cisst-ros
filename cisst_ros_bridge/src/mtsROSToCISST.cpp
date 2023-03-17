@@ -409,6 +409,14 @@ void mtsROSToCISST(const cisst_msgs::mtsIntervalStatistics & rosData, mtsInterva
                               rosData.StatisticsInterval);
 }
 
+void mtsROSToCISST(const cisst_msgs::ConvertFloat64Array::Request & rosData,
+                   vctDoubleVec & cisstData)
+{
+    cisstData.SetSize(rosData.input.size());
+    std::copy(rosData.input.begin(), rosData.input.end(),
+              cisstData.begin());
+}
+
 void mtsROSToCISST(const cisst_msgs::QueryForwardKinematics::Request & rosData,
                    vctDoubleVec & cisstData)
 {
