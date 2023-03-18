@@ -420,7 +420,16 @@ void mtsROSToCISST(const cisst_msgs::ConvertFloat64Array::Request & rosData,
 void mtsROSToCISST(const cisst_msgs::QueryForwardKinematics::Request & rosData,
                    vctDoubleVec & cisstData)
 {
-    cisstData.SetSize(rosData.jp.position.size());
-    std::copy(rosData.jp.position.begin(), rosData.jp.position.end(),
+    cisstData.SetSize(rosData.jp.size());
+    std::copy(rosData.jp.begin(), rosData.jp.end(),
               cisstData.begin());
+}
+
+void mtsROSToCISST(const cisst_msgs::QueryInverseKinematics::Request & rosData,
+                   prmInverseKinematicsQuery & cisstData)
+{
+    cisstData.measured_jp().SetSize(rosData.measured_jp.size());
+    std::copy(rosData.measured_jp.begin(), rosData.measured_jp.end(),
+              cisstData.measured_jp().begin());
+    mtsROSPoseToCISST(rosData.goal_cp, cisstData.goal_cp());
 }

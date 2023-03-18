@@ -74,7 +74,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_msgs/BoolStamped.h>
 #include <cisst_msgs/ConvertFloat64Array.h>
 #include <cisst_msgs/QueryForwardKinematics.h>
-
+#include <cisst_msgs/QueryInverseKinematics.h>
 
 namespace mts_cisst_to_ros {
 
@@ -335,6 +335,9 @@ void mtsCISSTToROS(const vctDoubleVec & cisstData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const vctFrm4x4 & cisstData,
                    cisst_msgs::QueryForwardKinematics::Response & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vctDoubleVec & cisstData,
+                   cisst_msgs::QueryInverseKinematics::Response & rosData,
                    const std::string & debugInfo);
 
 #endif // _mtsCISSTToROS_h

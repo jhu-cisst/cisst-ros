@@ -1,5 +1,5 @@
-sensor_msgs/JointState initial
-geometry_msgs/PoseStamped cp
+float64[] measured_jp
+geometry_msgs/Pose goal_cp
 ---
-sensor_msgs/JointState final
+float64[] goal_jp
 
