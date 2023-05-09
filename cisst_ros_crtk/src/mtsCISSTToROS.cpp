@@ -53,3 +53,23 @@ void mtsCISSTToROS(const prmOperatingState & cisstData,
 {
     mtsCISSTToROSOperatingState(cisstData, rosData.operating_state, debugInfo);
 }
+
+void mtsCISSTToROS(const prmForwardKinematicsResponse & cisstData,
+                   crtk_msgs::QueryForwardKinematics::Response & rosData,
+                   const std::string &)
+{
+    mtsCISSTToROSPose(cisstData.cp(), rosData.cp);
+    rosData.result = cisstData.result();
+    rosData.message = cisstData.message();
+}
+
+void mtsCISSTToROS(const prmInverseKinematicsResponse & cisstData,
+                   crtk_msgs::QueryInverseKinematics::Response & rosData,
+                   const std::string &)
+{
+    rosData.jp.resize(cisstData.jp().size());
+    std::copy(cisstData.jp().begin(), cisstData.jp().end(),
+              rosData.jp.begin());
+    rosData.result = cisstData.result();
+    rosData.message = cisstData.message();
+}

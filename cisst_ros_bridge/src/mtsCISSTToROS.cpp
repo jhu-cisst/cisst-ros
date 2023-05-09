@@ -656,19 +656,3 @@ void mtsCISSTToROS(const vctDoubleVec & cisstData,
                   rosData.output.begin());
     }
 }
-
-void mtsCISSTToROS(const vctFrm4x4 & cisstData,
-                   cisst_msgs::QueryForwardKinematics::Response & rosData,
-                   const std::string &)
-{
-    mtsCISSTToROSPose(cisstData, rosData.cp);
-}
-
-void mtsCISSTToROS(const vctDoubleVec & cisstData,
-                   cisst_msgs::QueryInverseKinematics::Response & rosData,
-                   const std::string &)
-{
-    rosData.goal_jp.resize(cisstData.size());
-    std::copy(cisstData.begin(), cisstData.end(),
-                  rosData.goal_jp.begin());
-}

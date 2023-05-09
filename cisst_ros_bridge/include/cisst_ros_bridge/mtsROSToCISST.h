@@ -45,8 +45,6 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmInputData.h>
 #include <cisstParameterTypes/prmKeyValue.h>
 #include <cisstParameterTypes/prmStateJoint.h>
-#include <cisstParameterTypes/prmOperatingState.h>
-#include <cisstParameterTypes/prmInverseKinematicsQuery.h>
 
 // ros include
 #include <ros/ros.h>
@@ -69,8 +67,6 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_msgs/mtsIntervalStatistics.h>
 #include <cisst_msgs/prmCartesianImpedanceGains.h>
 #include <cisst_msgs/ConvertFloat64Array.h>
-#include <cisst_msgs/QueryForwardKinematics.h>
-#include <cisst_msgs/QueryInverseKinematics.h>
 
 namespace mts_ros_to_cisst {
 
@@ -272,9 +268,5 @@ void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData, prmCa
 void mtsROSToCISST(const cisst_msgs::mtsIntervalStatistics & rosData, mtsIntervalStatistics & cisstData);
 void mtsROSToCISST(const cisst_msgs::ConvertFloat64Array::Request & rosData,
                    vctDoubleVec & cisstData);
-void mtsROSToCISST(const cisst_msgs::QueryForwardKinematics::Request & rosData,
-                   vctDoubleVec & cisstData);
-void mtsROSToCISST(const cisst_msgs::QueryInverseKinematics::Request & rosData,
-                   prmInverseKinematicsQuery & cisstData);
 
 #endif // _mtsROSToCISST_h

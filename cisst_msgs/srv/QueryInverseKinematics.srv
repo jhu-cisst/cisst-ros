@@ -1,5 +1,0 @@
-float64[] measured_jp
-geometry_msgs/Pose goal_cp
----
-float64[] goal_jp
-

@@ -384,9 +384,15 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
             // get the CRTK command so we know which template type to use
             cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
             _ros_topic = _clean_namespace + _command;
-            if (_crtk_command == "query_cp") {
-                m_subscribers_bridge->AddServiceFromCommandQualifiedRead<vctDoubleVec, vctFrm4x4,
-                                                                         cisst_msgs::QueryForwardKinematics>
+            if (_crtk_command == "forward_kinematics") {
+                m_subscribers_bridge->AddServiceFromCommandQualifiedRead<prmForwardKinematicsRequest,
+                                                                         prmForwardKinematicsResponse,
+                                                                         crtk_msgs::QueryForwardKinematics>
+                    (_required_interface_name, _command, _ros_topic);
+            } else if (_crtk_command == "inverse_kinematics") {
+                m_subscribers_bridge->AddServiceFromCommandQualifiedRead<prmInverseKinematicsRequest,
+                                                                         prmInverseKinematicsResponse,
+                                                                         crtk_msgs::QueryInverseKinematics>
                     (_required_interface_name, _command, _ros_topic);
             }
         }

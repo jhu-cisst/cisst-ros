@@ -26,8 +26,6 @@ add_message_files(
 add_service_files(
   FILES
   ConvertFloat64Array.srv
-  QueryForwardKinematics.srv
-  QueryInverseKinematics.srv
 )
 
 ## Generate added messages and services with any dependencies listed here
