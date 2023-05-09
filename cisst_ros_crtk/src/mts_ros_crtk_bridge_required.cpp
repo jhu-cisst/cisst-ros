@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2022 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2023 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -202,7 +202,7 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
             this->AddSubscriberToCommandRead<vctDoubleMat, std_msgs::Float64MultiArray>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "operating_state") {
-            this->AddSubscriberToCommandRead<prmOperatingState, crtk_msgs::operating_state>
+            this->AddSubscriberToCommandRead<prmOperatingState, crtk_msgs::OperatingState>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "period_statistics") {
             this->AddSubscriberToCommandRead<mtsIntervalStatistics, cisst_msgs::mtsIntervalStatistics>
@@ -226,7 +226,7 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
             this->AddSubscriberToEventWrite<prmEventButton, sensor_msgs::Joy>
                 (_interface_name, _event, _clean_namespace); // for buttons, we just use the interface name
         } else if (_crtk_command == "operating_state") {
-            this->AddSubscriberToEventWrite<prmOperatingState, crtk_msgs::operating_state>
+            this->AddSubscriberToEventWrite<prmOperatingState, crtk_msgs::OperatingState>
                 (_interface_name, _event, _ros_topic);
         } else if (_crtk_command == "error") {
             this->AddSubscriberToEventWrite<mtsMessage, std_msgs::String>

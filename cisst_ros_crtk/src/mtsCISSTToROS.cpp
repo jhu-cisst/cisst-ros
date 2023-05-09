@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2022 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2023 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -34,7 +34,7 @@ void mtsCISSTToROSOperatingState(const prmOperatingState & cisstData,
 }
 
 void mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::operating_state & rosData,
+                   crtk_msgs::OperatingState & rosData,
                    const std::string & debugInfo)
 {
     mtsCISSTToROSOperatingState(cisstData, rosData, debugInfo);
@@ -48,7 +48,7 @@ void mtsCISSTToROS(const std::string & cisstData,
 }
 
 void mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::trigger_operating_state::Response & rosData,
+                   crtk_msgs::TriggerOperatingState::Response & rosData,
                    const std::string & debugInfo)
 {
     mtsCISSTToROSOperatingState(cisstData, rosData.operating_state, debugInfo);

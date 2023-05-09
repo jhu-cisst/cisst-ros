@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2022 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2023 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -366,7 +366,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                 _pub_bridge->AddPublisherFromCommandRead<vctDoubleMat, std_msgs::Float64MultiArray>
                     (_interface_name, _command, _ros_topic);
             } else if (_crtk_command == "operating_state") {
-                m_subscribers_bridge->AddServiceFromCommandRead<prmOperatingState, crtk_msgs::trigger_operating_state>
+                m_subscribers_bridge->AddServiceFromCommandRead<prmOperatingState, crtk_msgs::TriggerOperatingState>
                     (_required_interface_name, _command, _ros_topic);
             } else if (_crtk_command == "period_statistics") {
                 std::string _namespace = _component_name + "_" + _interface_name;
@@ -405,7 +405,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                 m_events_bridge->AddPublisherFromEventWrite<prmEventButton, sensor_msgs::Joy>
                     (_required_interface_name, _event, _clean_namespace); // for buttons, we just use the interface name
             } else if (_crtk_command == "operating_state") {
-                m_events_bridge->AddPublisherFromEventWrite<prmOperatingState, crtk_msgs::operating_state>
+                m_events_bridge->AddPublisherFromEventWrite<prmOperatingState, crtk_msgs::OperatingState>
                     (_required_interface_name, _event, _ros_topic);
             } else if (_crtk_command == "error") {
                 m_events_bridge->AddPublisherFromEventWrite<mtsMessage, std_msgs::String>
