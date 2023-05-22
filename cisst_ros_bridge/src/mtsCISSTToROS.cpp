@@ -370,12 +370,22 @@ void mtsCISSTToROS(const prmForceCartesianSet & cisstData, geometry_msgs::Wrench
 // ---------------------------------------------
 // sensor_msgs
 // ---------------------------------------------
+
+void mtsCISSTToROSSetJointNames(sensor_msgs::JointState & rosData, const size_t & nb_joints)
+{
+    rosData.name.resize(nb_joints);
+    for (size_t i = 0; i < nb_joints; ++i) {
+        rosData.name[i] = std::to_string(i);
+    }
+}
+
 void mtsCISSTToROS(const vctDoubleVec & cisstData, sensor_msgs::JointState & rosData,
                    const std::string &)
 {
+    const size_t size = cisstData.size();
+    mtsCISSTToROSSetJointNames(rosData, size);
     rosData.velocity.resize(0);
     rosData.effort.resize(0);
-    const size_t size = cisstData.size();
     if (size != 0) {
         rosData.position.resize(size);
         std::copy(cisstData.begin(), cisstData.end(),
@@ -386,10 +396,10 @@ void mtsCISSTToROS(const vctDoubleVec & cisstData, sensor_msgs::JointState & ros
 void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData,
                    const std::string &)
 {
-    rosData.name.resize(0);
+    const size_t size = cisstData.Position().size();
+    mtsCISSTToROSSetJointNames(rosData, size);
     rosData.velocity.resize(0);
     rosData.effort.resize(0);
-    const size_t size = cisstData.Position().size();
     if (size != 0) {
         rosData.position.resize(size);
         std::copy(cisstData.Position().begin(), cisstData.Position().end(),
@@ -400,10 +410,10 @@ void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointStat
 void mtsCISSTToROS(const prmPositionJointSet & cisstData, sensor_msgs::JointState & rosData,
                    const std::string &)
 {
-    rosData.name.resize(0);
+    const size_t size = cisstData.Goal().size();
+    mtsCISSTToROSSetJointNames(rosData, size);
     rosData.velocity.resize(0);
     rosData.effort.resize(0);
-    const size_t size = cisstData.Goal().size();
     if (size != 0) {
         rosData.position.resize(size);
         std::copy(cisstData.Goal().begin(), cisstData.Goal().end(),
@@ -414,10 +424,10 @@ void mtsCISSTToROS(const prmPositionJointSet & cisstData, sensor_msgs::JointStat
 void mtsCISSTToROS(const prmVelocityJointGet & cisstData, sensor_msgs::JointState & rosData,
                    const std::string &)
 {
-    rosData.name.resize(0);
+    const size_t size = cisstData.Velocity().size();
+    mtsCISSTToROSSetJointNames(rosData, size);
     rosData.position.resize(0);
     rosData.effort.resize(0);
-    const size_t size = cisstData.Velocity().size();
     if (size != 0) {
         rosData.velocity.resize(size);
         std::copy(cisstData.Velocity().begin(), cisstData.Velocity().end(),
@@ -428,9 +438,10 @@ void mtsCISSTToROS(const prmVelocityJointGet & cisstData, sensor_msgs::JointStat
 void mtsCISSTToROS(const prmVelocityJointSet & cisstData, sensor_msgs::JointState & rosData,
                    const std::string &)
 {
-    rosData.name.resize(0);
-    rosData.effort.resize(0);
     const size_t size = cisstData.Goal().size();
+    mtsCISSTToROSSetJointNames(rosData, size);
+    rosData.position.resize(0);
+    rosData.effort.resize(0);
     if (size != 0) {
         rosData.velocity.resize(size);
         std::copy(cisstData.Goal().begin(), cisstData.Goal().end(),
@@ -441,10 +452,10 @@ void mtsCISSTToROS(const prmVelocityJointSet & cisstData, sensor_msgs::JointStat
 void mtsCISSTToROS(const prmForceTorqueJointSet & cisstData, sensor_msgs::JointState & rosData,
                    const std::string &)
 {
-    rosData.name.resize(0);
+    const size_t size = cisstData.ForceTorque().size();
+    mtsCISSTToROSSetJointNames(rosData, size);
     rosData.position.resize(0);
     rosData.velocity.resize(0);
-    const size_t size = cisstData.ForceTorque().size();
     if (size != 0) {
         rosData.effort.resize(size);
         std::copy(cisstData.ForceTorque().begin(), cisstData.ForceTorque().end(),
