@@ -38,6 +38,42 @@ void mtsROSToCISST(const crtk_msgs::StringStamped & rosData,
     cisstData = rosData.string;
 }
 
+void mtsROSToCISST(const crtk_msgs::CartesianImpedanceHalfPlaneGains & rosData,
+                   prmCartesianImpedanceHalfPlaneGains & cisstData)
+{
+    mtsROSToCISST(rosData.deadband,
+                  cisstData.Deadband);
+    mtsROSToCISST(rosData.p,
+                  cisstData.P);
+    mtsROSToCISST(rosData.d,
+                  cisstData.D);
+    mtsROSToCISST(rosData.bias,
+                  cisstData.Bias);
+}
+
+void mtsROSToCISST(const crtk_msgs::CartesianImpedance & rosData, prmCartesianImpedance & cisstData)
+{
+    // vf pos/rot
+    mtsROSToCISST(rosData.force_position,
+                  cisstData.ForcePosition);
+    mtsROSToCISST(rosData.force_orientation,
+                  cisstData.ForceOrientation);
+    mtsROSToCISST(rosData.torque_orientation,
+                  cisstData.TorqueOrientation);
+
+    // force gains
+    mtsROSToCISST(rosData.position_positive,
+                  cisstData.PositionPositive);
+    mtsROSToCISST(rosData.position_negative,
+                  cisstData.PositionNegative);
+
+    // torque gains
+    mtsROSToCISST(rosData.orientation_positive,
+                  cisstData.OrientationPositive);
+    mtsROSToCISST(rosData.orientation_negative,
+                  cisstData.OrientationNegative);
+}
+
 void mtsROSToCISST(const crtk_msgs::QueryForwardKinematics::Request & rosData,
                    prmForwardKinematicsRequest & cisstData)
 {

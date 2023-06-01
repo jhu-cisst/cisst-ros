@@ -346,54 +346,6 @@ void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & ciss
     }
 }
 
-void mtsROSToCISST(const cisst_msgs::prmCartesianImpedanceGains & rosData,
-                   prmCartesianImpedanceGains & cisstData)
-{
-    // vf pos/rot
-    mtsROSToCISST(rosData.ForcePosition,
-                  cisstData.ForcePosition());
-    mtsROSToCISST(rosData.ForceOrientation,
-                  cisstData.ForceOrientation());
-    mtsROSToCISST(rosData.TorqueOrientation,
-                  cisstData.TorqueOrientation());
-
-    // force gains
-    mtsROSToCISST(rosData.PosDeadbandPos,
-                  cisstData.PositionDeadbandPos());
-    mtsROSToCISST(rosData.PosDeadbandNeg,
-                  cisstData.PositionDeadbandNeg());
-    mtsROSToCISST(rosData.PosStiffPos,
-                  cisstData.PositionStiffnessPos());
-    mtsROSToCISST(rosData.PosStiffNeg,
-                  cisstData.PositionStiffnessNeg());
-    mtsROSToCISST(rosData.PosDampingPos,
-                  cisstData.PositionDampingPos());
-    mtsROSToCISST(rosData.PosDampingNeg,
-                  cisstData.PositionDampingNeg());
-    mtsROSToCISST(rosData.ForceBiasPos,
-                  cisstData.ForceBiasPos());
-    mtsROSToCISST(rosData.ForceBiasNeg,
-                  cisstData.ForceBiasNeg());
-
-    // torque gains
-    mtsROSToCISST(rosData.OriDeadbandPos,
-                  cisstData.OrientationDeadbandPos());
-    mtsROSToCISST(rosData.OriDeadbandNeg,
-                  cisstData.OrientationDeadbandNeg());
-    mtsROSToCISST(rosData.OriStiffPos,
-                  cisstData.OrientationStiffnessPos());
-    mtsROSToCISST(rosData.OriStiffNeg,
-                  cisstData.OrientationStiffnessNeg());
-    mtsROSToCISST(rosData.OriDampingPos,
-                  cisstData.OrientationDampingPos());
-    mtsROSToCISST(rosData.OriDampingNeg,
-                  cisstData.OrientationDampingNeg());
-    mtsROSToCISST(rosData.TorqueBiasPos,
-                  cisstData.TorqueBiasPos());
-    mtsROSToCISST(rosData.TorqueBiasNeg,
-                  cisstData.TorqueBiasNeg());
-}
-
 void mtsROSToCISST(const cisst_msgs::mtsIntervalStatistics & rosData, mtsIntervalStatistics & cisstData)
 {
     cisstData.SetFromExisting(rosData.PeriodAvg,
