@@ -282,6 +282,8 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
             _ros_topic = _clean_namespace + _command;
             if (_crtk_command == "hold") {
                 m_subscribers_bridge->AddSubscriberToCommandVoid(_required_interface_name, _command, _ros_topic);
+            } else if (_crtk_command == "free") {
+                m_subscribers_bridge->AddSubscriberToCommandVoid(_required_interface_name, _command, _ros_topic);
             }
         }
     }
@@ -298,7 +300,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                 || (_crtk_command == "move_jr")) {
                 m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionJointSet, sensor_msgs::JointState>
                     (_required_interface_name, _command, _ros_topic);
-            } else  if (_crtk_command == "servo_jf") {
+            } else if (_crtk_command == "servo_jf") {
                 m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceTorqueJointSet, sensor_msgs::JointState>
                     (_required_interface_name, _command, _ros_topic);
             } else if ((_crtk_command == "servo_cp")
