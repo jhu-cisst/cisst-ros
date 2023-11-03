@@ -374,6 +374,9 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
             } else if (_crtk_command == "operating_state") {
                 m_subscribers_bridge->AddServiceFromCommandRead<prmOperatingState, crtk_msgs::TriggerOperatingState>
                     (_required_interface_name, _command, _ros_topic);
+            } else if (_crtk_command == "crtk_version") {
+                m_subscribers_bridge->AddServiceFromCommandRead<std::string, std_srvs::Trigger>
+                    (_required_interface_name, _command, _ros_topic);
             } else if (_crtk_command == "period_statistics") {
                 std::string _namespace = _component_name + "_" + _interface_name;
                 std::transform(_namespace.begin(), _namespace.end(), _namespace.begin(), tolower);
