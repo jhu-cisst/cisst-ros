@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(cisst_ros_bridge VERSION 2.0.0)
+project(cisst_ros_bridge VERSION 2.1.0)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -27,7 +27,7 @@ set(REQUIRED_CISST_LIBRARIES
   )
 
 # find cisst and make sure the required libraries have been compiled
-find_package(cisst 1.1.0 REQUIRED ${REQUIRED_CISST_LIBRARIES})
+find_package(cisst 1.2.0 REQUIRED ${REQUIRED_CISST_LIBRARIES})
 include(${CISST_USE_FILE})
 
 catkin_package(
