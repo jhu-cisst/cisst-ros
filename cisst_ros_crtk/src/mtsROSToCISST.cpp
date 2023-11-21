@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2023 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -20,10 +20,9 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_ros_crtk/mtsROSToCISST.h>
 #include <cisst_ros_bridge/mtsROSToCISST.h>
 
-void mtsROSToCISST(const crtk_msgs::operating_state & rosData,
+void mtsROSToCISST(const crtk_msgs::OperatingState & rosData,
                    prmOperatingState & cisstData)
 {
-    mtsROSToCISSTHeader(rosData, cisstData);
     try {
         cisstData.State() = prmOperatingState::StateTypeFromString(rosData.state);
     } catch (...) {
@@ -37,4 +36,57 @@ void mtsROSToCISST(const crtk_msgs::StringStamped & rosData,
                    std::string & cisstData)
 {
     cisstData = rosData.string;
+}
+
+void mtsROSToCISST(const crtk_msgs::CartesianImpedanceHalfPlaneGains & rosData,
+                   prmCartesianImpedanceHalfPlaneGains & cisstData)
+{
+    mtsROSToCISST(rosData.deadband,
+                  cisstData.Deadband);
+    mtsROSToCISST(rosData.p,
+                  cisstData.P);
+    mtsROSToCISST(rosData.d,
+                  cisstData.D);
+    mtsROSToCISST(rosData.bias,
+                  cisstData.Bias);
+}
+
+void mtsROSToCISST(const crtk_msgs::CartesianImpedance & rosData, prmCartesianImpedance & cisstData)
+{
+    // vf pos/rot
+    mtsROSToCISST(rosData.force_position,
+                  cisstData.ForcePosition);
+    mtsROSToCISST(rosData.force_orientation,
+                  cisstData.ForceOrientation);
+    mtsROSToCISST(rosData.torque_orientation,
+                  cisstData.TorqueOrientation);
+
+    // force gains
+    mtsROSToCISST(rosData.position_positive,
+                  cisstData.PositionPositive);
+    mtsROSToCISST(rosData.position_negative,
+                  cisstData.PositionNegative);
+
+    // torque gains
+    mtsROSToCISST(rosData.orientation_positive,
+                  cisstData.OrientationPositive);
+    mtsROSToCISST(rosData.orientation_negative,
+                  cisstData.OrientationNegative);
+}
+
+void mtsROSToCISST(const crtk_msgs::QueryForwardKinematics::Request & rosData,
+                   prmForwardKinematicsRequest & cisstData)
+{
+    cisstData.jp().SetSize(rosData.jp.size());
+    std::copy(rosData.jp.begin(), rosData.jp.end(),
+              cisstData.jp().begin());
+}
+
+void mtsROSToCISST(const crtk_msgs::QueryInverseKinematics::Request & rosData,
+                   prmInverseKinematicsRequest & cisstData)
+{
+    cisstData.jp().SetSize(rosData.jp.size());
+    std::copy(rosData.jp.begin(), rosData.jp.end(),
+              cisstData.jp().begin());
+    mtsROSPoseToCISST(rosData.cp, cisstData.cp());
 }

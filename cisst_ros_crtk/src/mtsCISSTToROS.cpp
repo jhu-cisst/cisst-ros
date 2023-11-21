@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2023 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -20,41 +20,56 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_ros_bridge/mtsCISSTToROS.h>
 
 template <typename _ros_operating_state>
-bool mtsCISSTToROSOperatingState(const prmOperatingState & cisstData,
+void mtsCISSTToROSOperatingState(const prmOperatingState & cisstData,
                                  _ros_operating_state & rosData,
-                                 const std::string & debugInfo)
+                                 const std::string &)
 {
-    if (mtsCISSTToROSHeader(cisstData, rosData, debugInfo)) {
-        try {
-            rosData.state = prmOperatingState::StateTypeToString(cisstData.State());
-        } catch (...) {
-            rosData.state = "UNDEFINED";
-        }
-        rosData.is_homed = cisstData.IsHomed();
-        rosData.is_busy = cisstData.IsBusy();
-        return true;
+    try {
+        rosData.state = prmOperatingState::StateTypeToString(cisstData.State());
+    } catch (...) {
+        rosData.state = "UNDEFINED";
     }
-    return false;
+    rosData.is_homed = cisstData.IsHomed();
+    rosData.is_busy = cisstData.IsBusy();
 }
 
-bool mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::operating_state & rosData,
+void mtsCISSTToROS(const prmOperatingState & cisstData,
+                   crtk_msgs::OperatingState & rosData,
                    const std::string & debugInfo)
 {
-    return mtsCISSTToROSOperatingState(cisstData, rosData, debugInfo);
+    mtsCISSTToROSOperatingState(cisstData, rosData, debugInfo);
 }
 
-bool mtsCISSTToROS(const std::string & cisstData,
+void mtsCISSTToROS(const std::string & cisstData,
                    crtk_msgs::StringStamped & rosData,
-                   const std::string & CMN_UNUSED(debugInfo))
+                   const std::string &)
 {
     rosData.string = cisstData;
-    return true;
 }
 
-bool mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::trigger_operating_state::Response & rosData,
+void mtsCISSTToROS(const prmOperatingState & cisstData,
+                   crtk_msgs::TriggerOperatingState::Response & rosData,
                    const std::string & debugInfo)
 {
-    return mtsCISSTToROSOperatingState(cisstData, rosData.operating_state, debugInfo);
+    mtsCISSTToROSOperatingState(cisstData, rosData.operating_state, debugInfo);
+}
+
+void mtsCISSTToROS(const prmForwardKinematicsResponse & cisstData,
+                   crtk_msgs::QueryForwardKinematics::Response & rosData,
+                   const std::string &)
+{
+    mtsCISSTToROSPose(cisstData.cp(), rosData.cp);
+    rosData.result = cisstData.result();
+    rosData.message = cisstData.message();
+}
+
+void mtsCISSTToROS(const prmInverseKinematicsResponse & cisstData,
+                   crtk_msgs::QueryInverseKinematics::Response & rosData,
+                   const std::string &)
+{
+    rosData.jp.resize(cisstData.jp().size());
+    std::copy(cisstData.jp().begin(), cisstData.jp().end(),
+              rosData.jp.begin());
+    rosData.result = cisstData.result();
+    rosData.message = cisstData.message();
 }

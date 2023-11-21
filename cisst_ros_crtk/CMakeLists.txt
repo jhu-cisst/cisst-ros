@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(cisst_ros_crtk)
+cmake_minimum_required(VERSION 3.1)
+project(cisst_ros_crtk VERSION 2.1.0)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -29,7 +29,7 @@ set(REQUIRED_CISST_LIBRARIES
   )
 
 # find cisst and make sure the required libraries have been compiled
-find_package(cisst 1.1.0 REQUIRED ${REQUIRED_CISST_LIBRARIES})
+find_package(cisst 1.2.0 REQUIRED ${REQUIRED_CISST_LIBRARIES})
 include(${CISST_USE_FILE})
 
 catkin_package(
@@ -47,13 +47,18 @@ include_directories(${catkin_INCLUDE_DIRS})
 
 # header
 set(HEADER_FILES
-  include/cisst_ros_crtk/mts_ros_crtk_bridge.h
+  include/cisst_ros_crtk/cisst_ros_crtk.h
+  include/cisst_ros_crtk/mts_ros_crtk_bridge.h # for backward compatibility
+  include/cisst_ros_crtk/mts_ros_crtk_bridge_provided.h
+  include/cisst_ros_crtk/mts_ros_crtk_bridge_required.h
   include/cisst_ros_crtk/mtsCISSTToROS.h
   include/cisst_ros_crtk/mtsROSToCISST.h)
 
 # source
 set(SOURCE_FILES
-  src/mts_ros_crtk_bridge.cpp
+  src/cisst_ros_crtk.cpp
+  src/mts_ros_crtk_bridge_provided.cpp
+  src/mts_ros_crtk_bridge_required.cpp
   src/mtsCISSTToROS.cpp
   src/mtsROSToCISST.cpp)
 

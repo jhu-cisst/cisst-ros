@@ -1,14 +1,13 @@
 <?xml version="1.0"?>
 <package>
   <name>cisst_ros_bridge</name>
-  <version>2.0.0</version>
+  <version>2.1.0</version>
   <description>The cisst_ros_bridge package</description>
 
-  <maintainer email="zihan.chen@jhu.edu">Zihan Chen</maintainer>
+  <maintainer email="anton.deguet@jhu.edu">Zihan Chen</maintainer>
   <license>CISST</license>
 
   <author email="anton.deguet@jhu.edu">Anton Deguet</author>
-  <author email="zihan.chen@jhu.edu">Zihan Chen</author>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>

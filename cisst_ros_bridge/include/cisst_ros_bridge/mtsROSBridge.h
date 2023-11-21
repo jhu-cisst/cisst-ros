@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2022 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -76,7 +76,8 @@ public:
         }
         mtsExecutionResult result = Function(mCISSTData);
         if (result) {
-            if (mtsCISSTToROS(mCISSTData, mROSData, mName)) {
+            if (mts_cisst_to_ros::header(mCISSTData, mROSData, mName)) {
+                mtsCISSTToROS(mCISSTData, mROSData, mName);
                 mPublisher.publish(mROSData);
                 return true;
             }
@@ -142,7 +143,8 @@ public:
         if ((mPublisher.getNumSubscribers() == 0) && !mPublisher.isLatched()) {
             return;
         }
-        if (mtsCISSTToROS(CISSTData, mROSData, mName)) {
+        if (mts_cisst_to_ros::header(CISSTData, mROSData, mName)) {
+            mtsCISSTToROS(CISSTData, mROSData, mName);
             mPublisher.publish(mROSData);
         }
     }
@@ -165,9 +167,15 @@ public:
     bool Execute(void) {
         mtsExecutionResult result = Function(mCISSTData);
         if (result) {
-            if (mtsCISSTToROS(mCISSTData, mROSData, mName)) {
-                mBroadcaster.sendTransform(mROSData);
-                return true;
+            // first check if it's new
+            if (mCISSTData.Timestamp() > mLastTimestamp) {
+                mLastTimestamp = mCISSTData.Timestamp();
+                // then convert and check if the data is valid
+                if (mts_cisst_to_ros::header(mCISSTData, mROSData, mName)) {
+                    mtsCISSTToROS(mCISSTData, mROSData, mName);
+                    mBroadcaster.sendTransform(mROSData);
+                    return true;
+                }
             }
         } else if (result.Value() != mtsExecutionResult::FUNCTION_NOT_BOUND) {
             ROS_ERROR("mtsROStf2Broadcaster::Execute: mtsFunction call failed");
@@ -182,6 +190,7 @@ protected:
     tf2_ros::TransformBroadcaster mBroadcaster;
     geometry_msgs::TransformStamped mROSData;
     prmPositionCartesianGet mCISSTData;
+    double mLastTimestamp = 0.0;
 };
 
 
@@ -243,6 +252,7 @@ public:
     }
 
     void Callback(const _rosType & rosData) {
+        mts_ros_to_cisst::header(rosData, mCISSTData);
         mtsROSToCISST(rosData, mCISSTData);
         mtsExecutionResult result = Function(mCISSTData);
         if (!result) {
@@ -297,7 +307,7 @@ public:
         StateTable(tableSize, rosTopicName)
     {
         mSubscriber = node.subscribe(rosTopicName, 1, &ThisType::Callback, this);
-        StateTable.AddData(CISSTData, rosTopicName);
+        StateTable.AddData(mCISSTData, rosTopicName);
     }
     virtual ~mtsROSSubscriberStateTable() {
         mSubscriber.shutdown();
@@ -305,12 +315,13 @@ public:
 
     void Callback(const _rosType & rosData) {
         StateTable.Start();
-        mtsROSToCISST(rosData, CISSTData);
+        mts_ros_to_cisst::header(rosData, mCISSTData);
+        mtsROSToCISST(rosData, mCISSTData);
         StateTable.Advance();
     }
 
     mtsStateTable StateTable;
-    _mtsType CISSTData;
+    _mtsType mCISSTData;
 
 protected:
     ros::Subscriber mSubscriber;
@@ -337,7 +348,8 @@ public:
         if ((mPublisher.getNumSubscribers() == 0) && !mPublisher.isLatched()) {
             return;
         }
-        if (mtsCISSTToROS(CISSTData, mROSData, mName)) {
+        if (mts_cisst_to_ros::header(CISSTData, mROSData, mName)) {
+            mtsCISSTToROS(CISSTData, mROSData, mName);
             mPublisher.publish(mROSData);
         }
     }
@@ -399,7 +411,8 @@ public:
                   typename _rosQueryType::Response & response) {
         mtsExecutionResult result = Function(mResponse);
         if (result) {
-            if (mtsCISSTToROS(mResponse, response, mName)) {
+            if (mts_cisst_to_ros::header(mResponse, response, mName)) {
+                mtsCISSTToROS(mResponse, response, mName);
                 return true;
             }
         } else {
@@ -439,10 +452,12 @@ public:
 
     bool Callback(typename _rosQueryType::Request & request,
                   typename _rosQueryType::Response & response) {
+        mts_ros_to_cisst::header(request, mResponse);
         mtsROSToCISST(request, mRequest);
         mtsExecutionResult result = Function(mRequest, mResponse);
         if (result) {
-            if (mtsCISSTToROS(mResponse, response, mName)) {
+            if (mts_cisst_to_ros::header(mResponse, response, mName)) {
+                mtsCISSTToROS(mResponse, response, mName);
                 return true;
             }
         } else {
@@ -521,8 +536,8 @@ protected:
   command, the second parameter is the ROS type used to publish.  At
   compilation time, the compiler will look for one of the following
   overloaded method:
-  - bool mtsCISSTToROS(const _cisstType & in, _rosType out, const std::string & debugInfo)
-  - bool mtsROSToCISST(const _rosType & in, _cisstType out, const std::string & debugInfo)
+  - void mtsCISSTToROS(const _cisstType & in, _rosType out, const std::string & debugInfo)
+  - void mtsROSToCISST(const _rosType & in, _cisstType out, const std::string & debugInfo)
 
   Some default conversion methods are provided in mtsROSToCISST.h
   and mtsCISSTToROS.h.
@@ -933,7 +948,7 @@ bool mtsROSBridge::AddSubscriberToCommandRead(const std::string & interfaceProvi
     mtsROSSubscriberStateTable<_mtsType, _rosType> * newSubscriber
         = new mtsROSSubscriberStateTable<_mtsType, _rosType>(topicName, *(this->mNodeHandlePointer), tableSize);
     if (!interfaceProvided->AddCommandReadState(newSubscriber->StateTable,
-                                                newSubscriber->CISSTData,
+                                                newSubscriber->mCISSTData,
                                                 commandName)) {
         ROS_ERROR("mtsROSBridge::AddSubscriberToCommandRead: failed to add command read to provided interface.");
         CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandRead: failed to add command read \""

@@ -1,6 +1,28 @@
 Change log
 ==========
 
+2.1.0 (2023-11-21)
+==================
+
+* API changes:
+  * :warning: all CRTK `_cp` methods use `PoseStamped` instead of `TransformStamped`
+  * :warning: CRTK messages using snake case renamed to use case to match ROS2 (e.g. `operating_state` is now `OperatingState`)
+* Deprecated features:
+  * Ubuntu 16.04 is not supported anymore
+  * Ubuntu 18.04 requires default clang or upgrading gcc, see build instructions
+* New features:
+  * cisst_ros_crtk bridge:
+    * Added support to bridge a required interface (see #15)
+    * New topics/services bridged:
+      * Topics `free`, `hold`, `servo_jv`
+      * Services `inverse_kinematics`, `forward_kinematics`, `crtk_version`
+  * cisst_ros_bridge:
+    * Better code for header conversions, using template inference
+    * More conversion methods (cisst to ros and ros to cisst)
+* Bug fixes:
+  * Tf: check timestamps to avoid boradcasting same data, check if multiple parents to since Tf doesn't support this
+  * Add default joint names if none specified in conversions from cisst to ROS (useful for plotjuggler)
+
 2.0.0 (2021-04-08)
 ==================
 

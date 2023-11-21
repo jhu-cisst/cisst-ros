@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2023 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -22,13 +22,24 @@ http://www.cisst.org/cisst/license.txt.
 
 // cisst include
 #include <cisstParameterTypes/prmOperatingState.h>
+#include <cisstParameterTypes/prmCartesianImpedance.h>
+#include <cisstParameterTypes/prmForwardKinematicsRequest.h>
+#include <cisstParameterTypes/prmInverseKinematicsRequest.h>
 
 // crtk
-#include <crtk_msgs/operating_state.h>
+#include <crtk_msgs/OperatingState.h>
 #include <crtk_msgs/StringStamped.h>
+#include <crtk_msgs/CartesianImpedance.h>
+#include <crtk_msgs/QueryForwardKinematics.h>
+#include <crtk_msgs/QueryInverseKinematics.h>
 
 // crtk_msgs
-void mtsROSToCISST(const crtk_msgs::operating_state & rosData, prmOperatingState & cisstData);
+void mtsROSToCISST(const crtk_msgs::OperatingState & rosData, prmOperatingState & cisstData);
 void mtsROSToCISST(const crtk_msgs::StringStamped & rosData, std::string & cisstData);
+void mtsROSToCISST(const crtk_msgs::CartesianImpedance & rosData, prmCartesianImpedance & cisstData);
+void mtsROSToCISST(const crtk_msgs::QueryForwardKinematics::Request & rosData,
+                   prmForwardKinematicsRequest & cisstData);
+void mtsROSToCISST(const crtk_msgs::QueryInverseKinematics::Request & rosData,
+                   prmInverseKinematicsRequest & cisstData);
 
 #endif // _mtsROSToCISST_CRTK_h

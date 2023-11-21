@@ -4,7 +4,7 @@
     [
         {
             "shared-library": "cisst_ros_crtk",
-            "class-name": "mts_ros_crtk_bridge",
+            "class-name": "mts_ros_crtk_bridge_provided",
             "constructor-arg": {
                 "Name": "ros_bridge"
             },
