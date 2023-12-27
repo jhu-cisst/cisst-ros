@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2019 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2023 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -127,21 +127,21 @@ int main(int argc, char **argv)
     mtsROSBridge bridge("publisher", 5.0 * cmn_ms, &rosNodeHandle);
     bridge.PerformsSpin(true);
 
-    bridge.AddPublisherFromCommandRead<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
-                                                                               "GetValue1",
-                                                                               "sawROSExample/get_value_1");
+    bridge.AddPublisherFromCommandRead<vctDoubleVec, cisst_msgs::DoubleVec>("required",
+                                                                            "GetValue1",
+                                                                            "sawROSExample/get_value_1");
 
-    bridge.AddPublisherFromCommandRead<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
-                                                                               "GetValue2",
-                                                                               "sawROSExample/get_value_2");
+    bridge.AddPublisherFromCommandRead<vctDoubleVec, cisst_msgs::DoubleVec>("required",
+                                                                            "GetValue2",
+                                                                            "sawROSExample/get_value_2");
 
-    bridge.AddSubscriberToCommandWrite<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
-                                                                               "SetValue1",
-                                                                               "sawROSExample/set_value_1");
+    bridge.AddSubscriberToCommandWrite<vctDoubleVec, cisst_msgs::DoubleVec>("required",
+                                                                            "SetValue1",
+                                                                            "sawROSExample/set_value_1");
 
-    bridge.AddSubscriberToCommandWrite<vctDoubleVec, cisst_msgs::vctDoubleVec>("required",
-                                                                               "SetValue2",
-                                                                               "sawROSExample/set_value_2");
+    bridge.AddSubscriberToCommandWrite<vctDoubleVec, cisst_msgs::DoubleVec>("required",
+                                                                            "SetValue2",
+                                                                            "sawROSExample/set_value_2");
 
     bridge.AddPublisherFromCommandWrite<double, std_msgs::Float32>("provided",
                                                                    "SumOfElements1",
@@ -151,17 +151,17 @@ int main(int argc, char **argv)
                                        "ValueChanged2",
                                        "sawROSExample/value_changed_2");
 
-    bridge.AddSubscriberToEventWrite<vctDoubleVec, cisst_msgs::vctDoubleVec>("provided",
-                                                                             "EventValue1",
-                                                                             "sawROSExample/set_value_1_event");
+    bridge.AddSubscriberToEventWrite<vctDoubleVec, cisst_msgs::DoubleVec>("provided",
+                                                                          "EventValue1",
+                                                                          "sawROSExample/set_value_1_event");
 
     bridge.AddSubscriberToEventVoid("provided",
                                     "EventReset",
                                     "sawROSExample/reset_event");
 
-    bridge.AddSubscriberToCommandRead<vctDoubleVec, cisst_msgs::vctDoubleVec>("provided",
-                                                                              "GetValue3",
-                                                                              "sawROSExample/set_value_3");
+    bridge.AddSubscriberToCommandRead<vctDoubleVec, cisst_msgs::DoubleVec>("provided",
+                                                                           "GetValue3",
+                                                                           "sawROSExample/set_value_3");
 
     manager->AddComponent(&bridge);
 

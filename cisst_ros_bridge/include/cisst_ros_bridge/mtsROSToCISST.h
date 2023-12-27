@@ -62,9 +62,8 @@ http://www.cisst.org/cisst/license.txt.
 #include <diagnostic_msgs/KeyValue.h>
 
 // non standard messages
-#include <cisst_msgs/vctDoubleVec.h>
-#include <cisst_msgs/mtsIntervalStatistics.h>
-#include <cisst_msgs/prmCartesianImpedanceGains.h>
+#include <cisst_msgs/DoubleVec.h>
+#include <cisst_msgs/IntervalStatistics.h>
 #include <cisst_msgs/ConvertFloat64Array.h>
 
 namespace mts_ros_to_cisst {
@@ -261,9 +260,9 @@ void mtsROSToCISST(const sensor_msgs::Joy & rosData, prmInputData & cisstData);
 void mtsROSToCISST(const diagnostic_msgs::KeyValue & rosData, prmKeyValue & cisstData);
 
 // cisst_msgs
-void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, prmPositionJointSet & cisstData);
-void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & cisstData);
-void mtsROSToCISST(const cisst_msgs::mtsIntervalStatistics & rosData, mtsIntervalStatistics & cisstData);
+void mtsROSToCISST(const cisst_msgs::DoubleVec & rosData, prmPositionJointSet & cisstData);
+void mtsROSToCISST(const cisst_msgs::DoubleVec & rosData, vctDoubleVec & cisstData);
+void mtsROSToCISST(const cisst_msgs::IntervalStatistics & rosData, mtsIntervalStatistics & cisstData);
 void mtsROSToCISST(const cisst_msgs::ConvertFloat64Array::Request & rosData,
                    vctDoubleVec & cisstData);
 
