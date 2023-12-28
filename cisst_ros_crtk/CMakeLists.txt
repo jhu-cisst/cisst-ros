@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.1)
-project(cisst_ros_crtk VERSION 2.1.0)
+cmake_minimum_required(VERSION 3.10)
+project(cisst_ros_crtk VERSION 2.2.0)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -29,7 +29,7 @@ set(REQUIRED_CISST_LIBRARIES
   )
 
 # find cisst and make sure the required libraries have been compiled
-find_package(cisst 1.2.0 REQUIRED ${REQUIRED_CISST_LIBRARIES})
+find_package(cisst 1.2.1 REQUIRED ${REQUIRED_CISST_LIBRARIES})
 include(${CISST_USE_FILE})
 
 catkin_package(

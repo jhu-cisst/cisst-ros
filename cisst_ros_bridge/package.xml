@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>cisst_ros_bridge</name>
-  <version>2.1.0</version>
+  <version>2.2.0</version>
   <description>The cisst_ros_bridge package</description>
 
   <maintainer email="anton.deguet@jhu.edu">Zihan Chen</maintainer>
