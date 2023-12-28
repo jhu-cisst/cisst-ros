@@ -527,7 +527,7 @@ protected:
 
   mtsROSBridge bridge("publisher", 5.0 * cmn_ms);
   bridge.AddPublisherFromCommandRead
-  <vctDoubleVec, cisst_msgs::vctDoubleVec>
+  <vctDoubleVec, cisst_msgs::DoubleVec>
   ("required",
   "GetValue1",
   "/sawROSExample/get_value_1");
