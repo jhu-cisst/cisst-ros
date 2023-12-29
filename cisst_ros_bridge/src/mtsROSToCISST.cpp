@@ -328,7 +328,7 @@ void mtsROSToCISST(const diagnostic_msgs::KeyValue & rosData, prmKeyValue & ciss
     cisstData.Value = rosData.value;
 }
 
-void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, prmPositionJointSet & cisstData)
+void mtsROSToCISST(const cisst_msgs::DoubleVec & rosData, prmPositionJointSet & cisstData)
 {
     const size_t size = rosData.data.size();
     cisstData.Goal().resize(size);
@@ -337,7 +337,7 @@ void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, prmPositionJointSet
     }
 }
 
-void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & cisstData)
+void mtsROSToCISST(const cisst_msgs::DoubleVec & rosData, vctDoubleVec & cisstData)
 {
     const size_t size = rosData.data.size();
     cisstData.resize(size);
@@ -346,19 +346,19 @@ void mtsROSToCISST(const cisst_msgs::vctDoubleVec & rosData, vctDoubleVec & ciss
     }
 }
 
-void mtsROSToCISST(const cisst_msgs::mtsIntervalStatistics & rosData, mtsIntervalStatistics & cisstData)
+void mtsROSToCISST(const cisst_msgs::IntervalStatistics & rosData, mtsIntervalStatistics & cisstData)
 {
-    cisstData.SetFromExisting(rosData.PeriodAvg,
-                              rosData.PeriodStdDev,
-                              rosData.PeriodMin,
-                              rosData.PeriodMax,
-                              rosData.ComputeTimeAvg,
-                              rosData.ComputeTimeStdDev,
-                              rosData.ComputeTimeMin,
-                              rosData.ComputeTimeMax,
-                              rosData.NumberOfSamples,
-                              rosData.NumberOfOverruns,
-                              rosData.StatisticsInterval);
+    cisstData.SetFromExisting(rosData.period_avg,
+                              rosData.period_std_dev,
+                              rosData.period_min,
+                              rosData.period_max,
+                              rosData.compute_time_avg,
+                              rosData.compute_time_std_dev,
+                              rosData.compute_time_min,
+                              rosData.compute_time_max,
+                              rosData.number_of_samples,
+                              rosData.number_of_overruns,
+                              rosData.statistics_interval);
 }
 
 void mtsROSToCISST(const cisst_msgs::ConvertFloat64Array::Request & rosData,
@@ -368,4 +368,3 @@ void mtsROSToCISST(const cisst_msgs::ConvertFloat64Array::Request & rosData,
     std::copy(rosData.input.begin(), rosData.input.end(),
               cisstData.begin());
 }
-

@@ -1,6 +1,18 @@
 Change log
 ==========
 
+2.2.0 (2023-12-29)
+==================
+
+* API changes:
+  * :warning: cisst messages using snake case renamed to use case to match ROS2 (e.g. `vecDoubleVec` is now `DoubleVec`)
+* Deprecated features:
+  * None
+* New features:
+  * None
+* Bug fixes:
+  * None
+
 2.1.0 (2023-11-21)
 ==================
 

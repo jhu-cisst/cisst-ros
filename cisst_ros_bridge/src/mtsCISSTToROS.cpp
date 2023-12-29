@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2022 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2023 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -570,7 +570,7 @@ void mtsCISSTToROS(const std::string & cisstData, std_srvs::Trigger::Response & 
 // ---------------------------------------------
 // cisst_msgs
 // ---------------------------------------------
-void mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::vctDoubleVec & rosData,
+void mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::DoubleVec & rosData,
                    const std::string &)
 {
     const size_t size = cisstData.Position().size();
@@ -580,7 +580,7 @@ void mtsCISSTToROS(const prmPositionJointGet & cisstData, cisst_msgs::vctDoubleV
     }
 }
 
-void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & rosData,
+void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::DoubleVec & rosData,
                    const std::string &)
 {
     const size_t size = cisstData.size();
@@ -591,20 +591,20 @@ void mtsCISSTToROS(const vctDoubleVec & cisstData, cisst_msgs::vctDoubleVec & ro
 }
 
 void mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
-                   cisst_msgs::mtsIntervalStatistics & rosData,
+                   cisst_msgs::IntervalStatistics & rosData,
                    const std::string &)
 {
-    rosData.PeriodAvg = cisstData.PeriodAvg();
-    rosData.PeriodStdDev = cisstData.PeriodStdDev();
-    rosData.PeriodMin = cisstData.PeriodMin();
-    rosData.PeriodMax = cisstData.PeriodMax();
-    rosData.ComputeTimeAvg = cisstData.ComputeTimeAvg();
-    rosData.ComputeTimeStdDev = cisstData.ComputeTimeStdDev();
-    rosData.ComputeTimeMin = cisstData.ComputeTimeMin();
-    rosData.ComputeTimeMax = cisstData.ComputeTimeMax();
-    rosData.NumberOfSamples = cisstData.NumberOfSamples();
-    rosData.NumberOfOverruns = cisstData.NumberOfOverruns();
-    rosData.StatisticsInterval = cisstData.StatisticsInterval();
+    rosData.period_avg = cisstData.PeriodAvg();
+    rosData.period_std_dev = cisstData.PeriodStdDev();
+    rosData.period_min = cisstData.PeriodMin();
+    rosData.period_max = cisstData.PeriodMax();
+    rosData.compute_time_avg = cisstData.ComputeTimeAvg();
+    rosData.compute_time_std_dev = cisstData.ComputeTimeStdDev();
+    rosData.compute_time_min = cisstData.ComputeTimeMin();
+    rosData.compute_time_max = cisstData.ComputeTimeMax();
+    rosData.number_of_samples = cisstData.NumberOfSamples();
+    rosData.number_of_overruns = cisstData.NumberOfOverruns();
+    rosData.statistics_interval = cisstData.StatisticsInterval();
 }
 
 void mtsCISSTToROS(const vctDoubleVec & cisstData,

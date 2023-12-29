@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2020 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2023 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -115,7 +115,7 @@ void mtsROSBridge::AddIntervalStatisticsPublisher(const std::string & rosNamespa
 {
     // create an publisher to publish this component interval statistics
     std::string topicName = rosNamespace + "/period_statistics";
-    this->AddPublisherFromCommandRead<mtsIntervalStatistics, cisst_msgs::mtsIntervalStatistics>
+    this->AddPublisherFromCommandRead<mtsIntervalStatistics, cisst_msgs::IntervalStatistics>
         (componentName + interfaceName, "period_statistics",
          topicName);
 

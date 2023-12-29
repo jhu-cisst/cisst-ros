@@ -67,8 +67,8 @@ http://www.cisst.org/cisst/license.txt.
 #include <std_srvs/Trigger.h>
 
 // non standard messages
-#include <cisst_msgs/vctDoubleVec.h>
-#include <cisst_msgs/mtsIntervalStatistics.h>
+#include <cisst_msgs/DoubleVec.h>
+#include <cisst_msgs/IntervalStatistics.h>
 #include <cisst_msgs/BoolStamped.h>
 #include <cisst_msgs/ConvertFloat64Array.h>
 
@@ -315,13 +315,13 @@ void mtsCISSTToROS(const std::string & cisstData,
 
 // cisst_msgs
 void mtsCISSTToROS(const prmPositionJointGet & cisstData,
-                   cisst_msgs::vctDoubleVec & rosData,
+                   cisst_msgs::DoubleVec & rosData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const vctDoubleVec & cisstData,
-                   cisst_msgs::vctDoubleVec & rosData,
+                   cisst_msgs::DoubleVec & rosData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
-                   cisst_msgs::mtsIntervalStatistics & rosData,
+                   cisst_msgs::IntervalStatistics & rosData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const vctDoubleVec & cisstData,
                    cisst_msgs::ConvertFloat64Array::Response & rosData,
