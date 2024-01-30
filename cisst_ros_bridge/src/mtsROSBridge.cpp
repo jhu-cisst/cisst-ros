@@ -19,7 +19,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstMultiTask/mtsInterfaceRequired.h>
 #include <cisstMultiTask/mtsInterfaceProvided.h>
 #include <signal.h>   // ROS only supports Linux
-#include "cisst_ros_bridge/mtsROSBridge.h"
+#include <cisst_ros_bridge/mtsROSBridge.h>
 
 CMN_IMPLEMENT_SERVICES(mtsROSBridge);
 
@@ -218,16 +218,14 @@ bool mtsROSBridge::AddLogFromEventWrite(const std::string & interfaceRequiredNam
     }
 
     mtsROSEventWriteLog * newPublisher = new mtsROSEventWriteLog(level);
-    if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWriteLog::EventHandler, newPublisher, eventName))
-        {
-            ROS_ERROR("mtsROSBridge::AddLogFromEventWrite: failed to add event handler to required interface.");
-            CMN_LOG_CLASS_INIT_ERROR << "AddLogFromEventWrite: failed to add event handler for \""
-                                     << eventName << "\" to required interface \""
-                                     << interfaceRequiredName << "\"" << std::endl;
-
-            delete newPublisher;
-            return false;
-        }
+    if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWriteLog::EventHandler, newPublisher, eventName)) {
+        ROS_ERROR("mtsROSBridge::AddLogFromEventWrite: failed to add event handler to required interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "AddLogFromEventWrite: failed to add event handler for \""
+                                 << eventName << "\" to required interface \""
+                                 << interfaceRequiredName << "\"" << std::endl;
+        delete newPublisher;
+        return false;
+    }
     Publishers.push_back(newPublisher);
     return true;
 }

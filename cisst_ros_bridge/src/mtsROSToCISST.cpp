@@ -17,7 +17,7 @@ http://www.cisst.org/cisst/license.txt.
 
 */
 
-#include "cisst_ros_bridge/mtsROSToCISST.h"
+#include <cisst_ros_bridge/mtsROSToCISST.h>
 
 void mtsROSToCISST(const std_msgs::Float32 & rosData, double & cisstData)
 {
@@ -236,7 +236,6 @@ void mtsROSToCISST(const geometry_msgs::Twist & rosData, prmVelocityCartesianSet
 
 void mtsROSToCISST(const geometry_msgs::TwistStamped & rosData, prmVelocityCartesianSet & cisstData)
 {
-    cisstData.SetTimestamp(rosData.header.stamp.toSec());
     mtsROSToCISST(rosData.twist, cisstData);
 }
 
@@ -248,7 +247,6 @@ void mtsROSToCISST(const geometry_msgs::Twist & rosData, prmVelocityCartesianGet
 
 void mtsROSToCISST(const geometry_msgs::TwistStamped & rosData, prmVelocityCartesianGet & cisstData)
 {
-    cisstData.SetTimestamp(rosData.header.stamp.toSec());
     mtsROSToCISST(rosData.twist, cisstData);
 }
 
@@ -361,8 +359,7 @@ void mtsROSToCISST(const cisst_msgs::IntervalStatistics & rosData, mtsIntervalSt
                               rosData.statistics_interval);
 }
 
-void mtsROSToCISST(const cisst_msgs::ConvertFloat64Array::Request & rosData,
-                   vctDoubleVec & cisstData)
+void mtsROSToCISST(const cisst_msgs::ConvertFloat64Array::Request & rosData, vctDoubleVec & cisstData)
 {
     cisstData.SetSize(rosData.input.size());
     std::copy(rosData.input.begin(), rosData.input.end(),

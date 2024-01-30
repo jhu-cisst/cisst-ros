@@ -1,3 +1,3 @@
 # A Pose with reference coordinate frame and timestamp
-Header header
+std_msgs/Header header
 bool data

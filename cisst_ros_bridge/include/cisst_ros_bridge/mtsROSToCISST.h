@@ -37,6 +37,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmForceTorqueJointSet.h>
 #include <cisstParameterTypes/prmForceCartesianGet.h>
 #include <cisstParameterTypes/prmForceCartesianSet.h>
+#include <cisstParameterTypes/prmVelocityCartesianGet.h>
 #include <cisstParameterTypes/prmVelocityJointSet.h>
 #include <cisstParameterTypes/prmVelocityCartesianGet.h>
 #include <cisstParameterTypes/prmVelocityCartesianSet.h>
@@ -76,7 +77,8 @@ namespace mts_ros_to_cisst {
     // -0- ROS has no header, cisst has nothing
 
     template <typename _rosType, typename _cisstType>
-    void ros_header_to_cisst_header(const _rosType & rosData, _cisstType & cisstData)
+    void ros_header_to_cisst_header(const _rosType & rosData,
+                                    _cisstType & cisstData)
     {
         const double cisstNow = mtsManagerLocal::GetInstance()->GetTimeServer().GetRelativeTime();
         // first check that header.stamp is not zero
@@ -208,6 +210,7 @@ void mtsROSPoseToCISST(const geometry_msgs::Pose & rosPose, _cisstFrame & cisstF
     cisstFrame.Rotation().Assign(rotation);
 }
 
+
 // std_msgs
 void mtsROSToCISST(const std_msgs::Float32 & rosData, double & cisstData);
 void mtsROSToCISST(const std_msgs::Float64 & rosData, double & cisstData);
@@ -263,7 +266,6 @@ void mtsROSToCISST(const diagnostic_msgs::KeyValue & rosData, prmKeyValue & ciss
 void mtsROSToCISST(const cisst_msgs::DoubleVec & rosData, prmPositionJointSet & cisstData);
 void mtsROSToCISST(const cisst_msgs::DoubleVec & rosData, vctDoubleVec & cisstData);
 void mtsROSToCISST(const cisst_msgs::IntervalStatistics & rosData, mtsIntervalStatistics & cisstData);
-void mtsROSToCISST(const cisst_msgs::ConvertFloat64Array::Request & rosData,
-                   vctDoubleVec & cisstData);
+void mtsROSToCISST(const cisst_msgs::ConvertFloat64Array::Request & rosData, vctDoubleVec & cisstData);
 
 #endif // _mtsROSToCISST_h
