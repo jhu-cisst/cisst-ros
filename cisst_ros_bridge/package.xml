@@ -1,41 +1,34 @@
 <?xml version="1.0"?>
-<package>
+<package format="3">
   <name>cisst_ros_bridge</name>
   <version>2.2.0</version>
   <description>The cisst_ros_bridge package</description>
-
-  <maintainer email="anton.deguet@jhu.edu">Zihan Chen</maintainer>
   <license>CISST</license>
-
   <author email="anton.deguet@jhu.edu">Anton Deguet</author>
+  <maintainer email="anton.deguet@jhu.edu">Zihan Chen</maintainer>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>roscpp</build_depend>
-  <build_depend>tf2_ros</build_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>diagnostic_msgs</build_depend>
-  <build_depend>cisst_msgs</build_depend>
-  <build_depend>cisst</build_depend>
+  <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+  <build_depend condition="$ROS_VERSION == 1">roscpp</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">tf2_ros</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">rospy</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">std_msgs</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">geometry_msgs</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">sensor_msgs</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">diagnostic_msgs</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">cisst_msgs</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">cisst</build_depend>
 
-  <run_depend>roscpp</run_depend>
-  <run_depend>tf2_ros</run_depend>
-  <run_depend>rospy</run_depend>
-  <run_depend>std_msgs</run_depend>
-  <run_depend>geometry_msgs</run_depend>
-  <run_depend>sensor_msgs</run_depend>
-  <run_depend>diagnostic_msgs</run_depend>
-  <run_depend>cisst_msgs</run_depend>
-  <run_depend>cisst</run_depend>
+  <exec_depend condition="$ROS_VERSION == 1">roscpp</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">tf2_ros</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">rospy</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">std_msgs</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">geometry_msgs</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">sensor_msgs</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">diagnostic_msgs</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">cisst_msgs</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">cisst</exec_depend>
 
-  <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <!-- You can specify that this package is a metapackage here: -->
-    <!-- <metapackage/> -->
-
-    <!-- Other tools can request additional information be placed here -->
-
+    <build_type condition="$ROS_VERSION == 2">ament_cmake</build_type>
   </export>
 </package>
