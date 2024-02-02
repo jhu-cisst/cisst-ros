@@ -18,7 +18,6 @@ find_package (catkin QUIET
 
 # ROS 1
 if (catkin_FOUND)
-  add_definitions (-DROS1)
   set (ROS_VERSION 1)
   include_directories (${catkin_INCLUDE_DIRS})
   catkin_package (
@@ -32,7 +31,6 @@ else (catkin_FOUND)
   # look for ROS2
   find_package (ament_cmake QUIET)
   if (ament_cmake_FOUND)
-    add_definitions (-DROS2)
     set (ROS_VERSION 2)
     set (ROS2_depends
       rclcpp
@@ -96,7 +94,7 @@ if (cisst_FOUND_AS_REQUIRED)
       RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
       )
 
-    install (DIRECTORY include/${PROJECT_NAME}/
+    install (DIRECTORY include/${PROJECT_NAME}
       DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
       )
   endif (ROS_VERSION EQUAL 1)

@@ -25,6 +25,8 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstMultiTask/mtsInterfaceProvided.h>
 
 // ros include
+#include <cisst_ros_bridge/cisst_ral.h>
+
 #if ROS1
 #include <ros/ros.h>
 #include <tf2_ros/transform_broadcaster.h>

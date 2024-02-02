@@ -16,11 +16,12 @@ find_package (catkin QUIET
 
 # ROS 1
 if (catkin_FOUND)
-  add_definitions (-DROS1)
+  set (ROS1 1)
+  set (ROS2 0)
   set (ROS_VERSION 1)
   include_directories (${catkin_INCLUDE_DIRS})
   catkin_package (
-    INCLUDE_DIRS include
+    INCLUDE_DIRS include ${cisst_ros_bridge_BINARY_DIR}/include
     LIBRARIES cisst_ros_bridge
     CATKIN_DEPENDS ${ROS1_depends}
     )
@@ -30,7 +31,8 @@ else (catkin_FOUND)
   # look for ROS2
   find_package (ament_cmake QUIET)
   if (ament_cmake_FOUND)
-    add_definitions (-DROS2)
+    set (ROS1 0)
+    set (ROS2 1)
     set (ROS_VERSION 2)
     set (ROS2_depends
       rclcpp
@@ -62,7 +64,12 @@ find_package (cisst 1.2.0 REQUIRED ${REQUIRED_CISST_LIBRARIES})
 if (cisst_FOUND_AS_REQUIRED)
 
   include (${CISST_USE_FILE})
-  include_directories (BEFORE include)
+
+  # configure header file
+  configure_file (${cisst_ros_bridge_SOURCE_DIR}/src/cisst_ral_config.h.in
+    ${cisst_ros_bridge_BINARY_DIR}/include/cisst_ros_bridge/cisst_ral_config.h)
+
+  include_directories (BEFORE include ${cisst_ros_bridge_BINARY_DIR}/include)
 
   # header
   set (HEADER_FILES
@@ -95,7 +102,11 @@ if (cisst_FOUND_AS_REQUIRED)
       RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
       )
 
-    install (DIRECTORY include/${PROJECT_NAME}/
+    install (DIRECTORY include/${PROJECT_NAME}
+      DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+      )
+
+    install (DIRECTORY ${cisst_ros_bridge_BINARY_DIR}/include/${PROJECT_NAME}
       DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
       )
   endif (ROS_VERSION EQUAL 1)
@@ -114,6 +125,10 @@ if (cisst_FOUND_AS_REQUIRED)
       )
 
     install (DIRECTORY include/${PROJECT_NAME}
+      DESTINATION include
+      )
+
+    install (DIRECTORY ${cisst_ros_bridge_BINARY_DIR}/include/${PROJECT_NAME}
       DESTINATION include
       )
 

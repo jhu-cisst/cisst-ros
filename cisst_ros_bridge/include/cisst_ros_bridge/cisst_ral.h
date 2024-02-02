@@ -23,6 +23,8 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstCommon/cmnPortability.h>
 #include <cisstCommon/cmnStrings.h>
 
+#include <cisst_ros_bridge/cisst_ral_config.h>
+
 // ros includes
 #if ROS1
 

@@ -1,0 +1,4 @@
+{
+  "name": "cisst_ros_crtk",
+  "dependencies": ["cisst_ros_bridge", "crtk_msgs"]
+}
