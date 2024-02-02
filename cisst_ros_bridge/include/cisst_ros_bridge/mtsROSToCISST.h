@@ -14,7 +14,6 @@ no warranty.  The complete license can be found in license.txt and
 http://www.cisst.org/cisst/license.txt.
 
 --- end cisst license ---
-
 */
 
 #ifndef _mtsROSToCISST_h
@@ -112,7 +111,7 @@ namespace mts_ros_to_cisst {
         if (cisst_ral::time_is_zero(rosData.header.stamp)) {
             cisstData.SetTimestamp(cisstNow);
         } else {
-            const double ageInSeconds = cisst_ral::age_in_seconds(node, rosData.header.stamp);
+            const double ageInSeconds = cisst_ral::age_in_seconds(rosData.header.stamp, node);
             if (ageInSeconds > 0.0) {
                 cisstData.SetTimestamp(cisstNow - ageInSeconds);
             } else {

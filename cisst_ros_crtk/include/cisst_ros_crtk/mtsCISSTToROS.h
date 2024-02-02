@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2023 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2024 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -24,31 +24,42 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmForwardKinematicsResponse.h>
 #include <cisstParameterTypes/prmInverseKinematicsResponse.h>
 
+// ral
+#include <cisst_ros_bridge/cisst_ral.h>
+
 // crtk
+#if ROS1
 #include <crtk_msgs/OperatingState.h>
 #include <crtk_msgs/StringStamped.h>
 #include <crtk_msgs/TriggerOperatingState.h>
 #include <crtk_msgs/QueryForwardKinematics.h>
 #include <crtk_msgs/QueryInverseKinematics.h>
+#elif ROS2
+#include <crtk_msgs/msg/operating_state.hpp>
+#include <crtk_msgs/msg/string_stamped.hpp>
+#include <crtk_msgs/srv/trigger_operating_state.hpp>
+#include <crtk_msgs/srv/query_forward_kinematics.hpp>
+#include <crtk_msgs/srv/query_inverse_kinematics.hpp>
+#endif
 
 // crtk_msgs
 void mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::OperatingState & rosData,
+                   CISST_RAL_MSG(crtk_msgs, OperatingState) & rosData,
                    const std::string & debugInfo);
 
 void mtsCISSTToROS(const std::string & cisstData,
-                   crtk_msgs::StringStamped & rosData,
+                   CISST_RAL_MSG(crtk_msgs, StringStamped) & rosData,
                    const std::string & debugInfo);
 
 // crtk_srvs
 void mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::TriggerOperatingState::Response & rosData,
+                   CISST_RAL_SRV_RES(crtk_msgs, TriggerOperatingState) & rosData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const prmForwardKinematicsResponse & cisstData,
-                   crtk_msgs::QueryForwardKinematics::Response & rosData,
+                   CISST_RAL_SRV_RES(crtk_msgs, QueryForwardKinematics) & rosData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const prmInverseKinematicsResponse & cisstData,
-                   crtk_msgs::QueryInverseKinematics::Response & rosData,
+                   CISST_RAL_SRV_RES(crtk_msgs, QueryInverseKinematics) & rosData,
                    const std::string & debugInfo);
 
 #endif // _mtsCISSTToROS_CRTK_h

@@ -21,6 +21,7 @@ http://www.cisst.org/cisst/license.txt.
 #define _cisst_ral_h
 
 #include <cisstCommon/cmnPortability.h>
+#include <cisstCommon/cmnStrings.h>
 
 // ros includes
 #if ROS1
@@ -34,6 +35,7 @@ http://www.cisst.org/cisst/license.txt.
 #define CISST_RAL_FATAL(...) ROS_FATAL(__VA_ARGS__)
 
 #define CISST_RAL_MSG(package, message) package::message
+#define CISST_RAL_SRV(package, service) package::service
 #define CISST_RAL_SRV_REQ(package, service) package::service::Request
 #define CISST_RAL_SRV_RES(package, service) package::service::Response
 
@@ -104,6 +106,7 @@ namespace cisst_ral {
 #define CISST_RAL_FATAL(...) RCLCPP_FATAL(rclcpp::get_logger("rclcpp"), __VA_ARGS__)
 
 #define CISST_RAL_MSG(package, message) package::msg::message
+#define CISST_RAL_SRV(package, service) package::srv::service
 #define CISST_RAL_SRV_REQ(package, service) package::srv::service::Request
 #define CISST_RAL_SRV_RES(package, service) package::srv::service::Response
 
@@ -169,10 +172,26 @@ namespace cisst_ral {
 #endif
 
 namespace cisst_ral {
+
+    inline void clean_namespace(std::string & _ros_namespace) {
+#if ROS1
+        _ros_namespace = ros::names::clean(_ros_namespace);
+#endif
+        cmnStringReplaceAll(_ros_namespace, "//", "/");
+        std::replace(_ros_namespace.begin(), _ros_namespace.end(), ' ', '_');
+        std::replace(_ros_namespace.begin(), _ros_namespace.end(), '-', '_');
+        std::replace(_ros_namespace.begin(), _ros_namespace.end(), '.', '_');
+        std::replace(_ros_namespace.begin(), _ros_namespace.end(), '(', '_');
+        std::replace(_ros_namespace.begin(), _ros_namespace.end(), ')', '_');
+        std::replace(_ros_namespace.begin(), _ros_namespace.end(), '[', '_');
+        std::replace(_ros_namespace.begin(), _ros_namespace.end(), ']', '_');
+    }
+
     class ral
     {
     public:
         ral(int argc, char * argv[], const std::string & node_name, bool anonymous_name = true);
+        ral(const std::string & node_name, bool anonymous_name = true);
         ~ral();
 
         inline node_ptr_t node(void) {
@@ -185,6 +204,7 @@ namespace cisst_ral {
         }
 
     protected:
+        void init(int argc,  char * argv[], const std::string & node_name, bool anonymous_name);
         std::string m_node_name;
         node_ptr_t m_node;
         stripped_arguments_t m_stripped_arguments;

@@ -14,7 +14,6 @@ no warranty.  The complete license can be found in license.txt and
 http://www.cisst.org/cisst/license.txt.
 
 --- end cisst license ---
-
 */
 
 #ifndef _mtsROSBridge_h
@@ -173,7 +172,7 @@ public:
         if ((cisst_ral::nb_subscribers(m_publisher) == 0) && !m_latched) {
             return;
         }
-        if (mts_cisst_to_ros::header(cisst_data, m_ros_data, m_name)) {
+        if (mts_cisst_to_ros::header(cisst_data, m_ros_data, m_node, m_name)) {
             mtsCISSTToROS(cisst_data, m_ros_data, m_name);
             m_publisher->publish(m_ros_data);
         }
@@ -526,7 +525,7 @@ public:
     mtsROSCommandReadService(const std::string name,
                              cisst_ral::node_ptr_t node):
         m_name(name),
-        m_node(name)
+        m_node(node)
     {
 #if ROS1
         m_service_server = m_node->advertiseService(m_name,
@@ -540,12 +539,13 @@ public:
                                                            std::placeholders::_2));
 #endif
     }
+#if ROS1
     bool Callback(typename _ros_service_t::Request & CMN_UNUSED(request),
                   typename _ros_service_t::Response & response) {
         mtsExecutionResult result = m_function(m_cisst_response);
         if (result) {
             if (mts_cisst_to_ros::header(m_cisst_response, response, m_node, m_name)) {
-                mtsCISSTToROS(m_cisst_response, response, m_node, m_name);
+                mtsCISSTToROS(m_cisst_response, response, m_name);
                 return true;
             }
         } else {
@@ -555,6 +555,23 @@ public:
         }
         return false;
     }
+#elif ROS2
+    bool Callback(const std::shared_ptr<typename _ros_service_t::Request> CMN_UNUSED(request),
+                  std::shared_ptr<typename _ros_service_t::Response> response) {
+        mtsExecutionResult result = m_function(m_cisst_response);
+        if (result) {
+            if (mts_cisst_to_ros::header(m_cisst_response, *response, m_node, m_name)) {
+                mtsCISSTToROS(m_cisst_response, *response, m_name);
+                return true;
+            }
+        } else {
+            CISST_RAL_ERROR("mtsROSCommandReadService::Callback: mtsFunction call failed");
+            CMN_LOG_RUN_ERROR << "mtsROSCommandReadService::Callback: " << result
+                              << " for " << m_name << std::endl;
+        }
+        return false;
+    }
+#endif
 
 protected:
     std::string m_name;
@@ -598,6 +615,7 @@ public:
                                                            std::placeholders::_2));
 #endif
     }
+#if ROS1
     bool Callback(typename _ros_service_t::Request & ros_request,
                   typename _ros_service_t::Response & ros_response) {
         mts_ros_to_cisst::header(ros_request, m_cisst_request, m_node);
@@ -610,12 +628,31 @@ public:
             }
         } else {
             CISST_RAL_ERROR("mtsROSCommandQualifiedReadService::Callback: mtsFunction call failed");
-            CMN_LOG_RUN_ERROR << "mtsROSCommandReadService::Callback: " << result
+            CMN_LOG_RUN_ERROR << "mtsROSCommandQualifiedReadService::Callback: " << result
                               << " for " << m_name << std::endl;
         }
         return false;
     }
-
+#elif ROS2
+    bool Callback(const std::shared_ptr<typename _ros_service_t::Request> request,
+                  std::shared_ptr<typename _ros_service_t::Response> response) {
+         mts_ros_to_cisst::header(*request, m_cisst_request, m_node);
+        mtsROSToCISST(*request, m_cisst_request);
+        mtsExecutionResult result = m_function(m_cisst_request, m_cisst_response);
+        if (result) {
+            if (mts_cisst_to_ros::header(m_cisst_response, *response, m_node, m_name)) {
+                mtsCISSTToROS(m_cisst_response, *response, m_name);
+                return true;
+            }
+        } else {
+            CISST_RAL_ERROR("mtsROSCommandQualifedReadService::Callback: mtsFunction call failed");
+            CMN_LOG_RUN_ERROR << "mtsROSCommandQualifiedReadService::Callback: " << result
+                              << " for " << m_name << std::endl;
+        }
+        return false;
+    }
+#endif
+    
 protected:
     std::string m_name;
     cisst_ral::node_ptr_t m_node;
@@ -1044,7 +1081,7 @@ bool mtsROSBridge::AddPublisherFromEventWrite(const std::string & interface_requ
     }
 
     mtsROSEventWritePublisher<_cisst_t, _ros_t> * new_pub
-        = new mtsROSEventWritePublisher<_cisst_t, _ros_t>(name, *(this->m_node), queue_size, latched);
+        = new mtsROSEventWritePublisher<_cisst_t, _ros_t>(name, m_node, queue_size, latched);
     if (!interfaceRequired->AddEventHandlerWrite(&mtsROSEventWritePublisher<_cisst_t, _ros_t>::EventHandler,
                                                  new_pub, event)) {
         CISST_RAL_ERROR("mtsROSBridge::AddPublisherFromEventWrite: failed to add event handler to required interface.");
@@ -1162,7 +1199,7 @@ bool mtsROSBridge::AddServiceFromCommandRead(const std::string & interface_requi
 
     typedef mtsROSCommandReadService<_cisst_response_t, _ros_service_t> serviceType;
     serviceType * newService
-        = new serviceType(serviceName, *(this->m_node));
+        = new serviceType(serviceName, m_node);
 
     if (!interfaceRequired->AddFunction(function, newService->m_function)) {
         CISST_RAL_ERROR("mtsROSBridge::AddServiceFromCommandRead: failed to create function.");
@@ -1193,7 +1230,7 @@ bool mtsROSBridge::AddServiceFromCommandQualifiedRead(const std::string & interf
 
     typedef mtsROSCommandQualifiedReadService<_cisst_request_t, _cisst_response_t, _ros_service_t> serviceType;
     serviceType * newService
-        = new serviceType(serviceName, *(this->m_node));
+        = new serviceType(serviceName, m_node);
 
     if (!interfaceRequired->AddFunction(function, newService->m_function)) {
         CISST_RAL_ERROR("mtsROSBridge::AddServiceFromCommandQualifiedRead: failed to create function.");

@@ -14,7 +14,6 @@ no warranty.  The complete license can be found in license.txt and
 http://www.cisst.org/cisst/license.txt.
 
 --- end cisst license ---
-
 */
 
 #include <cisst_ros_bridge/cisst_ral.h>
@@ -23,22 +22,60 @@ http://www.cisst.org/cisst/license.txt.
 
 cisst_ral::ral::ral(int argc, char * argv[], const std::string & node_name, bool anonymous_name)
 {
+    init(argc, argv, node_name, anonymous_name);
+}
+
+cisst_ral::ral::ral(const std::string & node_name, bool anonymous_name)
+{
+    // create fake argc/argv
+    typedef char * char_pointer;
+    char_pointer * argv = new char_pointer[1];
+    argv[0]= new char[node_name.size() + 1];
+    strcpy(argv[0], node_name.c_str());
+    int argc = 1;
+    init(argc, argv, node_name, anonymous_name);
+}
+
+void cisst_ral::ral::init(int argc, char * argv[], const std::string & node_name, bool anonymous_name)
+{
     if (anonymous_name) {
         ros::init(argc, argv, node_name, ros::init_options::AnonymousName);
     } else {
         ros::init(argc, argv, node_name);
+    }
+    for (int i = 0; i < argc; ++i) {
+        m_stripped_arguments.push_back(argv[i]);
     }
     m_node = std::make_shared<ros::NodeHandle>();
 }
 
 cisst_ral::ral::~ral()
 {
-
 }
 
 #elif ROS2
 
-cisst_ral::ral::ral(int argc, char * argv[], const std::string & node_name, bool)
+cisst_ral::ral::ral(int argc, char * argv[], const std::string & node_name, bool anonymous_name)
+{
+    init(argc, argv, node_name, anonymous_name);
+}
+
+cisst_ral::ral::ral(const std::string & node_name, bool)
+{
+    if (!rclcpp::ok()) {
+        // create fake argc/argv
+        typedef char * char_pointer;
+        char_pointer * argv = new char_pointer[1];
+        argv[0]= new char[node_name.size() + 1];
+        strcpy(argv[0], node_name.c_str());
+        int argc = 1;
+        rclcpp::init(argc, argv);
+    }
+    m_node = std::make_shared<rclcpp::Node>(node_name);
+    m_stripped_arguments.push_back(node_name);
+}
+
+void cisst_ral::ral::init(int argc, char * argv[], const std::string & node_name, bool)
 {
     m_stripped_arguments = rclcpp::init_and_remove_ros_arguments(argc, argv);
     m_node = std::make_shared<rclcpp::Node>(node_name);
@@ -46,7 +83,6 @@ cisst_ral::ral::ral(int argc, char * argv[], const std::string & node_name, bool
 
 cisst_ral::ral::~ral()
 {
-
 }
 
 #endif

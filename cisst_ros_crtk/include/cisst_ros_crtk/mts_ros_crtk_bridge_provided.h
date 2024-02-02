@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2021 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2024 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -45,7 +45,7 @@ public:
       doesn't impact the ROS publish rates.  There is no reason to
       change the default for most applications. */
     mts_ros_crtk_bridge_provided(const std::string & _component_name,
-                                 ros::NodeHandle * _node_handle,
+                                 cisst_ral::node_ptr_t _node_handle,
                                  const double _period_in_seconds = 5.0 * cmn_ms);
     mts_ros_crtk_bridge_provided(const mtsTaskPeriodicConstructorArg & arg);
 
@@ -137,13 +137,13 @@ public:
         return *m_stats_bridge;
     }
 
-    inline ros::NodeHandle * node_handle_ptr(void) {
+    inline cisst_ral::node_ptr_t node_handle_ptr(void) {
         return m_node_handle_ptr;
     }
 
 protected:
     //! ros node
-    ros::NodeHandle * m_node_handle_ptr = nullptr;
+    cisst_ral::node_ptr_t m_node_handle_ptr = nullptr;
 
     mtsROSBridge * m_subscribers_bridge = nullptr;
     mtsROSBridge * m_events_bridge = nullptr;

@@ -164,8 +164,6 @@ void mtsCISSTToROS(const prmPositionCartesianGet & cisstData,
                    CISST_RAL_MSG(geometry_msgs, TransformStamped) & rosData,
                    const std::string &)
 {
-    rosData.header.frame_id = cisstData.ReferenceFrame();
-    rosData.child_frame_id = cisstData.MovingFrame();
     mtsCISSTToROSTransform(cisstData.Position(), rosData.transform);
 }
 
@@ -180,7 +178,6 @@ void mtsCISSTToROS(const prmPositionCartesianGet & cisstData,
                    CISST_RAL_MSG(geometry_msgs, PoseStamped) & rosData,
                    const std::string &)
 {
-    rosData.header.frame_id = cisstData.ReferenceFrame();
     mtsCISSTToROSPose(cisstData.Position(), rosData.pose);
 }
 
@@ -188,7 +185,6 @@ void mtsCISSTToROS(const prmPositionCartesianArrayGet & cisstData,
                    CISST_RAL_MSG(geometry_msgs, PoseArray) & rosData,
                    const std::string &)
 {
-    rosData.header.frame_id = cisstData.ReferenceFrame();
     typedef std::vector<vctFrm3>::const_iterator IteratorType;
     const IteratorType end = cisstData.Positions().end();
     IteratorType iter;
@@ -383,7 +379,6 @@ void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData,
                    CISST_RAL_MSG(geometry_msgs, TwistStamped) & rosData,
                    const std::string & debugInfo)
 {
-    rosData.header.frame_id = cisstData.MovingFrame();
     mtsCISSTToROS(cisstData, rosData.twist, debugInfo);
 }
 
@@ -398,7 +393,6 @@ void mtsCISSTToROS(const prmForceCartesianGet & cisstData,
                    CISST_RAL_MSG(geometry_msgs, WrenchStamped) & rosData,
                    const std::string & debugInfo)
 {
-    rosData.header.frame_id = cisstData.MovingFrame();
     mtsCISSTToROS(cisstData, rosData.wrench, debugInfo);
 }
 
