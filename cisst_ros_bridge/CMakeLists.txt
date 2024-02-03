@@ -19,9 +19,11 @@ if (catkin_FOUND)
   set (ROS1 1)
   set (ROS2 0)
   set (ROS_VERSION 1)
+  set (GENERATED_INCLUDE_DIR ${CATKIN_DEVEL_PREFIX}/include)
+  file (MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME})
   include_directories (${catkin_INCLUDE_DIRS})
   catkin_package (
-    INCLUDE_DIRS include ${cisst_ros_bridge_BINARY_DIR}/include
+    INCLUDE_DIRS include ${GENERATED_INCLUDE_DIR}
     LIBRARIES cisst_ros_bridge
     CATKIN_DEPENDS ${ROS1_depends}
     )
@@ -34,6 +36,7 @@ else (catkin_FOUND)
     set (ROS1 0)
     set (ROS2 1)
     set (ROS_VERSION 2)
+    set (GENERATED_INCLUDE_DIR ${cisst_ros_bridge_BINARY_DIR}/include)
     set (ROS2_depends
       rclcpp
       std_msgs
@@ -67,9 +70,9 @@ if (cisst_FOUND_AS_REQUIRED)
 
   # configure header file
   configure_file (${cisst_ros_bridge_SOURCE_DIR}/src/cisst_ral_config.h.in
-    ${cisst_ros_bridge_BINARY_DIR}/include/cisst_ros_bridge/cisst_ral_config.h)
+    ${GENERATED_INCLUDE_DIR}/cisst_ros_bridge/cisst_ral_config.h)
 
-  include_directories (BEFORE include ${cisst_ros_bridge_BINARY_DIR}/include)
+  include_directories (BEFORE include ${GENERATED_INCLUDE_DIR})
 
   # header
   set (HEADER_FILES
@@ -128,7 +131,7 @@ if (cisst_FOUND_AS_REQUIRED)
       DESTINATION include
       )
 
-    install (DIRECTORY ${cisst_ros_bridge_BINARY_DIR}/include/${PROJECT_NAME}
+    install (DIRECTORY ${GENERATED_INCLUDE_DIR}/${PROJECT_NAME}
       DESTINATION include
       )
 

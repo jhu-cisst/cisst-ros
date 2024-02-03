@@ -23,6 +23,8 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstCommon/cmnUnits.h>
 #include <cisstMultiTask/mtsTaskPeriodic.h>
 #include <cisstMultiTask/mtsDelayedConnections.h>
+
+#include <cisst_ros_bridge/cisst_ral.h>
 #include <cisst_ros_crtk/cisst_ros_crtk.h>
 
 #include <set>
