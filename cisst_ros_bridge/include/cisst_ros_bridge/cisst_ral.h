@@ -44,6 +44,10 @@ http://www.cisst.org/cisst/license.txt.
 namespace cisst_ral {
     typedef std::shared_ptr<ros::NodeHandle> node_ptr_t;
 
+    inline std::string node_namespace(node_ptr_t node) {
+        return node->getNamespace();
+    }
+
     inline bool time_is_zero(const ros::Time & time) {
         return time.isZero();
     }
@@ -114,6 +118,10 @@ namespace cisst_ral {
 
 namespace cisst_ral {
     typedef std::shared_ptr<rclcpp::Node> node_ptr_t;
+
+    inline std::string node_namespace(node_ptr_t node) {
+        return node->get_namespace();
+    }
 
     inline bool time_is_zero(const rclcpp::Time & time) {
         return ((time.seconds() == 0)
