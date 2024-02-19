@@ -20,7 +20,7 @@ http://www.cisst.org/cisst/license.txt.
 
 #if ROS1
 
-cisst_ral::ral::ral(int argc, char * argv[], const std::string & node_name, bool anonymous_name)
+cisst_ral::ral::ral(int & argc, char * argv[], const std::string & node_name, bool anonymous_name)
 {
     init(argc, argv, node_name, anonymous_name);
 }
@@ -36,7 +36,7 @@ cisst_ral::ral::ral(const std::string & node_name, bool anonymous_name)
     init(argc, argv, node_name, anonymous_name);
 }
 
-void cisst_ral::ral::init(int argc, char * argv[], const std::string & node_name, bool anonymous_name)
+void cisst_ral::ral::init(int & argc, char * argv[], const std::string & node_name, bool anonymous_name)
 {
     if (anonymous_name) {
         ros::init(argc, argv, node_name, ros::init_options::AnonymousName);
@@ -55,7 +55,7 @@ cisst_ral::ral::~ral()
 
 #elif ROS2
 
-cisst_ral::ral::ral(int argc, char * argv[], const std::string & node_name, bool anonymous_name)
+cisst_ral::ral::ral(int & argc, char * argv[], const std::string & node_name, bool anonymous_name)
 {
     init(argc, argv, node_name, anonymous_name);
 }
@@ -75,9 +75,17 @@ cisst_ral::ral::ral(const std::string & node_name, bool)
     m_stripped_arguments.push_back(node_name);
 }
 
-void cisst_ral::ral::init(int argc, char * argv[], const std::string & node_name, bool)
+void cisst_ral::ral::init(int & argc, char * argv[], const std::string & node_name, bool)
 {
     m_stripped_arguments = rclcpp::init_and_remove_ros_arguments(argc, argv);
+    // reconstruct argc/argv from stripped arguments
+    typedef char * char_ptr;
+    argc = m_stripped_arguments.size();
+    argv = reinterpret_cast<char_ptr *>(malloc(argc * sizeof(char_ptr)));
+    for (int i = 0; i < argc; ++i) {
+        argv[i] = reinterpret_cast<char_ptr>(malloc(m_stripped_arguments.at(i).size() + 1));
+        strcpy(argv[i], m_stripped_arguments.at(i).c_str());
+    }
     m_node = std::make_shared<rclcpp::Node>(node_name);
 }
 

@@ -200,7 +200,7 @@ namespace cisst_ral {
     class ral
     {
     public:
-        ral(int argc, char * argv[], const std::string & node_name, bool anonymous_name = true);
+        ral(int & argc, char * argv[], const std::string & node_name, bool anonymous_name = true);
         ral(const std::string & node_name, bool anonymous_name = true);
         ~ral();
 
@@ -214,7 +214,7 @@ namespace cisst_ral {
         }
 
     protected:
-        void init(int argc,  char * argv[], const std::string & node_name, bool anonymous_name);
+        void init(int & argc,  char * argv[], const std::string & node_name, bool anonymous_name);
         std::string m_node_name;
         node_ptr_t m_node;
         stripped_arguments_t m_stripped_arguments;
