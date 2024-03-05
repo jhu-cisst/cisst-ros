@@ -158,6 +158,10 @@ protected:
     std::set<std::string> m_bridge_only;
     bool should_be_bridged(const std::string & _command);
 
+    //! Check argument type
+    bool argument_type_is_expected(const std::string & _command,
+                                   const std::string & _actual) const;
+
     class factory {
     public:
         mts_ros_crtk_bridge_provided * m_bridge;
@@ -168,6 +172,9 @@ protected:
     };
 
     std::map<std::pair<std::string, std::string>, factory *> m_factories;
+
+    //! Map of command names and argument types
+    std::map<std::string, std::string> m_signatures;
 };
 
 CMN_DECLARE_SERVICES_INSTANTIATION(mts_ros_crtk_bridge_provided);
