@@ -264,15 +264,15 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
     const std::string _required_interface_name = _component_name + "_using_" + _interface_name;
 
     // create new pub/tf bridges for this provided interface if needed
-    mtsComponent * _existing_component;
-    mtsROSBridge * _pub_bridge;
-    mtsROSBridge * _tf_bridge;
+    mtsComponent * _existing_component = nullptr;
+    mtsROSBridge * _pub_bridge = nullptr;
+    mtsROSBridge * _tf_bridge = nullptr;
 
     bool _pub_bridge_used = false;
     bool _tf_bridge_used = false;
 
     bool _pub_bridge_is_new;
-    bool _tf_bridge_is_new;
+    bool _tf_bridge_is_new = false;
 
     const std::string _pub_bridge_name =  this->GetName() + "_pub_" + _clean_namespace;
     _existing_component = _component_manager->GetComponent(_pub_bridge_name);
@@ -285,15 +285,18 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                                        _publish_period_in_seconds, m_node_handle_ptr);
     }
 
-    const std::string _tf_bridge_name =  this->GetName() + "_tf_" + _clean_namespace;
-    _existing_component = _component_manager->GetComponent(_tf_bridge_name);
-    if (_existing_component) {
-        _tf_bridge_is_new = false;
-        _tf_bridge = dynamic_cast<mtsROSBridge *>(_existing_component);
-    } else {
-        _tf_bridge_is_new = true;
-        _tf_bridge = new mtsROSBridge(_tf_bridge_name,
-                                      _tf_period_in_seconds, m_node_handle_ptr);
+    if (_tf_period_in_seconds > 0.0) {
+        const std::string _tf_bridge_name =  this->GetName() + "_tf_" + _clean_namespace;
+        _existing_component = _component_manager->GetComponent(_tf_bridge_name);
+        if (_existing_component) {
+            _tf_bridge_is_new = false;
+            _tf_bridge = dynamic_cast<mtsROSBridge *>(_existing_component);
+        } else {
+            _tf_bridge_is_new = true;
+            _tf_bridge = new mtsROSBridge(_tf_bridge_name,
+                                          _tf_period_in_seconds,
+                                          m_node_handle_ptr);
+        }
     }
 
     // add trailing / for clean namespace
@@ -424,6 +427,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                     // duplicates - even though they have different
                     // reference frames
                     if ((_crtk_command == "measured_cp")
+                        && (_tf_period_in_seconds > 0.0)
                         && (_command.find("local/measured_cp") == std::string::npos)) {
                         _tf_bridge_used = true;
                         _tf_bridge->Addtf2BroadcasterFromCommandRead(_interface_name, _command);
@@ -596,22 +600,24 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                           _component_name, _interface_name);
     }
 
-    if (_tf_bridge_used) {
-        if (_tf_bridge_is_new) {
-            _component_manager->AddComponent(_tf_bridge);
-            m_new_components.push_back(_tf_bridge->GetName());
+    if (_tf_period_in_seconds > 0.0) {
+        if (_tf_bridge_used) {
+            if (_tf_bridge_is_new) {
+                _component_manager->AddComponent(_tf_bridge);
+                m_new_components.push_back(_tf_bridge->GetName());
+            }
+            m_connections.Add(_tf_bridge->GetName(), _interface_name,
+                              _component_name, _interface_name);
+            if (_tf_bridge->AddIntervalStatisticsInterface()) {
+                std::string _tf_namespace = "stats/tf_" + _component_name + "_" + _interface_name;
+                cisst_ral::clean_namespace(_tf_namespace);
+                std::transform(_tf_namespace.begin(), _tf_namespace.end(), _tf_namespace.begin(), tolower);
+                m_stats_bridge->AddIntervalStatisticsPublisher(_tf_namespace,
+                                                               _tf_bridge->GetName());
+            }
+        } else {
+            delete _tf_bridge;
         }
-        m_connections.Add(_tf_bridge->GetName(), _interface_name,
-                          _component_name, _interface_name);
-        if (_tf_bridge->AddIntervalStatisticsInterface()) {
-            std::string _tf_namespace = "stats/tf_" + _component_name + "_" + _interface_name;
-            cisst_ral::clean_namespace(_tf_namespace);
-            std::transform(_tf_namespace.begin(), _tf_namespace.end(), _tf_namespace.begin(), tolower);
-            m_stats_bridge->AddIntervalStatisticsPublisher(_tf_namespace,
-                                                           _tf_bridge->GetName());
-        }
-    } else {
-        delete _tf_bridge;
     }
 
     if (_pub_bridge_used) {
