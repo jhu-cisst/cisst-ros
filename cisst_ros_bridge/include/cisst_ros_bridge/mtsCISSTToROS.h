@@ -44,6 +44,9 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmInputData.h>
 #include <cisstParameterTypes/prmKeyValue.h>
 #include <cisstParameterTypes/prmOperatingState.h>
+#include <cisstParameterTypes/prmImageFrame.h>
+#include <cisstParameterTypes/prmCameraInfo.h>
+#include <cisstParameterTypes/prmDepthMap.h>
 
 #include <cisst_ros_bridge/cisst_ral.h>
 
@@ -66,6 +69,9 @@ http://www.cisst.org/cisst/license.txt.
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/Joy.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/PointCloud2.h>
 #include <diagnostic_msgs/KeyValue.h>
 #include <std_srvs/Trigger.h>
 
@@ -93,6 +99,9 @@ http://www.cisst.org/cisst/license.txt.
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <sensor_msgs/msg/point_cloud.hpp>
 #include <sensor_msgs/msg/joy.hpp>
+#include <sensor_msgs/msg/image.hpp>
+#include <sensor_msgs/msg/camera_info.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <diagnostic_msgs/msg/key_value.hpp>
 #include <std_srvs/srv/trigger.hpp>
 
@@ -448,6 +457,15 @@ void mtsCISSTToROS(const std::vector<vct3> & cisstData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const prmInputData & cisstData,
                    CISST_RAL_MSG(sensor_msgs, Joy) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmImageFrame & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, Image) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmCameraInfo & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, CameraInfo) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmDepthMap & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, PointCloud2) & rosData,
                    const std::string & debugInfo);
 
 // diagnostic_msgs
