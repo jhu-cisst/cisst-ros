@@ -18,6 +18,8 @@ http://www.cisst.org/cisst/license.txt.
 
 #include <cisst_ros_bridge/mtsCISSTToROS.h>
 
+#include <limits>
+
 #if ROS1
 #include <sensor_msgs/distortion_models.h>
 #include <sensor_msgs/image_encodings.h>
@@ -659,16 +661,18 @@ void mtsCISSTToROS(const prmDepthMap & cisstData,
     rosData.is_bigendian = false;
     rosData.is_dense = false;
 
+    bool has_color = cisstData.Color().size() > 0;
+
     sensor_msgs::PointCloud2Modifier modifier(rosData);
-    modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
+    if (has_color) {
+        modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
+    } else {
+        modifier.setPointCloud2FieldsByString(1, "xyz");
+    }
 
     sensor_msgs::PointCloud2Iterator<float> iter_x(rosData, "x");
     sensor_msgs::PointCloud2Iterator<float> iter_y(rosData, "y");
     sensor_msgs::PointCloud2Iterator<float> iter_z(rosData, "z");
-
-    sensor_msgs::PointCloud2Iterator<uint8_t> iter_r(rosData, "r");
-    sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(rosData, "g");
-    sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(rosData, "b");
 
     float invalid = std::numeric_limits<float>::quiet_NaN();
     size_t size = cisstData.Width() * cisstData.Height();
@@ -677,14 +681,10 @@ void mtsCISSTToROS(const prmDepthMap & cisstData,
         float y = cisstData.Points().at(3*i + 1);
         float z = cisstData.Points().at(3*i + 2);
 
-        if (z != 1000.0f && !std::isinf(z)) {
+        if (!std::isinf(z)) {
             *iter_x = x;
             *iter_y = y;
             *iter_z = z;
-
-            *iter_r = cisstData.Color().at(3*i + 0);
-            *iter_g = cisstData.Color().at(3*i + 1);
-            *iter_b = cisstData.Color().at(3*i + 2);
         } else {
             *iter_x = *iter_y = *iter_z = invalid;
         }
@@ -692,10 +692,25 @@ void mtsCISSTToROS(const prmDepthMap & cisstData,
         ++iter_x;
         ++iter_y;
         ++iter_z;
+    }
 
-        ++iter_r;
-        ++iter_g;
-        ++iter_b;
+    if (has_color) {
+        sensor_msgs::PointCloud2Iterator<uint8_t> iter_r(rosData, "r");
+        sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(rosData, "g");
+        sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(rosData, "b");
+
+        for (size_t i = 0; i < size; i++) {
+            float z = cisstData.Points().at(3*i + 2);
+            if (!std::isinf(z)) {
+                *iter_r = cisstData.Color().at(3*i + 0);
+                *iter_g = cisstData.Color().at(3*i + 1);
+                *iter_b = cisstData.Color().at(3*i + 2);
+            }
+
+            ++iter_r;
+            ++iter_g;
+            ++iter_b;
+        }
     }
 }
 
