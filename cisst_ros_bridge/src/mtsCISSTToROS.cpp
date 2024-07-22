@@ -18,6 +18,18 @@ http://www.cisst.org/cisst/license.txt.
 
 #include <cisst_ros_bridge/mtsCISSTToROS.h>
 
+#include <limits>
+
+#if ROS1
+#include <sensor_msgs/distortion_models.h>
+#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/point_cloud2_iterator.h>
+#elif ROS2
+#include <sensor_msgs/distortion_models.hpp>
+#include <sensor_msgs/image_encodings.hpp>
+#include <sensor_msgs/point_cloud2_iterator.hpp>
+#endif
+
 void mtsCISSTToROS(const double & cisstData,
                    CISST_RAL_MSG(std_msgs, Float32) & rosData,
                    const std::string &)
@@ -590,6 +602,116 @@ void mtsCISSTToROS(const prmInputData & cisstData,
               rosData.axes.begin());
     std::copy(cisstData.DigitalInputs().begin(), cisstData.DigitalInputs().end(),
               rosData.buttons.begin());
+}
+
+void mtsCISSTToROS(const prmImageFrame & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, Image) & rosData,
+                   const std::string & debugInfo)
+{
+    rosData.width = cisstData.Width();
+    rosData.height = cisstData.Height();
+    rosData.step = rosData.width * cisstData.Channels();
+    rosData.is_bigendian = false;
+
+    if (cisstData.Channels() == 3) {
+        rosData.encoding = sensor_msgs::image_encodings::RGB8;
+    } else {
+        rosData.encoding = sensor_msgs::image_encodings::MONO8;
+    }
+
+    rosData.data.resize(rosData.step * rosData.height);
+    std::copy(cisstData.Data().begin(), cisstData.Data().end(), rosData.data.begin());
+}
+
+// Capitalization was changed in ROS2 :(
+#if ROS1
+#define ros_distortion(data) data.D
+#define ros_intrinsic(data) data.K
+#define ros_rectification(data) data.R
+#define ros_projection(data) data.P
+#elif ROS2
+#define ros_distortion(data) data.d
+#define ros_intrinsic(data) data.k
+#define ros_rectification(data) data.r
+#define ros_projection(data) data.p
+#endif
+
+void mtsCISSTToROS(const prmCameraInfo & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, CameraInfo) & rosData,
+                   const std::string & debugInfo)
+{
+    rosData.width = cisstData.Width();
+    rosData.height = cisstData.Height();
+
+    rosData.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
+    ros_distortion(rosData).resize(cisstData.DistortionParameters().size());
+    std::copy(cisstData.DistortionParameters().begin(), cisstData.DistortionParameters().end(), ros_distortion(rosData).begin());
+
+    std::copy(cisstData.Intrinsic().begin(), cisstData.Intrinsic().end(), ros_intrinsic(rosData).begin());
+    std::copy(cisstData.Rectification().begin(), cisstData.Rectification().end(), ros_rectification(rosData).begin());
+    std::copy(cisstData.Projection().begin(), cisstData.Projection().end(), ros_projection(rosData).begin());
+}
+
+void mtsCISSTToROS(const prmDepthMap & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, PointCloud2) & rosData,
+                   const std::string & debugInfo)
+{
+    rosData.width = cisstData.Width();
+    rosData.height = cisstData.Height();
+    rosData.is_bigendian = false;
+    rosData.is_dense = false;
+
+    bool has_color = cisstData.Color().size() > 0;
+
+    sensor_msgs::PointCloud2Modifier modifier(rosData);
+    if (has_color) {
+        modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
+    } else {
+        modifier.setPointCloud2FieldsByString(1, "xyz");
+    }
+
+    sensor_msgs::PointCloud2Iterator<float> iter_x(rosData, "x");
+    sensor_msgs::PointCloud2Iterator<float> iter_y(rosData, "y");
+    sensor_msgs::PointCloud2Iterator<float> iter_z(rosData, "z");
+
+    float invalid = std::numeric_limits<float>::quiet_NaN();
+    size_t size = cisstData.Width() * cisstData.Height();
+    for (size_t i = 0; i < size; i++) {
+        float x = cisstData.Points().at(3*i + 0);
+        float y = cisstData.Points().at(3*i + 1);
+        float z = cisstData.Points().at(3*i + 2);
+
+        if (!std::isinf(z)) {
+            *iter_x = x;
+            *iter_y = y;
+            *iter_z = z;
+        } else {
+            *iter_x = *iter_y = *iter_z = invalid;
+        }
+
+        ++iter_x;
+        ++iter_y;
+        ++iter_z;
+    }
+
+    if (has_color) {
+        sensor_msgs::PointCloud2Iterator<uint8_t> iter_r(rosData, "r");
+        sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(rosData, "g");
+        sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(rosData, "b");
+
+        for (size_t i = 0; i < size; i++) {
+            float z = cisstData.Points().at(3*i + 2);
+            if (!std::isinf(z)) {
+                *iter_r = cisstData.Color().at(3*i + 0);
+                *iter_g = cisstData.Color().at(3*i + 1);
+                *iter_b = cisstData.Color().at(3*i + 2);
+            }
+
+            ++iter_r;
+            ++iter_g;
+            ++iter_b;
+        }
+    }
 }
 
 // ---------------------------------------------
