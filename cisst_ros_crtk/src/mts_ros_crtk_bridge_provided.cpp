@@ -300,6 +300,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
     }
 
     // add trailing / for clean namespace
+    const std::string _clean_namespace_no_trailing_slash = _clean_namespace;
     if (!_clean_namespace.empty()) {
         _clean_namespace.append("/");
     }
@@ -520,7 +521,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
             } else if (_crtk_command == "Button") {
                 m_events_bridge->AddPublisherFromEventWrite<prmEventButton,
                                                             CISST_RAL_MSG(sensor_msgs, Joy)>
-                    (_required_interface_name, _event, _clean_namespace); // for buttons, we just use the interface name
+                    (_required_interface_name, _event, _clean_namespace_no_trailing_slash); // for buttons, we just use the interface name
             } else if (_crtk_command == "operating_state") {
                 m_events_bridge->AddPublisherFromEventWrite<prmOperatingState,
                                                             CISST_RAL_MSG(crtk_msgs, OperatingState)>
@@ -578,7 +579,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                     // add and connect interface to event bridge
                     m_events_bridge->AddPublisherFromEventWrite<prmEventButton,
                                                                 CISST_RAL_MSG(sensor_msgs, Joy)>
-                        (_button_interface, "Button", _clean_namespace + _button_name);
+                        (_button_interface, "Button", _clean_namespace_no_trailing_slash + _button_name);
                     m_connections.Add(m_events_bridge->GetName(), _button_interface,
                                       _component_name, _button_interface);
                 }
