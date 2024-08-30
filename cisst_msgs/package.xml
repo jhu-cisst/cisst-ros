@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>cisst_msgs</name>
-  <version>2.2.0</version>
+  <version>3.0.0</version>
   <description>The cisst_msgs package</description>
   <license>CISST</license>
   <author email="zihan.chen@jhu.edu">Zihan Chen</author>

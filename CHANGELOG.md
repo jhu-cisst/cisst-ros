@@ -1,6 +1,20 @@
 Change log
 ==========
 
+3.0.0 (2024-08-30)
+==================
+
+* API changes:
+  * All code is now shared for ROS1 and ROS2, older ROS2 specific repositories will be archived
+* Deprecated features:
+  * None
+* New features:
+  * New namespace and class `cisst_ral` to encapsulate most ROS1 and ROS2 differences
+  * CRTK bridge checks that payload types are correct for a given command
+  * More cisst types supported
+* Bug fixes:
+  * None
+
 2.2.0 (2023-12-29)
 ==================
 
