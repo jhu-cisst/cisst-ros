@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2023 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2024 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -27,7 +27,7 @@ http://www.cisst.org/cisst/license.txt.
 CMN_IMPLEMENT_SERVICES_DERIVED_ONEARG(mts_ros_crtk_bridge_required, mtsROSBridge, mtsTaskPeriodicConstructorArg);
 
 mts_ros_crtk_bridge_required::mts_ros_crtk_bridge_required(const std::string & _component_name,
-                                                           ros::NodeHandle * _node_handle,
+                                                           cisst_ral::node_ptr_t _node_handle,
                                                            const double _period_in_seconds):
     mtsROSBridge(_component_name, _period_in_seconds, _node_handle)
 {
@@ -35,8 +35,10 @@ mts_ros_crtk_bridge_required::mts_ros_crtk_bridge_required(const std::string & _
 }
 
 mts_ros_crtk_bridge_required::mts_ros_crtk_bridge_required(const mtsTaskPeriodicConstructorArg & arg):
-    mtsROSBridge(arg.Name, arg.Period, cisst_ros_crtk::ros_init(arg.Name))
+    mtsROSBridge(arg.Name, arg.Period, nullptr)
 {
+    cisst_ral::ral ral(arg.Name);
+    m_node = ral.node();
     init();
 }
 
@@ -120,7 +122,7 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
 {
     // clean ROS namespace
     std::string _clean_namespace = _ros_namespace;
-    cisst_ros_crtk::clean_namespace(_clean_namespace);
+    cisst_ral::clean_namespace(_clean_namespace);
 
     // add trailing / for clean namespace
     if (!_clean_namespace.empty()) {
@@ -149,28 +151,28 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
             || (_crtk_command == "servo_jr")
             || (_crtk_command == "move_jp")
             || (_crtk_command == "move_jr")) {
-            this->AddPublisherFromCommandWrite<prmPositionJointSet, sensor_msgs::JointState>
+            this->AddPublisherFromCommandWrite<prmPositionJointSet, CISST_RAL_MSG(sensor_msgs, JointState)>
                 (_interface_name, _command, _ros_topic);
         } else  if (_crtk_command == "servo_jv") {
-            this->AddPublisherFromCommandWrite<prmVelocityJointSet, sensor_msgs::JointState>
+            this->AddPublisherFromCommandWrite<prmVelocityJointSet, CISST_RAL_MSG(sensor_msgs, JointState)>
                 (_interface_name, _command, _ros_topic);
         } else  if (_crtk_command == "servo_jf") {
-            this->AddPublisherFromCommandWrite<prmForceTorqueJointSet, sensor_msgs::JointState>
+            this->AddPublisherFromCommandWrite<prmForceTorqueJointSet, CISST_RAL_MSG(sensor_msgs, JointState)>
                 (_interface_name, _command, _ros_topic);
         } else if ((_crtk_command == "servo_cp")
                    || (_crtk_command == "servo_cr")
                    || (_crtk_command == "move_cp")
                    || (_crtk_command == "move_cr")) {
-            this->AddPublisherFromCommandWrite<prmPositionCartesianSet, geometry_msgs::PoseStamped>
+            this->AddPublisherFromCommandWrite<prmPositionCartesianSet, CISST_RAL_MSG(geometry_msgs, PoseStamped)>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "servo_cf") {
-            this->AddPublisherFromCommandWrite<prmForceCartesianSet, geometry_msgs::WrenchStamped>
+            this->AddPublisherFromCommandWrite<prmForceCartesianSet, CISST_RAL_MSG(geometry_msgs, WrenchStamped)>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "state_command") {
-            this->AddPublisherFromCommandWrite<std::string, crtk_msgs::StringStamped>
+            this->AddPublisherFromCommandWrite<std::string, CISST_RAL_MSG(crtk_msgs, StringStamped)>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "use_gravity_compensation") {
-            this->AddPublisherFromCommandWrite<bool, std_msgs::Bool>
+            this->AddPublisherFromCommandWrite<bool, CISST_RAL_MSG(std_msgs, Bool)>
                 (_interface_name, _command, _ros_topic);
         } else {
             CMN_LOG_CLASS_INIT_WARNING << "populate_interface_provided: write command \"" << _command
@@ -186,26 +188,26 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
         _ros_topic = _clean_namespace + _command;
         if ((_crtk_command == "measured_js")
             || (_crtk_command == "setpoint_js")) {
-            this->AddSubscriberToCommandRead<prmStateJoint, sensor_msgs::JointState>
+            this->AddSubscriberToCommandRead<prmStateJoint, CISST_RAL_MSG(sensor_msgs, JointState)>
                 (_interface_name, _command, _ros_topic);
         } else  if ((_crtk_command == "measured_cp")
                     || (_crtk_command == "setpoint_cp")) {
-            this->AddSubscriberToCommandRead<prmPositionCartesianGet, geometry_msgs::PoseStamped>
+            this->AddSubscriberToCommandRead<prmPositionCartesianGet, CISST_RAL_MSG(geometry_msgs, PoseStamped)>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "measured_cv") {
-            this->AddSubscriberToCommandRead<prmVelocityCartesianGet, geometry_msgs::TwistStamped>
+            this->AddSubscriberToCommandRead<prmVelocityCartesianGet, CISST_RAL_MSG(geometry_msgs, TwistStamped)>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "measured_cf") {
-            this->AddSubscriberToCommandRead<prmForceCartesianGet, geometry_msgs::WrenchStamped>
+            this->AddSubscriberToCommandRead<prmForceCartesianGet, CISST_RAL_MSG(geometry_msgs, WrenchStamped)>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "jacobian") {
-            this->AddSubscriberToCommandRead<vctDoubleMat, std_msgs::Float64MultiArray>
+            this->AddSubscriberToCommandRead<vctDoubleMat, CISST_RAL_MSG(std_msgs, Float64MultiArray)>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "operating_state") {
-            this->AddSubscriberToCommandRead<prmOperatingState, crtk_msgs::OperatingState>
+            this->AddSubscriberToCommandRead<prmOperatingState, CISST_RAL_MSG(crtk_msgs, OperatingState)>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "period_statistics") {
-            this->AddSubscriberToCommandRead<mtsIntervalStatistics, cisst_msgs::IntervalStatistics>
+            this->AddSubscriberToCommandRead<mtsIntervalStatistics, CISST_RAL_MSG(cisst_msgs, IntervalStatistics)>
                 (_interface_name, _command, _ros_topic);
         } else {
             CMN_LOG_CLASS_INIT_WARNING << "populate_interface_provided: read command \"" << _command
@@ -220,22 +222,22 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
         cisst_ros_crtk::get_crtk_command(_event, _crtk_command);
         _ros_topic = _clean_namespace + _event;
         if (_crtk_command == "input_data") {
-            this->AddSubscriberToEventWrite<prmInputData, sensor_msgs::Joy>
+            this->AddSubscriberToEventWrite<prmInputData, CISST_RAL_MSG(sensor_msgs, Joy)>
                 (_interface_name, _event, _ros_topic);
         } else if (_crtk_command == "Button") {
-            this->AddSubscriberToEventWrite<prmEventButton, sensor_msgs::Joy>
+            this->AddSubscriberToEventWrite<prmEventButton, CISST_RAL_MSG(sensor_msgs, Joy)>
                 (_interface_name, _event, _clean_namespace); // for buttons, we just use the interface name
         } else if (_crtk_command == "operating_state") {
-            this->AddSubscriberToEventWrite<prmOperatingState, crtk_msgs::OperatingState>
+            this->AddSubscriberToEventWrite<prmOperatingState, CISST_RAL_MSG(crtk_msgs, OperatingState)>
                 (_interface_name, _event, _ros_topic);
         } else if (_crtk_command == "error") {
-            this->AddSubscriberToEventWrite<mtsMessage, std_msgs::String>
+            this->AddSubscriberToEventWrite<mtsMessage, CISST_RAL_MSG(std_msgs, String)>
                 (_interface_name, _event, _ros_topic);
         } else if (_crtk_command == "warning") {
-            this->AddSubscriberToEventWrite<mtsMessage, std_msgs::String>
+            this->AddSubscriberToEventWrite<mtsMessage, CISST_RAL_MSG(std_msgs, String)>
                 (_interface_name, _event, _ros_topic);
         } else if (_crtk_command == "status") {
-            this->AddSubscriberToEventWrite<mtsMessage, std_msgs::String>
+            this->AddSubscriberToEventWrite<mtsMessage, CISST_RAL_MSG(std_msgs, String)>
                 (_interface_name, _event, _ros_topic);
         } else {
             CMN_LOG_CLASS_INIT_WARNING << "populate_interface_provided: write event \"" << _event

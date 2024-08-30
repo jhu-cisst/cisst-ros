@@ -1,54 +1,54 @@
 cmake_minimum_required(VERSION 3.10)
-project(cisst_msgs VERSION 2.2.0)
+project(cisst_msgs VERSION 3.0.0)
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  std_msgs
-  geometry_msgs
-  sensor_msgs
-  message_generation
-  )
+# first test for ROS1
+set (ROS1_depends std_msgs geometry_msgs)
 
+find_package (catkin QUIET
+  COMPONENTS message_generation ${ROS1_depends})
 
-## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  DoubleVec.msg
-  CartesianImpedanceGains.msg
-  IntervalStatistics.msg
-  BoolStamped.msg
-  StringStamped.msg
-  )
+# ROS 1
+if (catkin_FOUND)
 
-## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  ConvertFloat64Array.srv
-)
+  ## Generate messages in the 'msg' folder
+  add_message_files (FILES
+    DoubleVec.msg
+    IntervalStatistics.msg
+    BoolStamped.msg
+    )
 
-## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs  # Or other packages containing msgs
-  geometry_msgs
-  sensor_msgs
-  )
+  ## Generate services in the 'srv' folder
+  add_service_files (FILES
+    ConvertFloat64Array.srv
+    )
 
+  ## Generate added messages and services with any dependencies listed here
+  generate_messages (DEPENDENCIES ${ROS1_depends})
 
-catkin_package(
-  # INCLUDE_DIRS include
-  # LIBRARIES cisst_ros_bridge
-  CATKIN_DEPENDS message_runtime
-  #  DEPENDS system_lib
-)
+  catkin_package (
+    CATKIN_DEPENDS message_runtime ${ROS1_depends}
+    )
 
-###########
-## Build ##
-###########
+else (catkin_FOUND)
 
-# include_directories(include)
-# include_directories(
-#   ${catkin_INCLUDE_DIRS}
-# )
+  # look for ROS2
+  find_package (ament_cmake QUIET)
+  if (ament_cmake_FOUND)
+    set (ROS2_depends ament_cmake rclcpp std_msgs geometry_msgs builtin_interfaces rosidl_default_generators)
+    foreach (_dep ${ROS2_depends})
+      find_package (${_dep} REQUIRED)
+    endforeach ()
+
+    rosidl_generate_interfaces (cisst_msgs
+      msg/DoubleVec.msg
+      msg/IntervalStatistics.msg
+      msg/BoolStamped.msg
+      srv/ConvertFloat64Array.srv
+      DEPENDENCIES builtin_interfaces std_msgs geometry_msgs
+      )
+
+    ament_package ()
+
+  endif (ament_cmake_FOUND)
+
+endif (catkin_FOUND)

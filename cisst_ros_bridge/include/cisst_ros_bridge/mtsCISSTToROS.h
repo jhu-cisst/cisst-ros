@@ -44,9 +44,15 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstParameterTypes/prmInputData.h>
 #include <cisstParameterTypes/prmKeyValue.h>
 #include <cisstParameterTypes/prmOperatingState.h>
+#include <cisstParameterTypes/prmImageFrame.h>
+#include <cisstParameterTypes/prmCameraInfo.h>
+#include <cisstParameterTypes/prmDepthMap.h>
 
-// ros include
-#include <ros/ros.h>
+#include <cisst_ros_bridge/cisst_ral.h>
+
+// ros includes
+#if ROS1
+
 #include <std_msgs/Float32.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/Bool.h>
@@ -63,6 +69,9 @@ http://www.cisst.org/cisst/license.txt.
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/Joy.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/PointCloud2.h>
 #include <diagnostic_msgs/KeyValue.h>
 #include <std_srvs/Trigger.h>
 
@@ -71,6 +80,38 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisst_msgs/IntervalStatistics.h>
 #include <cisst_msgs/BoolStamped.h>
 #include <cisst_msgs/ConvertFloat64Array.h>
+
+#elif ROS2
+
+#include <std_msgs/msg/float32.hpp>
+#include <std_msgs/msg/float64.hpp>
+#include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/int32.hpp>
+#include <std_msgs/msg/string.hpp>
+#include <std_msgs/msg/float64_multi_array.hpp>
+#include <geometry_msgs/msg/vector3_stamped.hpp>
+#include <geometry_msgs/msg/quaternion_stamped.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/pose_array.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
+#include <geometry_msgs/msg/wrench_stamped.hpp>
+#include <sensor_msgs/msg/joint_state.hpp>
+#include <sensor_msgs/msg/point_cloud.hpp>
+#include <sensor_msgs/msg/joy.hpp>
+#include <sensor_msgs/msg/image.hpp>
+#include <sensor_msgs/msg/camera_info.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <diagnostic_msgs/msg/key_value.hpp>
+#include <std_srvs/srv/trigger.hpp>
+
+// non standard messages
+#include <cisst_msgs/msg/double_vec.hpp>
+#include <cisst_msgs/msg/interval_statistics.hpp>
+#include <cisst_msgs/msg/bool_stamped.hpp>
+#include <cisst_msgs/srv/convert_float64_array.hpp>
+
+#endif
 
 namespace mts_cisst_to_ros {
 
@@ -83,6 +124,7 @@ namespace mts_cisst_to_ros {
 
     template <typename _cisstType, typename _rosType>
     void cisst_header_to_ros_header(const _cisstType & cisstData, _rosType & rosData,
+                                    cisst_ral::node_ptr_t node,
                                     const std::string & debugInfo)
     {
         try {
@@ -92,12 +134,12 @@ namespace mts_cisst_to_ros {
                     mtsManagerLocal::GetInstance()->GetTimeServer().GetRelativeTime()
                     - cisstDataTime;
                 if (age > 0.0) {
-                    rosData.header.stamp = ros::Time::now() - ros::Duration(age);
+                    rosData.header.stamp = cisst_ral::now(node) - cisst_ral::duration_from_seconds(age);
                 } else {
-                    rosData.header.stamp = ros::Time::now();
+                    rosData.header.stamp = cisst_ral::now(node);
                 }
             } else {
-                rosData.header.stamp = ros::Time::now();
+                rosData.header.stamp = cisst_ral::now(node);
             }
         } catch (std::exception & e) {
             CMN_LOG_RUN_ERROR << "cisst_header_to_ros_header caught exception \""
@@ -120,6 +162,7 @@ namespace mts_cisst_to_ros {
     auto header_impl(header_choice<4>,
                      const _cisstType & cisstData,
                      _rosType & rosData,
+                     cisst_ral::node_ptr_t node,
                      const std::string & debugInfo)
         -> decltype(cisstData.Valid(),
                     cisstData.Timestamp(),
@@ -132,7 +175,7 @@ namespace mts_cisst_to_ros {
         if (!cisstData.Valid()) {
             return false;
         }
-        cisst_header_to_ros_header<_cisstType, _rosType>(cisstData, rosData, debugInfo);
+        cisst_header_to_ros_header<_cisstType, _rosType>(cisstData, rosData, node, debugInfo);
         // set reference frame name
         rosData.header.frame_id = cisstData.ReferenceFrame();
         rosData.child_frame_id = cisstData.MovingFrame();
@@ -143,6 +186,7 @@ namespace mts_cisst_to_ros {
     auto header_impl(header_choice<3>,
                      const _cisstType & cisstData,
                      _rosType & rosData,
+                     cisst_ral::node_ptr_t node,
                      const std::string & debugInfo)
         -> decltype(cisstData.Valid(),
                     cisstData.Timestamp(),
@@ -153,7 +197,7 @@ namespace mts_cisst_to_ros {
         if (!cisstData.Valid()) {
             return false;
         }
-        cisst_header_to_ros_header<_cisstType, _rosType>(cisstData, rosData, debugInfo);
+        cisst_header_to_ros_header<_cisstType, _rosType>(cisstData, rosData, node, debugInfo);
         // set reference frame name
         rosData.header.frame_id = cisstData.ReferenceFrame();
         return true;
@@ -163,6 +207,7 @@ namespace mts_cisst_to_ros {
     auto header_impl(header_choice<2>,
                      const _cisstType & cisstData,
                      _rosType & rosData,
+                     cisst_ral::node_ptr_t node,
                      const std::string & debugInfo)
         -> decltype(cisstData.Valid(),
                     cisstData.Timestamp(),
@@ -172,7 +217,7 @@ namespace mts_cisst_to_ros {
         if (!cisstData.Valid()) {
             return false;
         }
-        cisst_header_to_ros_header<_cisstType, _rosType>(cisstData, rosData, debugInfo);
+        cisst_header_to_ros_header<_cisstType, _rosType>(cisstData, rosData, node, debugInfo);
         return true;
     }
 
@@ -180,27 +225,33 @@ namespace mts_cisst_to_ros {
     auto header_impl(header_choice<1>,
                      const _cisstType &,
                      _rosType & rosData,
+                     cisst_ral::node_ptr_t node,
                      const std::string &)
         -> decltype(rosData.header,
                     false)
     {
-        rosData.header.stamp = ros::Time::now();
+        rosData.header.stamp = cisst_ral::now(node);
         return true;
     }
 
     // last case, nothing to do
     template <typename _cisstType, typename _rosType>
     bool header_impl(header_choice<0>,
-                     const _cisstType &, _rosType &, const std::string &)
+                     const _cisstType &,
+                     _rosType &,
+                     cisst_ral::node_ptr_t,
+                     const std::string &)
     {
         return true;
     }
 
     template <typename _cisstType, typename _rosType>
-    bool header(const _cisstType & cisstData, _rosType & rosData,
+    bool header(const _cisstType & cisstData,
+                _rosType & rosData,
+                cisst_ral::node_ptr_t node,
                 const std::string & debugInfo)
     {
-        return header_impl<_cisstType, _rosType>(header_choice<4>(), cisstData, rosData, debugInfo);
+        return header_impl<_cisstType, _rosType>(header_choice<4>(), cisstData, rosData, node, debugInfo);
     }
 }
 
@@ -244,87 +295,204 @@ void mtsCISSTToROSWrench(const _cisstVector & cisstVector, _rosWrench & rosWrenc
 }
 
 // std_msgs
-void mtsCISSTToROS(const double & cisstData, std_msgs::Float32 & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const double & cisstData, std_msgs::Float64 & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const int & cisstData, std_msgs::Int32 & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const bool & cisstData, std_msgs::Bool & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const bool & cisstData, cisst_msgs::BoolStamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const bool & cisstData, sensor_msgs::Joy & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const std::string & cisstData, std_msgs::String & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const mtsMessage & cisstData, std_msgs::String & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmEventButton & cisstData, std_msgs::Bool & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmEventButton & cisstData, cisst_msgs::BoolStamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmEventButton & cisstData, sensor_msgs::Joy & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const vctDoubleVec & cisstData, std_msgs::Float64MultiArray & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const vctDoubleMat & cisstData, std_msgs::Float64MultiArray & rosData, const std::string & debugInfo);
+void mtsCISSTToROS(const double & cisstData,
+                   CISST_RAL_MSG(std_msgs, Float32) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const double & cisstData,
+                   CISST_RAL_MSG(std_msgs, Float64) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const int & cisstData,
+                   CISST_RAL_MSG(std_msgs, Int32) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const bool & cisstData,
+                   CISST_RAL_MSG(std_msgs, Bool) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const bool & cisstData,
+                   CISST_RAL_MSG(cisst_msgs, BoolStamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const bool & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, Joy) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const std::string & cisstData,
+                   CISST_RAL_MSG(std_msgs, String) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const mtsMessage & cisstData,
+                   CISST_RAL_MSG(std_msgs, String) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmEventButton & cisstData,
+                   CISST_RAL_MSG(std_msgs, Bool) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmEventButton & cisstData,
+                   CISST_RAL_MSG(cisst_msgs, BoolStamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmEventButton & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, Joy) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vctDoubleVec & cisstData,
+                   CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vctDoubleMat & cisstData,
+                   CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
+                   const std::string & debugInfo);
 
 // geometry_msgs
-void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Transform & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::TransformStamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmPositionCartesianGet & cisstData, geometry_msgs::PoseStamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmPositionCartesianArrayGet & cisstData, geometry_msgs::PoseArray & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmPositionCartesianSet & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmPositionCartesianSet & cisstData, geometry_msgs::PoseStamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const vctFrm4x4 & cisstData, geometry_msgs::Transform & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::Transform & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmPositionCartesianSet & cisstData, geometry_msgs::TransformStamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const mtsFrm4x4 & cisstData, geometry_msgs::TransformStamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Transform & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::PoseStamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const vctFrm3 & cisstData, geometry_msgs::Pose & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const vct3 & cisstData, geometry_msgs::Vector3 & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::Quaternion & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const vctMatRot3 & cisstData, geometry_msgs::QuaternionStamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const vct6 & cisstData, geometry_msgs::Wrench & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const vct6 & cisstData, geometry_msgs::WrenchStamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Wrench & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::WrenchStamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const mtsDoubleVec & cisstData, geometry_msgs::Vector3Stamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData, geometry_msgs::Twist & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData, geometry_msgs::TwistStamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmForceCartesianGet & cisstData, geometry_msgs::Wrench & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmForceCartesianGet & cisstData, geometry_msgs::WrenchStamped & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmForceCartesianSet & cisstData, geometry_msgs::Wrench & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmForceCartesianSet & cisstData, geometry_msgs::WrenchStamped & rosData, const std::string & debugInfo);
+void mtsCISSTToROS(const prmPositionCartesianGet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Transform) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmPositionCartesianGet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, TransformStamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmPositionCartesianGet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmPositionCartesianGet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, PoseStamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmPositionCartesianArrayGet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, PoseArray) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmPositionCartesianSet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmPositionCartesianSet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, PoseStamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vctFrm4x4 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const mtsFrm4x4 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vctFrm4x4 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Transform) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const mtsFrm4x4 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Transform) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmPositionCartesianSet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, TransformStamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const mtsFrm4x4 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, TransformStamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vctFrm3 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Transform) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vctFrm3 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, PoseStamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vctFrm3 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vct3 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Vector3) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vctMatRot3 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Quaternion) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vctMatRot3 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, QuaternionStamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vct6 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Wrench) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vct6 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, WrenchStamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const mtsDoubleVec & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Wrench) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const mtsDoubleVec & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, WrenchStamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const mtsDoubleVec & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Vector3Stamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Twist) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmVelocityCartesianGet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, TwistStamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmForceCartesianGet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Wrench) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmForceCartesianGet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, WrenchStamped) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmForceCartesianSet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Wrench) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmForceCartesianSet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, WrenchStamped) & rosData,
+                   const std::string & debugInfo);
 
 // sensor_msgs
-void mtsCISSTToROS(const vctDoubleVec & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmPositionJointGet & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmPositionJointSet & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmVelocityJointGet & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmVelocityJointSet & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmForceTorqueJointSet & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmStateJoint & cisstData, sensor_msgs::JointState & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const vctDoubleMat & cisstData, sensor_msgs::PointCloud & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const std::vector<vct3> & cisstData, sensor_msgs::PointCloud & rosData, const std::string & debugInfo);
-void mtsCISSTToROS(const prmInputData & cisstData, sensor_msgs::Joy & rosData, const std::string & debugInfo);
+void mtsCISSTToROS(const vctDoubleVec & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmPositionJointGet & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmPositionJointSet & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmVelocityJointGet & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmVelocityJointSet & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmForceTorqueJointSet & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmStateJoint & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const vctDoubleMat & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, PointCloud) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const std::vector<vct3> & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, PointCloud) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmInputData & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, Joy) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmImageFrame & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, Image) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmCameraInfo & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, CameraInfo) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmDepthMap & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, PointCloud2) & rosData,
+                   const std::string & debugInfo);
 
 // diagnostic_msgs
-void mtsCISSTToROS(const prmKeyValue & cisstData, diagnostic_msgs::KeyValue & rosData, const std::string & debugInfo);
+void mtsCISSTToROS(const prmKeyValue & cisstData,
+                   CISST_RAL_MSG(diagnostic_msgs, KeyValue) & rosData,
+                   const std::string & debugInfo);
 
 // std_srvs
 void mtsCISSTToROS(const bool & cisstData,
-                   std_srvs::Trigger::Response & rosData,
+                   CISST_RAL_SRV_RES(std_srvs, Trigger) & rosData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const std::string & cisstData,
-                   std_srvs::Trigger::Response & rosData,
+                   CISST_RAL_SRV_RES(std_srvs, Trigger) & rosData,
                    const std::string & debugInfo);
 
 // cisst_msgs
 void mtsCISSTToROS(const prmPositionJointGet & cisstData,
-                   cisst_msgs::DoubleVec & rosData,
+                   CISST_RAL_MSG(cisst_msgs, DoubleVec) & rosData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const vctDoubleVec & cisstData,
-                   cisst_msgs::DoubleVec & rosData,
+                   CISST_RAL_MSG(cisst_msgs, DoubleVec) & rosData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const mtsIntervalStatistics & cisstData,
-                   cisst_msgs::IntervalStatistics & rosData,
+                   CISST_RAL_MSG(cisst_msgs, IntervalStatistics) & rosData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const vctDoubleVec & cisstData,
-                   cisst_msgs::ConvertFloat64Array::Response & rosData,
+                   CISST_RAL_SRV_RES(cisst_msgs, ConvertFloat64Array) & rosData,
                    const std::string & debugInfo);
 
 #endif // _mtsCISSTToROS_h

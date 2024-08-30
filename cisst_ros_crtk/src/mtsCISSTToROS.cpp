@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2023 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2024 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -34,28 +34,28 @@ void mtsCISSTToROSOperatingState(const prmOperatingState & cisstData,
 }
 
 void mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::OperatingState & rosData,
+                   CISST_RAL_MSG(crtk_msgs, OperatingState) & rosData,
                    const std::string & debugInfo)
 {
     mtsCISSTToROSOperatingState(cisstData, rosData, debugInfo);
 }
 
 void mtsCISSTToROS(const std::string & cisstData,
-                   crtk_msgs::StringStamped & rosData,
+                   CISST_RAL_MSG(crtk_msgs, StringStamped) & rosData,
                    const std::string &)
 {
     rosData.string = cisstData;
 }
 
 void mtsCISSTToROS(const prmOperatingState & cisstData,
-                   crtk_msgs::TriggerOperatingState::Response & rosData,
+                   CISST_RAL_SRV_RES(crtk_msgs, TriggerOperatingState) & rosData,
                    const std::string & debugInfo)
 {
     mtsCISSTToROSOperatingState(cisstData, rosData.operating_state, debugInfo);
 }
 
 void mtsCISSTToROS(const prmForwardKinematicsResponse & cisstData,
-                   crtk_msgs::QueryForwardKinematics::Response & rosData,
+                   CISST_RAL_SRV_RES(crtk_msgs, QueryForwardKinematics) & rosData,
                    const std::string &)
 {
     mtsCISSTToROSPose(cisstData.cp(), rosData.cp);
@@ -64,7 +64,7 @@ void mtsCISSTToROS(const prmForwardKinematicsResponse & cisstData,
 }
 
 void mtsCISSTToROS(const prmInverseKinematicsResponse & cisstData,
-                   crtk_msgs::QueryInverseKinematics::Response & rosData,
+                   CISST_RAL_SRV_RES(crtk_msgs, QueryInverseKinematics) & rosData,
                    const std::string &)
 {
     rosData.jp.resize(cisstData.jp().size());

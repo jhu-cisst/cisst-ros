@@ -1,4 +1,4 @@
-Header header
+std_msgs/Header header
 
 # average period
 float64 period_avg

@@ -1,0 +1,4 @@
+{
+  "name": "cisst_ros_bridge",
+  "dependencies": ["cisst", "cisst_msgs"]
+}

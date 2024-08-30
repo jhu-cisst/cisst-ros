@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2023 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2024 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -14,13 +14,12 @@ no warranty.  The complete license can be found in license.txt and
 http://www.cisst.org/cisst/license.txt.
 
 --- end cisst license ---
-
 */
 
 #include <cisst_ros_crtk/mtsROSToCISST.h>
 #include <cisst_ros_bridge/mtsROSToCISST.h>
 
-void mtsROSToCISST(const crtk_msgs::OperatingState & rosData,
+void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, OperatingState) & rosData,
                    prmOperatingState & cisstData)
 {
     try {
@@ -32,13 +31,13 @@ void mtsROSToCISST(const crtk_msgs::OperatingState & rosData,
     cisstData.IsBusy() = rosData.is_busy;
 }
 
-void mtsROSToCISST(const crtk_msgs::StringStamped & rosData,
+void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, StringStamped) & rosData,
                    std::string & cisstData)
 {
     cisstData = rosData.string;
 }
 
-void mtsROSToCISST(const crtk_msgs::CartesianImpedanceHalfPlaneGains & rosData,
+void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, CartesianImpedanceHalfPlaneGains) & rosData,
                    prmCartesianImpedanceHalfPlaneGains & cisstData)
 {
     mtsROSToCISST(rosData.deadband,
@@ -51,7 +50,8 @@ void mtsROSToCISST(const crtk_msgs::CartesianImpedanceHalfPlaneGains & rosData,
                   cisstData.Bias);
 }
 
-void mtsROSToCISST(const crtk_msgs::CartesianImpedance & rosData, prmCartesianImpedance & cisstData)
+void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, CartesianImpedance) & rosData,
+                   prmCartesianImpedance & cisstData)
 {
     // vf pos/rot
     mtsROSToCISST(rosData.force_position,
@@ -74,7 +74,7 @@ void mtsROSToCISST(const crtk_msgs::CartesianImpedance & rosData, prmCartesianIm
                   cisstData.OrientationNegative);
 }
 
-void mtsROSToCISST(const crtk_msgs::QueryForwardKinematics::Request & rosData,
+void mtsROSToCISST(const CISST_RAL_SRV_REQ(crtk_msgs, QueryForwardKinematics) & rosData,
                    prmForwardKinematicsRequest & cisstData)
 {
     cisstData.jp().SetSize(rosData.jp.size());
@@ -82,7 +82,7 @@ void mtsROSToCISST(const crtk_msgs::QueryForwardKinematics::Request & rosData,
               cisstData.jp().begin());
 }
 
-void mtsROSToCISST(const crtk_msgs::QueryInverseKinematics::Request & rosData,
+void mtsROSToCISST(const CISST_RAL_SRV_REQ(crtk_msgs, QueryInverseKinematics) & rosData,
                    prmInverseKinematicsRequest & cisstData)
 {
     cisstData.jp().SetSize(rosData.jp.size());

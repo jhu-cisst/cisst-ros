@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2022 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2024 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -14,7 +14,6 @@ no warranty.  The complete license can be found in license.txt and
 http://www.cisst.org/cisst/license.txt.
 
 --- end cisst license ---
-
 */
 
 #ifndef _mts_ros_crtk_bridge_required_h
@@ -43,7 +42,7 @@ public:
       doesn't impact the ROS publish rates.  There is no reason to
       change the default for most applications. */
     mts_ros_crtk_bridge_required(const std::string & _component_name,
-                                 ros::NodeHandle * _node_handle,
+                                 cisst_ral::node_ptr_t _node_handle,
                                  const double _period_in_seconds = 0.1 * cmn_ms);
     mts_ros_crtk_bridge_required(const mtsTaskPeriodicConstructorArg & arg);
 
