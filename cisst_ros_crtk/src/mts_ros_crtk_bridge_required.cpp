@@ -139,6 +139,8 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
         _ros_topic = _clean_namespace + _command;
         if ("hold") {
             this->AddPublisherFromCommandVoid(_interface_name, _command, _ros_topic);
+        } else if ("free") {
+            this->AddPublisherFromCommandVoid(_interface_name, _command, _ros_topic);
         }
     }
 
@@ -153,10 +155,10 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
             || (_crtk_command == "move_jr")) {
             this->AddPublisherFromCommandWrite<prmPositionJointSet, CISST_RAL_MSG(sensor_msgs, JointState)>
                 (_interface_name, _command, _ros_topic);
-        } else  if (_crtk_command == "servo_jv") {
+        } else if (_crtk_command == "servo_jv") {
             this->AddPublisherFromCommandWrite<prmVelocityJointSet, CISST_RAL_MSG(sensor_msgs, JointState)>
                 (_interface_name, _command, _ros_topic);
-        } else  if (_crtk_command == "servo_jf") {
+        } else if (_crtk_command == "servo_jf") {
             this->AddPublisherFromCommandWrite<prmForceTorqueJointSet, CISST_RAL_MSG(sensor_msgs, JointState)>
                 (_interface_name, _command, _ros_topic);
         } else if ((_crtk_command == "servo_cp")
@@ -190,8 +192,8 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
             || (_crtk_command == "setpoint_js")) {
             this->AddSubscriberToCommandRead<prmStateJoint, CISST_RAL_MSG(sensor_msgs, JointState)>
                 (_interface_name, _command, _ros_topic);
-        } else  if ((_crtk_command == "measured_cp")
-                    || (_crtk_command == "setpoint_cp")) {
+        } else if ((_crtk_command == "measured_cp")
+                   || (_crtk_command == "setpoint_cp")) {
             this->AddSubscriberToCommandRead<prmPositionCartesianGet, CISST_RAL_MSG(geometry_msgs, PoseStamped)>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "measured_cv") {
