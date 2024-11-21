@@ -127,6 +127,11 @@ namespace mts_cisst_to_ros {
                                     cisst_ral::node_ptr_t node,
                                     const std::string & debugInfo)
     {
+        if (!cisstData.Valid()) {
+            rosData.header.stamp.sec = 0;
+            rosData.header.stamp.nanosec = 0;
+            return;
+        }
         try {
             const double cisstDataTime = cisstData.Timestamp();
             if (cisstDataTime > 0.0) {
@@ -172,9 +177,6 @@ namespace mts_cisst_to_ros {
                     rosData.child_frame_id,
                     false)
     {
-        if (!cisstData.Valid()) {
-            return false;
-        }
         cisst_header_to_ros_header<_cisstType, _rosType>(cisstData, rosData, node, debugInfo);
         // set reference frame name
         rosData.header.frame_id = cisstData.ReferenceFrame();
@@ -194,9 +196,6 @@ namespace mts_cisst_to_ros {
                     rosData.header,
                     false)
     {
-        if (!cisstData.Valid()) {
-            return false;
-        }
         cisst_header_to_ros_header<_cisstType, _rosType>(cisstData, rosData, node, debugInfo);
         // set reference frame name
         rosData.header.frame_id = cisstData.ReferenceFrame();
@@ -214,9 +213,6 @@ namespace mts_cisst_to_ros {
                     rosData.header,
                     false)
     {
-        if (!cisstData.Valid()) {
-            return false;
-        }
         cisst_header_to_ros_header<_cisstType, _rosType>(cisstData, rosData, node, debugInfo);
         return true;
     }
