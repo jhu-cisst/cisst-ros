@@ -128,8 +128,7 @@ namespace mts_cisst_to_ros {
                                     const std::string & debugInfo)
     {
         if (!cisstData.Valid()) {
-            rosData.header.stamp.sec = 0;
-            rosData.header.stamp.nanosec = 0;
+            CISST_RAL_TIME_SET_TO_ZERO(rosData.header.stamp);
             return;
         }
         try {
