@@ -576,6 +576,8 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                     std::string _button_name = _button_interface.substr(_prefix_size + _offset);
                     // put all to lower case to be more ROS alike
                     std::transform(_button_name.begin(), _button_name.end(), _button_name.begin(), tolower);
+                    cmnStringReplaceAll(_button_name, "-", "_minus");
+                    cmnStringReplaceAll(_button_name, "+", "_plus");
                     // add and connect interface to event bridge
                     m_events_bridge->AddPublisherFromEventWrite<prmEventButton,
                                                                 CISST_RAL_MSG(sensor_msgs, Joy)>
