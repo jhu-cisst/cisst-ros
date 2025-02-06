@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2024 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2025 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -205,7 +205,8 @@ void mts_ros_crtk_bridge_provided::Run(void)
 void mts_ros_crtk_bridge_provided::bridge_all_interfaces_provided(const std::string & _component_name,
                                                                   const std::string & _ros_namespace,
                                                                   const double _publish_period_in_seconds,
-                                                                  const double _tf_period_in_seconds)
+                                                                  const double _tf_period_in_seconds,
+                                                                  const bool _read_write)
 {
     // first make sure we can find the component to bridge
     mtsManagerLocal * _component_manager = mtsComponentManager::GetInstance();
@@ -228,7 +229,8 @@ void mts_ros_crtk_bridge_provided::bridge_all_interfaces_provided(const std::str
                                   _interface,
                                   _ros_sub_namespace,
                                   _publish_period_in_seconds,
-                                  _tf_period_in_seconds);
+                                  _tf_period_in_seconds,
+                                  _read_write);
     }
 }
 
@@ -236,7 +238,8 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                                                              const std::string & _interface_name,
                                                              const std::string & _ros_namespace,
                                                              const double _publish_period_in_seconds,
-                                                             const double _tf_period_in_seconds)
+                                                             const double _tf_period_in_seconds,
+                                                             const bool _read_write)
 {
     // first make sure we can find the component to bridge
     mtsManagerLocal * _component_manager = mtsComponentManager::GetInstance();
@@ -308,95 +311,118 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
     std::string _crtk_command;
     std::string _ros_topic;
 
-    // void commands
-    for (auto & _command :  _interface_provided->GetNamesOfCommandsVoid()) {
-        if (should_be_bridged(_command)) {
-            // get the CRTK command so we know which template type to use
-            cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
-            _ros_topic = _clean_namespace + _command;
-            if (_crtk_command == "hold") {
-                m_subscribers_bridge->AddSubscriberToCommandVoid(_required_interface_name, _command, _ros_topic);
-            } else if (_crtk_command == "free") {
-                m_subscribers_bridge->AddSubscriberToCommandVoid(_required_interface_name, _command, _ros_topic);
+    // read-write only
+    if (_read_write) {
+        // void commands
+        for (auto & _command :  _interface_provided->GetNamesOfCommandsVoid()) {
+            if (should_be_bridged(_command)) {
+                // get the CRTK command so we know which template type to use
+                cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
+                _ros_topic = _clean_namespace + _command;
+                if (_crtk_command == "hold") {
+                    m_subscribers_bridge->AddSubscriberToCommandVoid(_required_interface_name, _command, _ros_topic);
+                } else if (_crtk_command == "free") {
+                    m_subscribers_bridge->AddSubscriberToCommandVoid(_required_interface_name, _command, _ros_topic);
+                }
             }
         }
-    }
 
-    // write commands
-    for (auto & _command :  _interface_provided->GetNamesOfCommandsWrite()) {
-        if (should_be_bridged(_command)) {
-            // get the CRTK command so we know which template type to use
-            cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
-            _ros_topic = _clean_namespace + _command;
-            if ((_crtk_command == "servo_jp")
-                || (_crtk_command == "servo_jr")
-                || (_crtk_command == "move_jp")
-                || (_crtk_command == "move_jr")) {
-                if (argument_type_is_expected(_crtk_command,
-                                              _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
-                    m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionJointSet,
-                                                                      CISST_RAL_MSG(sensor_msgs, JointState)>
+        // write commands
+        for (auto & _command :  _interface_provided->GetNamesOfCommandsWrite()) {
+            if (should_be_bridged(_command)) {
+                // get the CRTK command so we know which template type to use
+                cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
+                _ros_topic = _clean_namespace + _command;
+                if ((_crtk_command == "servo_jp")
+                    || (_crtk_command == "servo_jr")
+                    || (_crtk_command == "move_jp")
+                    || (_crtk_command == "move_jr")) {
+                    if (argument_type_is_expected(_crtk_command,
+                                                  _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
+                        m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionJointSet,
+                                                                          CISST_RAL_MSG(sensor_msgs, JointState)>
+                            (_required_interface_name, _command, _ros_topic);
+                    }
+                } else  if (_crtk_command == "servo_jv") {
+                    if (argument_type_is_expected(_crtk_command,
+                                                  _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
+                        m_subscribers_bridge->AddSubscriberToCommandWrite<prmVelocityJointSet,
+                                                                          CISST_RAL_MSG(sensor_msgs, JointState)>
+                            (_required_interface_name, _command, _ros_topic);
+                    }
+                } else  if (_crtk_command == "servo_jf") {
+                    if (argument_type_is_expected(_crtk_command,
+                                                  _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
+                        m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceTorqueJointSet,
+                                                                          CISST_RAL_MSG(sensor_msgs, JointState)>
+                            (_required_interface_name, _command, _ros_topic);
+                    }
+                } else if ((_crtk_command == "servo_cp")
+                           || (_crtk_command == "servo_cr")
+                           || (_crtk_command == "move_cp")
+                           || (_crtk_command == "move_cr")) {
+                    if (argument_type_is_expected(_crtk_command,
+                                                  _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
+                        m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionCartesianSet,
+                                                                          CISST_RAL_MSG(geometry_msgs, PoseStamped)>
+                            (_required_interface_name, _command, _ros_topic);
+                    }
+                } else if (_crtk_command == "servo_cv") {
+                    if (argument_type_is_expected(_crtk_command,
+                                                  _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
+                        m_subscribers_bridge->AddSubscriberToCommandWrite<prmVelocityCartesianSet,
+                                                                          CISST_RAL_MSG(geometry_msgs, TwistStamped)>
+                            (_required_interface_name, _command, _ros_topic);
+                    }
+                } else if (_crtk_command == "servo_cf") {
+                    if (argument_type_is_expected(_crtk_command,
+                                                  _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
+                        m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceCartesianSet,
+                                                                          CISST_RAL_MSG(geometry_msgs, WrenchStamped)>
+                            (_required_interface_name, _command, _ros_topic);
+                    }
+                } else if (_crtk_command == "state_command") {
+                    if (argument_type_is_expected(_crtk_command,
+                                                  _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
+                        m_subscribers_bridge->AddSubscriberToCommandWrite<std::string,
+                                                                          CISST_RAL_MSG(crtk_msgs, StringStamped)>
+                            (_required_interface_name, _command, _ros_topic);
+                    }
+                } else if (_crtk_command == "use_gravity_compensation") {
+                    m_subscribers_bridge->AddSubscriberToCommandWrite<bool,
+                                                                      CISST_RAL_MSG(std_msgs, Bool)>
                         (_required_interface_name, _command, _ros_topic);
-                }
-            } else  if (_crtk_command == "servo_jv") {
-                if (argument_type_is_expected(_crtk_command,
-                                              _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
-                    m_subscribers_bridge->AddSubscriberToCommandWrite<prmVelocityJointSet,
-                                                                      CISST_RAL_MSG(sensor_msgs, JointState)>
+                } else if (_crtk_command == "servo_ci") {
+                    m_subscribers_bridge->AddSubscriberToCommandWrite<prmCartesianImpedance,
+                                                                      CISST_RAL_MSG(crtk_msgs, CartesianImpedance)>
                         (_required_interface_name, _command, _ros_topic);
-                }
-            } else  if (_crtk_command == "servo_jf") {
-                if (argument_type_is_expected(_crtk_command,
-                                              _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
-                    m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceTorqueJointSet,
-                                                                      CISST_RAL_MSG(sensor_msgs, JointState)>
-                        (_required_interface_name, _command, _ros_topic);
-                }
-            } else if ((_crtk_command == "servo_cp")
-                       || (_crtk_command == "servo_cr")
-                       || (_crtk_command == "move_cp")
-                       || (_crtk_command == "move_cr")) {
-                if (argument_type_is_expected(_crtk_command,
-                                              _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
-                    m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionCartesianSet,
-                                                                      CISST_RAL_MSG(geometry_msgs, PoseStamped)>
-                        (_required_interface_name, _command, _ros_topic);
-                }
-            } else if (_crtk_command == "servo_cv") {
-                if (argument_type_is_expected(_crtk_command,
-                                              _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
+                } else if (_crtk_command == "servo_cv") {
                     m_subscribers_bridge->AddSubscriberToCommandWrite<prmVelocityCartesianSet,
                                                                       CISST_RAL_MSG(geometry_msgs, TwistStamped)>
                         (_required_interface_name, _command, _ros_topic);
                 }
-            } else if (_crtk_command == "servo_cf") {
-                if (argument_type_is_expected(_crtk_command,
-                                              _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
-                    m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceCartesianSet,
-                                                                      CISST_RAL_MSG(geometry_msgs, WrenchStamped)>
-                        (_required_interface_name, _command, _ros_topic);
-                }
-            } else if (_crtk_command == "state_command") {
-                if (argument_type_is_expected(_crtk_command,
-                                              _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
-                    m_subscribers_bridge->AddSubscriberToCommandWrite<std::string,
-                                                                      CISST_RAL_MSG(crtk_msgs, StringStamped)>
-                        (_required_interface_name, _command, _ros_topic);
-                }
-            } else if (_crtk_command == "use_gravity_compensation") {
-                m_subscribers_bridge->AddSubscriberToCommandWrite<bool,
-                                                                  CISST_RAL_MSG(std_msgs, Bool)>
-                    (_required_interface_name, _command, _ros_topic);
-            } else if (_crtk_command == "servo_ci") {
-                m_subscribers_bridge->AddSubscriberToCommandWrite<prmCartesianImpedance,
-                                                                  CISST_RAL_MSG(crtk_msgs, CartesianImpedance)>
-                    (_required_interface_name, _command, _ros_topic);
-            } else if (_crtk_command == "servo_cv") {
-                m_subscribers_bridge->AddSubscriberToCommandWrite<prmVelocityCartesianSet,
-                                                                  CISST_RAL_MSG(geometry_msgs, TwistStamped)>
-                    (_required_interface_name, _command, _ros_topic);
-            }
 
+            }
+        }
+
+        // qualified read commands
+        for (auto & _command : _interface_provided->GetNamesOfCommandsQualifiedRead()) {
+            if (should_be_bridged(_command)) {
+                // get the CRTK command so we know which template type to use
+                cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
+                _ros_topic = _clean_namespace + _command;
+                if (_crtk_command == "forward_kinematics") {
+                    m_subscribers_bridge->AddServiceFromCommandQualifiedRead<prmForwardKinematicsRequest,
+                                                                             prmForwardKinematicsResponse,
+                                                                             CISST_RAL_SRV(crtk_msgs, QueryForwardKinematics)>
+                        (_required_interface_name, _command, _ros_topic);
+                } else if (_crtk_command == "inverse_kinematics") {
+                    m_subscribers_bridge->AddServiceFromCommandQualifiedRead<prmInverseKinematicsRequest,
+                                                                             prmInverseKinematicsResponse,
+                                                                             CISST_RAL_SRV(crtk_msgs, QueryInverseKinematics)>
+                        (_required_interface_name, _command, _ros_topic);
+                }
+            }
         }
     }
 
@@ -484,26 +510,6 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                 cisst_ral::clean_namespace(_namespace);
                 m_stats_bridge->AddIntervalStatisticsPublisher("stats/" + _namespace,
                                                                _component_name, _interface_name);
-            }
-        }
-    }
-
-    // qualified read commands
-    for (auto & _command : _interface_provided->GetNamesOfCommandsQualifiedRead()) {
-        if (should_be_bridged(_command)) {
-            // get the CRTK command so we know which template type to use
-            cisst_ros_crtk::get_crtk_command(_command, _crtk_command);
-            _ros_topic = _clean_namespace + _command;
-            if (_crtk_command == "forward_kinematics") {
-                m_subscribers_bridge->AddServiceFromCommandQualifiedRead<prmForwardKinematicsRequest,
-                                                                         prmForwardKinematicsResponse,
-                                                                         CISST_RAL_SRV(crtk_msgs, QueryForwardKinematics)>
-                    (_required_interface_name, _command, _ros_topic);
-            } else if (_crtk_command == "inverse_kinematics") {
-                m_subscribers_bridge->AddServiceFromCommandQualifiedRead<prmInverseKinematicsRequest,
-                                                                         prmInverseKinematicsResponse,
-                                                                         CISST_RAL_SRV(crtk_msgs, QueryInverseKinematics)>
-                    (_required_interface_name, _command, _ros_topic);
             }
         }
     }
@@ -645,7 +651,9 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
 void mts_ros_crtk_bridge_provided::add_factory_source(const std::string & _component_name,
                                                       const std::string & _interface_name,
                                                       const double _publish_period_in_seconds,
-                                                      const double _tf_period_in_seconds)
+                                                      const double _tf_period_in_seconds,
+                                                      const bool _read_write
+                                                      )
 {
     decltype(m_factories)::key_type source(_component_name, _interface_name);
 
@@ -659,7 +667,7 @@ void mts_ros_crtk_bridge_provided::add_factory_source(const std::string & _compo
     }
 
     // save default periods for this interface
-    factory * _new_factory = new factory;
+    factory * _new_factory = new factory(_read_write);
     _new_factory->m_bridge = this;
     _new_factory->m_publish_period = _publish_period_in_seconds;
     _new_factory->m_tf_period = _tf_period_in_seconds;
@@ -749,7 +757,8 @@ void mts_ros_crtk_bridge_provided::factory::crtk_interfaces_provided_updated_han
                                             _source.InterfaceName,
                                             _namespace,
                                             m_publish_period,
-                                            m_tf_period);
+                                            m_tf_period,
+                                            m_read_write);
         m_bridge->Connect();
         // after connect, we rely on the new connection event handler to create and start components
     }
