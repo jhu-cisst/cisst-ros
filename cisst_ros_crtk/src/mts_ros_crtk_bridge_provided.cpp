@@ -525,9 +525,15 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                                                             CISST_RAL_MSG(sensor_msgs, Joy)>
                     (_required_interface_name, _event, _ros_topic);
             } else if (_crtk_command == "Button") {
+                std::string _button_name = _clean_namespace_no_trailing_slash;
+                // dirty hack for dVRK buttons Cam+ and Cam-
+                if (*(_button_name.rbegin()) == '_') {
+                    _button_name += "minus";
+                }
+                cmnStringReplaceAll(_button_name, "+", "_plus");
                 m_events_bridge->AddPublisherFromEventWrite<prmEventButton,
                                                             CISST_RAL_MSG(sensor_msgs, Joy)>
-                    (_required_interface_name, _event, _clean_namespace_no_trailing_slash); // for buttons, we just use the interface name
+                    (_required_interface_name, _event, _button_name); // for buttons, we just use the interface name
             } else if (_crtk_command == "operating_state") {
                 m_events_bridge->AddPublisherFromEventWrite<prmOperatingState,
                                                             CISST_RAL_MSG(crtk_msgs, OperatingState)>
@@ -550,47 +556,6 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                     (_required_interface_name, _event, _ros_topic);
                 m_events_bridge->AddLogFromEventWrite(_required_interface_name + "-ros-log", _event,
                                                       mtsROSEventWriteLog::ROS_LOG_INFO);
-            }
-        }
-    }
-
-    // buttons are a pain, they tend to have one interface per button
-    // with a single write event called "Button".  By convention, the
-    // button interface is using the name of the device it is attached
-    // too as prefix (e.g. ForceDimension Falcon00 has button
-    // Falcon00-Left, SensablePhantom left has button leftButton1).
-    // So we look at all interfaces on the component that match the
-    // interface_name and have an event write called "Button".
-    const size_t _prefix_size =_interface_name.size();
-    for (auto & _button_interface : _component->GetNamesOfInterfacesProvided()) {
-        // can only be a prefix if shorter
-        if (_button_interface.size() > _prefix_size) {
-            if (std::equal(_interface_name.begin(),
-                           _interface_name.end(),
-                           _button_interface.begin())) {
-                // this interface qualifies based on the name, does it
-                // contain an event write "Button"?
-                auto _interface_candidate = _component->GetInterfaceProvided(_button_interface);
-                auto _events = _interface_candidate->GetNamesOfEventsWrite();
-                if (std::find(_events.begin(), _events.end(), "Button") != _events.end()) {
-                    // remove heading - or _
-                    size_t _offset = 0;
-                    const char _first_char = _button_interface.at(_prefix_size);
-                    if ((_first_char == '-') || (_first_char == '_')) {
-                        _offset = 1;
-                    }
-                    std::string _button_name = _button_interface.substr(_prefix_size + _offset);
-                    // put all to lower case to be more ROS alike
-                    std::transform(_button_name.begin(), _button_name.end(), _button_name.begin(), tolower);
-                    cmnStringReplaceAll(_button_name, "-", "_minus");
-                    cmnStringReplaceAll(_button_name, "+", "_plus");
-                    // add and connect interface to event bridge
-                    m_events_bridge->AddPublisherFromEventWrite<prmEventButton,
-                                                                CISST_RAL_MSG(sensor_msgs, Joy)>
-                        (_button_interface, "Button", _clean_namespace_no_trailing_slash + _button_name);
-                    m_connections.Add(m_events_bridge->GetName(), _button_interface,
-                                      _component_name, _button_interface);
-                }
             }
         }
     }
