@@ -40,12 +40,11 @@ mts_ros_crtk_bridge_required::mts_ros_crtk_bridge_required(const mtsTaskPeriodic
     cisst_ral::ral ral(arg.Name);
     m_node = ral.node();
     init();
+    PerformsSpin(true);
 }
 
 void mts_ros_crtk_bridge_required::init(void)
-{
-    PerformsSpin(true);
-}
+{ }
 
 mts_ros_crtk_bridge_required::~mts_ros_crtk_bridge_required(void)
 {
