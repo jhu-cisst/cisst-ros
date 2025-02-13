@@ -97,10 +97,10 @@ void mtsROSBridge::Configure(const std::string & CMN_UNUSED(filename))
 
 mtsROSBridge::~mtsROSBridge()
 {
-    for (auto pub : m_publishers) {
+    for (auto pub : m_periodic_publishers) {
         delete(pub);
     }
-    m_publishers.clear();
+    m_periodic_publishers.clear();
 }
 
 bool mtsROSBridge::AddIntervalStatisticsInterface(const std::string & interfaceName)
@@ -151,7 +151,7 @@ void mtsROSBridge::Run(void)
     ProcessQueuedCommands();
     ProcessQueuedEvents();
 
-    for (auto pub : m_publishers) {
+    for (auto pub : m_periodic_publishers) {
         pub->Execute();
     }
 
@@ -187,7 +187,6 @@ bool mtsROSBridge::AddPublisherFromEventVoid(const std::string & interfaceRequir
             delete new_pub;
             return false;
         }
-    m_publishers.push_back(new_pub);
     return true;
 }
 
@@ -215,7 +214,7 @@ bool mtsROSBridge::Addtf2BroadcasterFromCommandRead(const std::string & interfac
         delete new_pub;
         return false;
     }
-    m_publishers.push_back(new_pub);
+    m_periodic_publishers.push_back(new_pub);
     return true;
 }
 
@@ -239,7 +238,6 @@ bool mtsROSBridge::AddLogFromEventWrite(const std::string & interfaceRequiredNam
         delete new_pub;
         return false;
     }
-    m_publishers.push_back(new_pub);
     return true;
 }
 

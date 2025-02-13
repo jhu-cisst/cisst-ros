@@ -993,7 +993,7 @@ public:
 protected:
     //! list of publishers
     typedef std::list<mtsROSPublisherBase *> publishers_t;
-    publishers_t m_publishers;
+    publishers_t m_periodic_publishers;
 
     //! ros node
     cisst_ral::node_ptr_t m_node;
@@ -1034,7 +1034,7 @@ bool mtsROSBridge::AddPublisherFromCommandRead(const std::string & interface_req
         delete new_pub;
         return false;
     }
-    m_publishers.push_back(new_pub);
+    m_periodic_publishers.push_back(new_pub);
     return true;
 }
 
@@ -1093,7 +1093,6 @@ bool mtsROSBridge::AddPublisherFromEventWrite(const std::string & interface_requ
         delete new_pub;
         return false;
     }
-    m_publishers.push_back(new_pub);
     return true;
 }
 
