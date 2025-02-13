@@ -200,7 +200,7 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "period_statistics") {
             this->AddSubscriberToCommandRead<mtsIntervalStatistics, CISST_RAL_MSG(cisst_msgs, IntervalStatistics)>
-                (_interface_name, _command, "stats/" + _ros_topic);
+                (_interface_name, _command, _ros_topic);
         } else {
             CMN_LOG_CLASS_INIT_WARNING << "populate_interface_provided: read command \"" << _command
                                        << "\" is not recognized as a CRTK command so it was not automatically added to the provided interface \""
