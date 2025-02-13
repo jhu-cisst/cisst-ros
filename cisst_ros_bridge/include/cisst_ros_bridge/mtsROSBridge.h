@@ -1137,6 +1137,12 @@ bool mtsROSBridge::AddSubscriberToCommandRead(const std::string & interface_prov
     if (!interfaceProvided) {
         interfaceProvided = this->AddInterfaceProvided(interface_provided);
     }
+    if (!interfaceProvided) {
+        CISST_RAL_ERROR("mtsROSBridge::AddSubscriberToCommandRead: failed to create provided interface.");
+        CMN_LOG_CLASS_INIT_ERROR << "AddSubscriberToCommandRead: failed to create provided interface \""
+                                 << interface_provided << "\"" << std::endl;
+        return false;
+    }
 
     mtsROSSubscriberStateTable<_cisst_t, _ros_t> * new_sub
         = new mtsROSSubscriberStateTable<_cisst_t, _ros_t>(name, m_node, table_size);
