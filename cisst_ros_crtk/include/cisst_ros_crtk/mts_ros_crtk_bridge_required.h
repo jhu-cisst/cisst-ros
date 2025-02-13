@@ -50,11 +50,6 @@ public:
 
     void init(void); // called by all ctors
     void Configure(const std::string & _json_file) override;
-    void ConfigureJSON(const Json::Value & _json_config);
-
-    inline void Startup(void) {};
-    void Run(void);
-    inline void Cleanup(void) {};
 
     /*! This method will look at all the required functions and event
       handlers that match the CRTK convention and automatically create

@@ -40,11 +40,11 @@ mts_ros_crtk_bridge_required::mts_ros_crtk_bridge_required(const mtsTaskPeriodic
     cisst_ral::ral ral(arg.Name);
     m_node = ral.node();
     init();
+    PerformsSpin(true);
 }
 
 void mts_ros_crtk_bridge_required::init(void)
-{
-}
+{ }
 
 mts_ros_crtk_bridge_required::~mts_ros_crtk_bridge_required(void)
 {
@@ -64,17 +64,6 @@ void mts_ros_crtk_bridge_required::Configure(const std::string & _json_file)
     }
 
     ConfigureJSON(_json_config);
-}
-
-void mts_ros_crtk_bridge_required::ConfigureJSON(const Json::Value & _json_config)
-{
-    Json::Value _json_value;
-}
-
-void mts_ros_crtk_bridge_required::Run(void)
-{
-    ProcessQueuedCommands();
-    ProcessQueuedEvents();
 }
 
 void mts_ros_crtk_bridge_required::bridge_interface_required(const std::string & _component_name,

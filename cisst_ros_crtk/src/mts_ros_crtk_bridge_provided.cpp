@@ -505,11 +505,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                         (_required_interface_name, _command, _ros_topic);
                 }
             } else if (_crtk_command == "period_statistics") {
-                std::string _namespace = _component_name + "_" + _interface_name;
-                std::transform(_namespace.begin(), _namespace.end(), _namespace.begin(), tolower);
-                cisst_ral::clean_namespace(_namespace);
-                m_stats_bridge->AddIntervalStatisticsPublisher("stats/" + _namespace,
-                                                               _component_name, _interface_name);
+                m_stats_bridge->AddIntervalStatisticsPublisher(_clean_namespace_no_trailing_slash, _component_name, _interface_name);
             }
         }
     }
