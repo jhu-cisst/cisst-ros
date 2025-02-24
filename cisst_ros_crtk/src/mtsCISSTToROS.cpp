@@ -47,6 +47,20 @@ void mtsCISSTToROS(const std::string & cisstData,
     rosData.string = cisstData;
 }
 
+void mtsCISSTToROS(const prmStateCartesian & cisstData,
+                   CISST_RAL_MSG(crtk_msgs, CartesianState) & rosData,
+                   const std::string &)
+{
+    mtsCISSTToROSPose(cisstData.Position(), rosData.pose);
+    rosData.pose_is_valid.data = cisstData.PositionIsValid();
+
+    mtsCISSTToROSTwist(cisstData.Velocity(), rosData.twist);
+    rosData.twist_is_valid.data = cisstData.VelocityIsValid();
+
+    mtsCISSTToROSWrench(cisstData.Force(), rosData.wrench);
+    rosData.wrench_is_valid.data = cisstData.ForceIsValid();
+}
+
 void mtsCISSTToROS(const prmOperatingState & cisstData,
                    CISST_RAL_SRV_RES(crtk_msgs, TriggerOperatingState) & rosData,
                    const std::string & debugInfo)

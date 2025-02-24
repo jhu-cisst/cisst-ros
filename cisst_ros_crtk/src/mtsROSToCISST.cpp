@@ -74,6 +74,23 @@ void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, CartesianImpedance) & rosData,
                   cisstData.OrientationNegative);
 }
 
+void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, CartesianState) & rosData,
+                   prmStateCartesian & cisstData)
+{
+    mtsROSPoseToCISST(rosData.pose, cisstData.Position());
+    cisstData.PositionIsValid() = rosData.pose_is_valid.data;
+
+    vct6 velocity(rosData.twist.linear.x,  rosData.twist.linear.y,  rosData.twist.linear.z,
+               rosData.twist.angular.x, rosData.twist.angular.y, rosData.twist.angular.z);
+    cisstData.SetVelocity(velocity);
+    cisstData.VelocityIsValid() = rosData.twist_is_valid.data;
+
+    vct6 force(rosData.wrench.force.x,  rosData.wrench.force.y,  rosData.wrench.force.z,
+                rosData.wrench.torque.x, rosData.wrench.torque.y, rosData.wrench.torque.z);
+    cisstData.SetForce(force);
+    cisstData.ForceIsValid() = rosData.wrench_is_valid.data;
+}
+
 void mtsROSToCISST(const CISST_RAL_SRV_REQ(crtk_msgs, QueryForwardKinematics) & rosData,
                    prmForwardKinematicsRequest & cisstData)
 {

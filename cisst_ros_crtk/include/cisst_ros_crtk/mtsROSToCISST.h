@@ -22,6 +22,7 @@ http://www.cisst.org/cisst/license.txt.
 // cisst include
 #include <cisstParameterTypes/prmOperatingState.h>
 #include <cisstParameterTypes/prmCartesianImpedance.h>
+#include <cisstParameterTypes/prmStateCartesian.h>
 #include <cisstParameterTypes/prmForwardKinematicsRequest.h>
 #include <cisstParameterTypes/prmInverseKinematicsRequest.h>
 
@@ -33,12 +34,14 @@ http://www.cisst.org/cisst/license.txt.
 #include <crtk_msgs/OperatingState.h>
 #include <crtk_msgs/StringStamped.h>
 #include <crtk_msgs/CartesianImpedance.h>
+#include <crtk_msgs/CartesianState.h>
 #include <crtk_msgs/QueryForwardKinematics.h>
 #include <crtk_msgs/QueryInverseKinematics.h>
 #elif ROS2
 #include <crtk_msgs/msg/operating_state.hpp>
 #include <crtk_msgs/msg/string_stamped.hpp>
 #include <crtk_msgs/msg/cartesian_impedance.hpp>
+#include <crtk_msgs/msg/cartesian_state.hpp>
 #include <crtk_msgs/srv/query_forward_kinematics.hpp>
 #include <crtk_msgs/srv/query_inverse_kinematics.hpp>
 #endif
@@ -50,6 +53,10 @@ void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, StringStamped) & rosData,
                    std::string & cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, CartesianImpedance) & rosData,
                    prmCartesianImpedance & cisstData);
+void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, CartesianState) & rosData,
+                   prmStateCartesian & cisstData);
+
+// crtk_srvs
 void mtsROSToCISST(const CISST_RAL_SRV_REQ(crtk_msgs, QueryForwardKinematics) & rosData,
                    prmForwardKinematicsRequest & cisstData);
 void mtsROSToCISST(const CISST_RAL_SRV_REQ(crtk_msgs, QueryInverseKinematics) & rosData,
