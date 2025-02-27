@@ -48,7 +48,8 @@ public:
       change the default for most applications. */
     mts_ros_crtk_bridge_provided(const std::string & _component_name,
                                  cisst_ral::node_ptr_t _node_handle,
-                                 const double _period_in_seconds = 5.0 * cmn_ms);
+                                 const double _period_in_seconds = 5.0 * cmn_ms,
+                                 const bool _perform_spin = true);
     mts_ros_crtk_bridge_provided(const mtsTaskPeriodicConstructorArg & arg);
 
     ~mts_ros_crtk_bridge_provided();
@@ -154,7 +155,7 @@ public:
 protected:
     //! ros node
     cisst_ral::node_ptr_t m_node_handle_ptr = nullptr;
-
+    bool m_perform_spin = true;
     mtsROSBridge * m_subscribers_bridge = nullptr;
     mtsROSBridge * m_events_bridge = nullptr;
     mtsROSBridge * m_stats_bridge = nullptr;

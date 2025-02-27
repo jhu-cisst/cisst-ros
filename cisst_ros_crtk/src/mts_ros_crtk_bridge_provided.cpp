@@ -31,9 +31,11 @@ CMN_IMPLEMENT_SERVICES_DERIVED_ONEARG(mts_ros_crtk_bridge_provided, mtsTaskPerio
 
 mts_ros_crtk_bridge_provided::mts_ros_crtk_bridge_provided(const std::string & _component_name,
                                                            cisst_ral::node_ptr_t _node_handle,
-                                                           const double _period_in_seconds):
+                                                           const double _period_in_seconds,
+                                                           const bool _perform_spin):
     mtsTaskPeriodic(_component_name, _period_in_seconds),
-    m_node_handle_ptr(_node_handle)
+    m_node_handle_ptr(_node_handle),
+    m_perform_spin(_perform_spin)
 {
     init();
 }
@@ -87,7 +89,7 @@ void mts_ros_crtk_bridge_provided::init(void)
     m_subscribers_bridge =
         new mtsROSBridge(_component_name + "_subscribers", 0.1 * cmn_ms, m_node_handle_ptr);
     m_subscribers_bridge->AddIntervalStatisticsInterface();
-    m_subscribers_bridge->PerformsSpin(true);
+    m_subscribers_bridge->PerformsSpin(m_perform_spin);
     _component_manager->AddComponent(m_subscribers_bridge);
 
     // event bridge
