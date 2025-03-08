@@ -267,7 +267,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
 
     // required interface for bridges shared across components being
     // bridged (e.g. subscribers and events)
-    const std::string _required_interface_name = _component_name + "_using_" + _interface_name;
+    const std::string _required_interface_name = required_interface_name_for(_component_name, _interface_name);
 
     // create new pub/tf bridges for this provided interface if needed
     mtsComponent * _existing_component = nullptr;

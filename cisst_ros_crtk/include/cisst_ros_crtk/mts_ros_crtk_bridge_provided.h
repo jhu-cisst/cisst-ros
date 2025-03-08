@@ -152,6 +152,11 @@ public:
         return m_node_handle_ptr;
     }
 
+    inline static std::string required_interface_name_for(const std::string & _component_name,
+                                                          const std::string & _interface_name) {
+        return _component_name + "_using_" + _interface_name;
+    }
+
 protected:
     //! ros node
     cisst_ral::node_ptr_t m_node_handle_ptr = nullptr;
