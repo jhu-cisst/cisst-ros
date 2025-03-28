@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen, Adnan Munawar
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2024 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2025 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -319,7 +319,7 @@ void mtsROSToCISST(const CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
 void mtsROSToCISST(const CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
                    prmStateJoint & cisstData)
 {
-    cisstData.Name().SetSize(rosData.name.size());
+    cisstData.Name().resize(rosData.name.size());
     std::copy(rosData.name.begin(), rosData.name.end(),
               cisstData.Name().begin());
     cisstData.Position().SetSize(rosData.position.size());
