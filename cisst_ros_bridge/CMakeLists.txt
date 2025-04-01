@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.16)
 project (cisst_ros_bridge VERSION 2.2.0)
 
 # first test for ROS1
