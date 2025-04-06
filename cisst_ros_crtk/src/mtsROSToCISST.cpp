@@ -113,8 +113,7 @@ void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, CartesianServo) & rosData,
 void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, JointServo) & rosData,
                    prmServoJoint & cisstData)
 {
-    cisstData.Name().SetSize(rosData.name.size());
-    std::copy(rosData.name.begin(), rosData.name.end(), cisstData.Name().begin());
+    cisstData.Name().assign(rosData.name.begin(), rosData.name.end());
 
     cisstData.Position().SetSize(rosData.position.size());
     std::copy(rosData.position.begin(), rosData.position.end(), cisstData.Position().begin());
@@ -125,7 +124,7 @@ void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, JointServo) & rosData,
     cisstData.Effort().SetSize(rosData.effort.size());
     std::copy(rosData.effort.begin(), rosData.effort.end(), cisstData.Effort().begin());
 
-    cisstData.Mode().SetSize(rosData.mode.size());
+    cisstData.Mode().resize(rosData.mode.size());
     for (size_t i = 0; i < rosData.mode.size(); i++) {
         cisstData.Mode()[i] = static_cast<prmSetpointMode>(rosData.mode[i].value);
     }
