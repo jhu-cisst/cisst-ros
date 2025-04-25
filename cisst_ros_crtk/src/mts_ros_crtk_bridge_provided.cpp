@@ -66,6 +66,7 @@ void mts_ros_crtk_bridge_provided::init(void)
                     {"move_cp", "prmPositionCartesianSet"},
                     {"move_cr", "prmPositionCartesianSet"},
                     {"servo_cf", "prmForceCartesianSet"},
+                    {"servo_cs", "prmStateCartesian"},
                     {"state_command", "mtsStdString"},
                     {"measured_js", "prmStateJoint"},
                     {"setpoint_js", "prmStateJoint"},
@@ -381,6 +382,13 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                                                   _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
                         m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceCartesianSet,
                                                                           CISST_RAL_MSG(geometry_msgs, WrenchStamped)>
+                            (_required_interface_name, _command, _ros_topic);
+                    }
+                } else if (_crtk_command == "servo_cs") {
+                    if (argument_type_is_expected(_crtk_command,
+                                                  _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
+                        m_subscribers_bridge->AddSubscriberToCommandWrite<prmStateCartesian,
+                                                                          CISST_RAL_MSG(crtk_msgs, CartesianState)>
                             (_required_interface_name, _command, _ros_topic);
                     }
                 } else if (_crtk_command == "state_command") {

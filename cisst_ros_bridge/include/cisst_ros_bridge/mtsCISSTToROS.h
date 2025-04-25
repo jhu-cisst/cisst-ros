@@ -278,6 +278,17 @@ void mtsCISSTToROSTransform(const _cisstFrame & cisstFrame, _rosTransform & rosT
     rosTransform.translation.z = cisstFrame.Translation().Z();
 }
 
+template <typename _cisstVector, typename _rosTwist>
+void mtsCISSTToROSTwist(const _cisstVector & cisstVector, _rosTwist & rosTwist)
+{
+    rosTwist.linear.x = cisstVector.Element(0);
+    rosTwist.linear.y = cisstVector.Element(1);
+    rosTwist.linear.z = cisstVector.Element(2);
+    rosTwist.angular.x = cisstVector.Element(3);
+    rosTwist.angular.y = cisstVector.Element(4);
+    rosTwist.angular.z = cisstVector.Element(5);
+}
+
 template <typename _cisstVector, typename _rosWrench>
 void mtsCISSTToROSWrench(const _cisstVector & cisstVector, _rosWrench & rosWrench)
 {

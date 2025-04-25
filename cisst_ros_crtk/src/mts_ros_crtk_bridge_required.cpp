@@ -159,6 +159,9 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
         } else if (_crtk_command == "servo_cf") {
             this->AddPublisherFromCommandWrite<prmForceCartesianSet, CISST_RAL_MSG(geometry_msgs, WrenchStamped)>
                 (_interface_name, _command, _ros_topic);
+        } else if (_crtk_command == "servo_cs") {
+            this->AddPublisherFromCommandWrite<prmStateCartesian, CISST_RAL_MSG(crtk_msgs, CartesianState)>
+                (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "state_command") {
             this->AddPublisherFromCommandWrite<std::string, CISST_RAL_MSG(crtk_msgs, StringStamped)>
                 (_interface_name, _command, _ros_topic);

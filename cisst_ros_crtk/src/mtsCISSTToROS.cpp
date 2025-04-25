@@ -47,6 +47,84 @@ void mtsCISSTToROS(const std::string & cisstData,
     rosData.string = cisstData;
 }
 
+void mtsCISSTToROS(const prmStateCartesian & cisstData,
+                   CISST_RAL_MSG(crtk_msgs, CartesianState) & rosData,
+                   const std::string &)
+{
+    mtsCISSTToROSPose(cisstData.Position(), rosData.pose);
+    rosData.pose_is_valid.data = cisstData.PositionIsValid();
+
+    mtsCISSTToROSTwist(cisstData.Velocity(), rosData.twist);
+    rosData.twist_is_valid.data = cisstData.VelocityIsValid();
+
+    mtsCISSTToROSWrench(cisstData.Force(), rosData.wrench);
+    rosData.wrench_is_valid.data = cisstData.ForceIsValid();
+}
+
+void mtsCISSTToROS(const prmServoCartesian & cisstData,
+    CISST_RAL_MSG(crtk_msgs, CartesianServo) & rosData,
+    const std::string &)
+{
+    mtsCISSTToROSTransform(cisstData.TaskFrame(), rosData.task_frame);
+
+    mtsCISSTToROSPose(cisstData.Position(), rosData.pose);
+    mtsCISSTToROSTwist(cisstData.Velocity(), rosData.twist);
+    mtsCISSTToROSWrench(cisstData.Force(), rosData.wrench);
+
+    for (size_t i = 0; i < 6; i++) {
+        rosData.axis_mode[i] = CISST_RAL_MSG(crtk_msgs, SetpointMode)();
+        rosData.axis_mode[i].value = static_cast<uint8_t>(cisstData.AxisMode()[i]);
+    }
+}
+
+void mtsCISSTToROS(const prmServoJoint & cisstData,
+    CISST_RAL_MSG(crtk_msgs, JointServo) & rosData,
+    const std::string &)
+{
+    { // names
+        const size_t size = cisstData.Name().size();
+        if (size != 0) {
+            rosData.name.resize(size);
+            std::copy(cisstData.Name().begin(), cisstData.Name().end(),
+                      rosData.name.begin());
+        }
+    }
+    { // positions
+        const size_t size = cisstData.Position().size();
+        if (size != 0) {
+            rosData.position.resize(size);
+            std::copy(cisstData.Position().begin(), cisstData.Position().end(),
+                      rosData.position.begin());
+        }
+    }
+    { // velocities
+        const size_t size = cisstData.Velocity().size();
+        if (size != 0) {
+            rosData.velocity.resize(size);
+            std::copy(cisstData.Velocity().begin(), cisstData.Velocity().end(),
+                      rosData.velocity.begin());
+        }
+    }
+    { // efforts
+        const size_t size = cisstData.Effort().size();
+        if (size != 0) {
+            rosData.effort.resize(size);
+            std::copy(cisstData.Effort().begin(), cisstData.Effort().end(),
+                      rosData.effort.begin());
+        }
+    }
+    { // modes
+        const size_t size = cisstData.Mode().size();
+        if (size != 0) {
+            rosData.mode.resize(size);
+            for (size_t i = 0; i < size; i++) {
+                rosData.mode[i] = CISST_RAL_MSG(crtk_msgs, SetpointMode)();
+                rosData.mode[i].value = static_cast<uint8_t>(cisstData.Mode()[i]);
+            }
+        }
+    }
+}
+
 void mtsCISSTToROS(const prmOperatingState & cisstData,
                    CISST_RAL_SRV_RES(crtk_msgs, TriggerOperatingState) & rosData,
                    const std::string & debugInfo)

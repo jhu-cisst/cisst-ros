@@ -74,6 +74,62 @@ void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, CartesianImpedance) & rosData,
                   cisstData.OrientationNegative);
 }
 
+void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, CartesianState) & rosData,
+                   prmStateCartesian & cisstData)
+{
+    mtsROSPoseToCISST(rosData.pose, cisstData.Position());
+    cisstData.PositionIsValid() = rosData.pose_is_valid.data;
+
+    vct6 velocity(rosData.twist.linear.x,  rosData.twist.linear.y,  rosData.twist.linear.z,
+               rosData.twist.angular.x, rosData.twist.angular.y, rosData.twist.angular.z);
+    cisstData.SetVelocity(velocity);
+    cisstData.VelocityIsValid() = rosData.twist_is_valid.data;
+
+    vct6 force(rosData.wrench.force.x,  rosData.wrench.force.y,  rosData.wrench.force.z,
+                rosData.wrench.torque.x, rosData.wrench.torque.y, rosData.wrench.torque.z);
+    cisstData.SetForce(force);
+    cisstData.ForceIsValid() = rosData.wrench_is_valid.data;
+}
+
+void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, CartesianServo) & rosData,
+                   prmServoCartesian & cisstData)
+{
+    mtsROSTransformToCISST(rosData.task_frame, cisstData.TaskFrame());
+    mtsROSPoseToCISST(rosData.pose, cisstData.Position());
+
+    vct6 velocity(rosData.twist.linear.x,  rosData.twist.linear.y,  rosData.twist.linear.z,
+               rosData.twist.angular.x, rosData.twist.angular.y, rosData.twist.angular.z);
+    cisstData.SetVelocity(velocity);
+
+    vct6 force(rosData.wrench.force.x,  rosData.wrench.force.y,  rosData.wrench.force.z,
+                rosData.wrench.torque.x, rosData.wrench.torque.y, rosData.wrench.torque.z);
+    cisstData.SetForce(force);
+
+    for (size_t i = 0; i < 6; i++) {
+        cisstData.AxisMode()[i] = static_cast<prmSetpointMode>(rosData.axis_mode[i].value);
+    }
+}
+
+void mtsROSToCISST(const CISST_RAL_MSG(crtk_msgs, JointServo) & rosData,
+                   prmServoJoint & cisstData)
+{
+    cisstData.Name().assign(rosData.name.begin(), rosData.name.end());
+
+    cisstData.Position().SetSize(rosData.position.size());
+    std::copy(rosData.position.begin(), rosData.position.end(), cisstData.Position().begin());
+
+    cisstData.Velocity().SetSize(rosData.velocity.size());
+    std::copy(rosData.velocity.begin(), rosData.velocity.end(), cisstData.Velocity().begin());
+
+    cisstData.Effort().SetSize(rosData.effort.size());
+    std::copy(rosData.effort.begin(), rosData.effort.end(), cisstData.Effort().begin());
+
+    cisstData.Mode().resize(rosData.mode.size());
+    for (size_t i = 0; i < rosData.mode.size(); i++) {
+        cisstData.Mode()[i] = static_cast<prmSetpointMode>(rosData.mode[i].value);
+    }
+}
+
 void mtsROSToCISST(const CISST_RAL_SRV_REQ(crtk_msgs, QueryForwardKinematics) & rosData,
                    prmForwardKinematicsRequest & cisstData)
 {
