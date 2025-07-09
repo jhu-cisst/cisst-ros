@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>cisst_ros_crtk</name>
-  <version>2.2.0</version>
+  <version>3.0.0</version>
   <description>The cisst_ros_crtk package</description>
   <license>CISST</license>
-  <author email="anton.deguet@jhu.edu">Anton Deguet</author>  
+  <author email="anton.deguet@jhu.edu">Anton Deguet</author>
   <maintainer email="anton.deguet@jhu.edu">Anton Deguet</maintainer>
 
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
@@ -31,7 +31,7 @@
   <exec_depend condition="$ROS_VERSION == 1">cisst</exec_depend>
   <exec_depend condition="$ROS_VERSION == 1">crtk_msgs</exec_depend>
   <exec_depend condition="$ROS_VERSION == 1">cisst_ros_bridge</exec_depend>
-  
+
   <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
   <depend condition="$ROS_VERSION == 2">cisst_ros2_bridge</depend>
   <depend condition="$ROS_VERSION == 2">crtk_msgs</depend>

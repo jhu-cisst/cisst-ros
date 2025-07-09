@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.16)
-project(cisst_ros_crtk VERSION 2.2.0)
+project(cisst_ros_crtk VERSION 3.0.0)
 
 # first test for ROS1
 set (ROS1_depends
@@ -59,7 +59,7 @@ set(REQUIRED_CISST_LIBRARIES
   )
 
 # find cisst and make sure the required libraries have been compiled
-find_package (cisst 1.2.1 REQUIRED ${REQUIRED_CISST_LIBRARIES})
+find_package (cisst 1.3.0 REQUIRED ${REQUIRED_CISST_LIBRARIES})
 
 if (cisst_FOUND_AS_REQUIRED)
 
