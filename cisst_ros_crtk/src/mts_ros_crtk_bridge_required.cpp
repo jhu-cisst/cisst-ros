@@ -40,11 +40,11 @@ mts_ros_crtk_bridge_required::mts_ros_crtk_bridge_required(const mtsTaskPeriodic
     cisst_ral::ral ral(arg.Name);
     m_node = ral.node();
     init();
+    PerformsSpin(true);
 }
 
 void mts_ros_crtk_bridge_required::init(void)
-{
-}
+{ }
 
 mts_ros_crtk_bridge_required::~mts_ros_crtk_bridge_required(void)
 {
@@ -64,17 +64,6 @@ void mts_ros_crtk_bridge_required::Configure(const std::string & _json_file)
     }
 
     ConfigureJSON(_json_config);
-}
-
-void mts_ros_crtk_bridge_required::ConfigureJSON(const Json::Value & _json_config)
-{
-    Json::Value _json_value;
-}
-
-void mts_ros_crtk_bridge_required::Run(void)
-{
-    ProcessQueuedCommands();
-    ProcessQueuedEvents();
 }
 
 void mts_ros_crtk_bridge_required::bridge_interface_required(const std::string & _component_name,
@@ -139,6 +128,8 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
         _ros_topic = _clean_namespace + _command;
         if ("hold") {
             this->AddPublisherFromCommandVoid(_interface_name, _command, _ros_topic);
+        } else if ("free") {
+            this->AddPublisherFromCommandVoid(_interface_name, _command, _ros_topic);
         }
     }
 
@@ -153,10 +144,10 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
             || (_crtk_command == "move_jr")) {
             this->AddPublisherFromCommandWrite<prmPositionJointSet, CISST_RAL_MSG(sensor_msgs, JointState)>
                 (_interface_name, _command, _ros_topic);
-        } else  if (_crtk_command == "servo_jv") {
+        } else if (_crtk_command == "servo_jv") {
             this->AddPublisherFromCommandWrite<prmVelocityJointSet, CISST_RAL_MSG(sensor_msgs, JointState)>
                 (_interface_name, _command, _ros_topic);
-        } else  if (_crtk_command == "servo_jf") {
+        } else if (_crtk_command == "servo_jf") {
             this->AddPublisherFromCommandWrite<prmForceTorqueJointSet, CISST_RAL_MSG(sensor_msgs, JointState)>
                 (_interface_name, _command, _ros_topic);
         } else if ((_crtk_command == "servo_cp")
@@ -167,6 +158,9 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "servo_cf") {
             this->AddPublisherFromCommandWrite<prmForceCartesianSet, CISST_RAL_MSG(geometry_msgs, WrenchStamped)>
+                (_interface_name, _command, _ros_topic);
+        } else if (_crtk_command == "servo_cs") {
+            this->AddPublisherFromCommandWrite<prmStateCartesian, CISST_RAL_MSG(crtk_msgs, CartesianState)>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "state_command") {
             this->AddPublisherFromCommandWrite<std::string, CISST_RAL_MSG(crtk_msgs, StringStamped)>
@@ -190,8 +184,8 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
             || (_crtk_command == "setpoint_js")) {
             this->AddSubscriberToCommandRead<prmStateJoint, CISST_RAL_MSG(sensor_msgs, JointState)>
                 (_interface_name, _command, _ros_topic);
-        } else  if ((_crtk_command == "measured_cp")
-                    || (_crtk_command == "setpoint_cp")) {
+        } else if ((_crtk_command == "measured_cp")
+                   || (_crtk_command == "setpoint_cp")) {
             this->AddSubscriberToCommandRead<prmPositionCartesianGet, CISST_RAL_MSG(geometry_msgs, PoseStamped)>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "measured_cv") {

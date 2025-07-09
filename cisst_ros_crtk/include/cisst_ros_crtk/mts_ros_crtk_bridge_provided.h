@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet
   Created on: 2020-03-24
 
-  (C) Copyright 2020-2024 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2020-2025 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -48,7 +48,8 @@ public:
       change the default for most applications. */
     mts_ros_crtk_bridge_provided(const std::string & _component_name,
                                  cisst_ral::node_ptr_t _node_handle,
-                                 const double _period_in_seconds = 5.0 * cmn_ms);
+                                 const double _period_in_seconds = 5.0 * cmn_ms,
+                                 const bool _perform_spin = true);
     mts_ros_crtk_bridge_provided(const mtsTaskPeriodicConstructorArg & arg);
 
     ~mts_ros_crtk_bridge_provided();
@@ -70,7 +71,8 @@ public:
                                         const double _publish_period_in_seconds
                                         = cisst_ros_crtk::bridge_provided_default_publish_period,
                                         const double _tf_period_in_seconds
-                                        = cisst_ros_crtk::bridge_provided_default_tf_period);
+                                        = cisst_ros_crtk::bridge_provided_default_tf_period,
+                                        const bool _read_write = true);
 
     /*! This method will look at all the provided functions and events
       that match the CRTK convention and automatically create the
@@ -81,13 +83,15 @@ public:
       their names are also parsed to check if they match the CRTK
       covention, i.e. `local/measured_cp` will also be automatically
       bridged. */
-    void bridge_interface_provided(const std::string & _component_name,
-                                   const std::string & _interface_name,
-                                   const std::string & _ros_namespace,
-                                   const double _publish_period_in_seconds
-                                   = cisst_ros_crtk::bridge_provided_default_publish_period,
-                                   const double _tf_period_in_seconds
-                                   = cisst_ros_crtk::bridge_provided_default_tf_period);
+    virtual void bridge_interface_provided(const std::string & _component_name,
+                                           const std::string & _interface_name,
+                                           const std::string & _ros_namespace,
+                                           const double _publish_period_in_seconds
+                                           = cisst_ros_crtk::bridge_provided_default_publish_period,
+                                           const double _tf_period_in_seconds
+                                           = cisst_ros_crtk::bridge_provided_default_tf_period,
+                                           const bool _read_write
+                                           = true);
 
     /*! Same method but used the name of the provided interface as ROS
       namespace. */
@@ -96,11 +100,14 @@ public:
                                           const double _publish_period_in_seconds
                                           = cisst_ros_crtk::bridge_provided_default_publish_period,
                                           const double _tf_period_in_seconds
-                                          = cisst_ros_crtk::bridge_provided_default_tf_period) {
+                                          = cisst_ros_crtk::bridge_provided_default_tf_period,
+                                          const bool _read_write
+                                          = true) {
         bridge_interface_provided(_component_name, _interface_name,
                                   _interface_name, // use interface names as ROS namespace
                                   _publish_period_in_seconds,
-                                  _tf_period_in_seconds);
+                                  _tf_period_in_seconds,
+                                  _read_write);
     }
 
     /*! Connect to an interface that will provide the name of newly
@@ -113,7 +120,9 @@ public:
                             const double _publish_period_in_seconds
                             = cisst_ros_crtk::bridge_provided_default_publish_period,
                             const double _tf_period_in_seconds
-                            = cisst_ros_crtk::bridge_provided_default_tf_period);
+                            = cisst_ros_crtk::bridge_provided_default_tf_period,
+                            const bool _read_write
+                            = true);
 
     /*! Connect all components created and used so far. */
     inline virtual void Connect(void) {
@@ -143,10 +152,15 @@ public:
         return m_node_handle_ptr;
     }
 
+    inline static std::string required_interface_name_for(const std::string & _component_name,
+                                                          const std::string & _interface_name) {
+        return _component_name + "_using_" + _interface_name;
+    }
+
 protected:
     //! ros node
     cisst_ral::node_ptr_t m_node_handle_ptr = nullptr;
-
+    bool m_perform_spin = true;
     mtsROSBridge * m_subscribers_bridge = nullptr;
     mtsROSBridge * m_events_bridge = nullptr;
     mtsROSBridge * m_stats_bridge = nullptr;
@@ -164,11 +178,17 @@ protected:
 
     class factory {
     public:
+        inline factory(const bool _read_write):
+            m_read_write(_read_write) {};
+
         mts_ros_crtk_bridge_provided * m_bridge;
         double m_publish_period;
         double m_tf_period;
+        bool m_read_write;
         mtsFunctionRead m_crtk_interfaces_provided;
         void crtk_interfaces_provided_updated_handler(void);
+    private:
+        factory(void);
     };
 
     std::map<std::pair<std::string, std::string>, factory *> m_factories;

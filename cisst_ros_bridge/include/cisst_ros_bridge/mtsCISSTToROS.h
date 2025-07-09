@@ -127,6 +127,10 @@ namespace mts_cisst_to_ros {
                                     cisst_ral::node_ptr_t node,
                                     const std::string & debugInfo)
     {
+        if (!cisstData.Valid()) {
+            CISST_RAL_TIME_SET_TO_ZERO(rosData.header.stamp);
+            return;
+        }
         try {
             const double cisstDataTime = cisstData.Timestamp();
             if (cisstDataTime > 0.0) {
@@ -172,9 +176,6 @@ namespace mts_cisst_to_ros {
                     rosData.child_frame_id,
                     false)
     {
-        if (!cisstData.Valid()) {
-            return false;
-        }
         cisst_header_to_ros_header<_cisstType, _rosType>(cisstData, rosData, node, debugInfo);
         // set reference frame name
         rosData.header.frame_id = cisstData.ReferenceFrame();
@@ -194,9 +195,6 @@ namespace mts_cisst_to_ros {
                     rosData.header,
                     false)
     {
-        if (!cisstData.Valid()) {
-            return false;
-        }
         cisst_header_to_ros_header<_cisstType, _rosType>(cisstData, rosData, node, debugInfo);
         // set reference frame name
         rosData.header.frame_id = cisstData.ReferenceFrame();
@@ -214,9 +212,6 @@ namespace mts_cisst_to_ros {
                     rosData.header,
                     false)
     {
-        if (!cisstData.Valid()) {
-            return false;
-        }
         cisst_header_to_ros_header<_cisstType, _rosType>(cisstData, rosData, node, debugInfo);
         return true;
     }
@@ -281,6 +276,17 @@ void mtsCISSTToROSTransform(const _cisstFrame & cisstFrame, _rosTransform & rosT
     rosTransform.translation.x = cisstFrame.Translation().X();
     rosTransform.translation.y = cisstFrame.Translation().Y();
     rosTransform.translation.z = cisstFrame.Translation().Z();
+}
+
+template <typename _cisstVector, typename _rosTwist>
+void mtsCISSTToROSTwist(const _cisstVector & cisstVector, _rosTwist & rosTwist)
+{
+    rosTwist.linear.x = cisstVector.Element(0);
+    rosTwist.linear.y = cisstVector.Element(1);
+    rosTwist.linear.z = cisstVector.Element(2);
+    rosTwist.angular.x = cisstVector.Element(3);
+    rosTwist.angular.y = cisstVector.Element(4);
+    rosTwist.angular.z = cisstVector.Element(5);
 }
 
 template <typename _cisstVector, typename _rosWrench>

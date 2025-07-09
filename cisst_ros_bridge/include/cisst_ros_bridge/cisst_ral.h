@@ -41,6 +41,8 @@ http://www.cisst.org/cisst/license.txt.
 #define CISST_RAL_SRV_REQ(package, service) package::service::Request
 #define CISST_RAL_SRV_RES(package, service) package::service::Response
 
+#define CISST_RAL_TIME_SET_TO_ZERO(stamp) stamp.sec = 0; stamp.nsec = 0
+
 namespace cisst_ral {
     typedef std::shared_ptr<ros::NodeHandle> node_ptr_t;
 
@@ -115,6 +117,8 @@ namespace cisst_ral {
 #define CISST_RAL_SRV(package, service) package::srv::service
 #define CISST_RAL_SRV_REQ(package, service) package::srv::service::Request
 #define CISST_RAL_SRV_RES(package, service) package::srv::service::Response
+
+#define CISST_RAL_TIME_SET_TO_ZERO(stamp) stamp.sec = 0; stamp.nanosec = 0
 
 namespace cisst_ral {
     typedef std::shared_ptr<rclcpp::Node> node_ptr_t;

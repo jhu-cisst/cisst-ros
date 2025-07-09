@@ -97,10 +97,10 @@ void mtsROSBridge::Configure(const std::string & CMN_UNUSED(filename))
 
 mtsROSBridge::~mtsROSBridge()
 {
-    for (auto pub : m_publishers) {
+    for (auto pub : m_periodic_publishers) {
         delete(pub);
     }
-    m_publishers.clear();
+    m_periodic_publishers.clear();
 }
 
 bool mtsROSBridge::AddIntervalStatisticsInterface(const std::string & interfaceName)
@@ -121,12 +121,13 @@ void mtsROSBridge::AddIntervalStatisticsPublisher(const std::string & ros_namesp
                                                   const std::string & interfaceName)
 {
     // create an publisher to publish this component interval statistics
-    std::string topicName = ros_namespace + "/period_statistics";
+    const std::string topicName = ros_namespace + "/period_statistics";
+    const std::string interfaceRequiredName = componentName + "_" + interfaceName + "_period_statistics";
     this->AddPublisherFromCommandRead<mtsIntervalStatistics, CISST_RAL_MSG(cisst_msgs, IntervalStatistics)>
-        (componentName + interfaceName, "period_statistics", topicName);
+        (interfaceRequiredName, "period_statistics", topicName);
 
     mtsManagerLocal * componentManager = mtsManagerLocal::GetInstance();
-    componentManager->Connect(this->GetName(), componentName + interfaceName,
+    componentManager->Connect(this->GetName(), interfaceRequiredName,
                               componentName, interfaceName);
 }
 
@@ -150,7 +151,7 @@ void mtsROSBridge::Run(void)
     ProcessQueuedCommands();
     ProcessQueuedEvents();
 
-    for (auto pub : m_publishers) {
+    for (auto pub : m_periodic_publishers) {
         pub->Execute();
     }
 
@@ -159,7 +160,7 @@ void mtsROSBridge::Run(void)
         ros::spinOnce();
 #elif ROS2
         rclcpp::spin_some(m_node);
-#endif 
+#endif
     }
 }
 
@@ -186,7 +187,6 @@ bool mtsROSBridge::AddPublisherFromEventVoid(const std::string & interfaceRequir
             delete new_pub;
             return false;
         }
-    m_publishers.push_back(new_pub);
     return true;
 }
 
@@ -214,7 +214,7 @@ bool mtsROSBridge::Addtf2BroadcasterFromCommandRead(const std::string & interfac
         delete new_pub;
         return false;
     }
-    m_publishers.push_back(new_pub);
+    m_periodic_publishers.push_back(new_pub);
     return true;
 }
 
@@ -238,7 +238,6 @@ bool mtsROSBridge::AddLogFromEventWrite(const std::string & interfaceRequiredNam
         delete new_pub;
         return false;
     }
-    m_publishers.push_back(new_pub);
     return true;
 }
 
