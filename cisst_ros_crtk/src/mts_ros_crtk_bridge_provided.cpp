@@ -16,6 +16,7 @@ http://www.cisst.org/cisst/license.txt.
 --- end cisst license ---
 */
 
+#include "cisstParameterTypes/prmStateJoint.h"
 #include <cisstMultiTask/mtsManagerComponentServices.h>
 
 // conversion methods
@@ -59,6 +60,7 @@ void mts_ros_crtk_bridge_provided::init(void)
                     {"move_jp", "prmPositionJointSet"},
                     {"move_jr", "prmPositionJointSet"},
                     {"servo_jf", "prmForceTorqueJointSet"},
+                    {"servo_js", "prmStateJoint"},
                     {"servo_cp", "prmPositionCartesianSet"},
                     {"servo_cr", "prmPositionCartesianSet"},
                     {"servo_jv", "prmVelocityJointSet"},
@@ -357,6 +359,13 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                     if (argument_type_is_expected(_crtk_command,
                                                   _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
                         m_subscribers_bridge->AddSubscriberToCommandWrite<prmForceTorqueJointSet,
+                                                                          CISST_RAL_MSG(sensor_msgs, JointState)>
+                            (_required_interface_name, _command, _ros_topic);
+                    }
+                } else  if (_crtk_command == "servo_js") {
+                    if (argument_type_is_expected(_crtk_command,
+                                                  _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
+                        m_subscribers_bridge->AddSubscriberToCommandWrite<prmStateJoint,
                                                                           CISST_RAL_MSG(sensor_msgs, JointState)>
                             (_required_interface_name, _command, _ros_topic);
                     }
