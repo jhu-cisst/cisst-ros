@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2023 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2025 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -57,6 +57,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <std_msgs/Float64.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int32.h>
+#include <std_msgs/UInt64.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Float64MultiArray.h>
 #include <geometry_msgs/Vector3Stamped.h>
@@ -87,6 +88,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <std_msgs/msg/float64.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/int32.hpp>
+#include <std_msgs/msg/u_int64.hpp>
 #include <std_msgs/msg/string.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <geometry_msgs/msg/vector3_stamped.hpp>
@@ -309,6 +311,9 @@ void mtsCISSTToROS(const double & cisstData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const int & cisstData,
                    CISST_RAL_MSG(std_msgs, Int32) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const size_t & cisstData,
+                   CISST_RAL_MSG(std_msgs, UInt64) & rosData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const bool & cisstData,
                    CISST_RAL_MSG(std_msgs, Bool) & rosData,

@@ -5,7 +5,7 @@
   Author(s):  Anton Deguet, Zihan Chen
   Created on: 2013-05-21
 
-  (C) Copyright 2013-2024 Johns Hopkins University (JHU), All Rights Reserved.
+  (C) Copyright 2013-2025 Johns Hopkins University (JHU), All Rights Reserved.
 
 --- begin cisst license - do not edit ---
 
@@ -46,6 +46,13 @@ void mtsCISSTToROS(const double & cisstData,
 
 void mtsCISSTToROS(const int & cisstData,
                    CISST_RAL_MSG(std_msgs, Int32) & rosData,
+                   const std::string &)
+{
+    rosData.data = cisstData;
+}
+
+void mtsCISSTToROS(const size_t & cisstData,
+                   CISST_RAL_MSG(std_msgs, UInt64) & rosData,
                    const std::string &)
 {
     rosData.data = cisstData;
@@ -606,7 +613,7 @@ void mtsCISSTToROS(const prmInputData & cisstData,
 
 void mtsCISSTToROS(const prmImageFrame & cisstData,
                    CISST_RAL_MSG(sensor_msgs, Image) & rosData,
-                   const std::string & debugInfo)
+                   const std::string &)
 {
     rosData.width = cisstData.Width();
     rosData.height = cisstData.Height();
@@ -638,7 +645,7 @@ void mtsCISSTToROS(const prmImageFrame & cisstData,
 
 void mtsCISSTToROS(const prmCameraInfo & cisstData,
                    CISST_RAL_MSG(sensor_msgs, CameraInfo) & rosData,
-                   const std::string & debugInfo)
+                   const std::string &)
 {
     rosData.width = cisstData.Width();
     rosData.height = cisstData.Height();
@@ -654,7 +661,7 @@ void mtsCISSTToROS(const prmCameraInfo & cisstData,
 
 void mtsCISSTToROS(const prmDepthMap & cisstData,
                    CISST_RAL_MSG(sensor_msgs, PointCloud2) & rosData,
-                   const std::string & debugInfo)
+                   const std::string &)
 {
     rosData.width = cisstData.Width();
     rosData.height = cisstData.Height();
