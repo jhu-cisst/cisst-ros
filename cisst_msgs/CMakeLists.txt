@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(cisst_msgs VERSION 3.0.0)
+project(cisst_msgs VERSION 4.0.0)
 
 # first test for ROS1
 set (ROS1_depends std_msgs geometry_msgs)

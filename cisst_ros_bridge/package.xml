@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>cisst_ros_bridge</name>
-  <version>3.0.0</version>
+  <version>4.0.0</version>
   <description>The cisst_ros_bridge package</description>
   <license>CISST</license>
   <author email="anton.deguet@jhu.edu">Anton Deguet</author>
