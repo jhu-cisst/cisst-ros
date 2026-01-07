@@ -1,6 +1,22 @@
 Change log
 ==========
 
+4.0.0 (2025-12-18)
+==================
+
+* API changes:
+  * Major change: Publishers always publish but set timestamp to zero if the data is invalid!
+  * Different handling for buttons
+  * Changed topic namespace for interval_statistics
+* Deprecated features:
+  * CMake minimum required is 3.16
+* New features:
+  * Add option read-only to disable all subscribers for a given interface
+  * Added support for `servo_cs` and Cartesian state
+  * Added `free` to supported CRTK commands
+* Bug fixes:
+  * None
+
 3.0.0 (2024-08-30)
 ==================
 
