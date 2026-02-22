@@ -33,6 +33,8 @@ mtsROSBridge::mtsROSBridge(const std::string & name,
     m_spin(spin),
     m_signal(signal)
 {
+    this->mTags.clear();
+    this->AddTag("ROS");
     typedef char * char_pointer;
     char_pointer * argv = new char_pointer[1];
     argv[0]= new char[strlen(name.c_str()) + 1];
@@ -66,6 +68,8 @@ mtsROSBridge::mtsROSBridge(const mtsTaskPeriodicConstructorArg &arg):
     m_spin(false),
     m_signal(true)
 {
+    this->mTags.clear();
+    this->AddTag("ROS");
     typedef char * char_pointer;
     char_pointer * argv = new char_pointer[1];
     argv[0]= new char[strlen(arg.Name.c_str()) + 1];
@@ -88,6 +92,8 @@ mtsROSBridge::mtsROSBridge(const std::string & name,
     m_spin(false),
     m_signal(false)
 {
+    this->mTags.clear();
+    this->AddTag("ROS");
     m_node = node;
 }
 

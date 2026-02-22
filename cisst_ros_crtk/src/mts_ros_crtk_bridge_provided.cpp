@@ -50,6 +50,8 @@ mts_ros_crtk_bridge_provided::mts_ros_crtk_bridge_provided(const mtsTaskPeriodic
 
 void mts_ros_crtk_bridge_provided::init(void)
 {
+    this->mTags.clear();
+    this->AddTag("ROS");
     mtsManagerLocal * _component_manager = mtsComponentManager::GetInstance();
     const std::string _component_name = this->GetName();
 

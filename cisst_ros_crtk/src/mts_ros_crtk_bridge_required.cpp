@@ -44,7 +44,10 @@ mts_ros_crtk_bridge_required::mts_ros_crtk_bridge_required(const mtsTaskPeriodic
 }
 
 void mts_ros_crtk_bridge_required::init(void)
-{ }
+{
+    this->mTags.clear();
+    this->AddTag("ROS");
+}
 
 mts_ros_crtk_bridge_required::~mts_ros_crtk_bridge_required(void)
 {
