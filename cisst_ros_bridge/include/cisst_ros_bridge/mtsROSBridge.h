@@ -770,14 +770,14 @@ public:
     ~mtsROSBridge();
 
     // taskPeriodic
-    void Configure(const std::string & CMN_UNUSED(filename) = "");
+    void Configure(const std::string & CMN_UNUSED(filename) = "") override;
     bool AddIntervalStatisticsInterface(const std::string & interface_name = "IntervalStatistics");
     void AddIntervalStatisticsPublisher(const std::string & ros_namespace,
                                         const std::string & name,
                                         const std::string & interface_name = "IntervalStatistics");
-    void Startup(void);
-    void Run(void);
-    void Cleanup(void);
+    void Startup(void) override;
+    void Run(void) override;
+    void Cleanup(void) override;
 
     /*! Request that the bridge calls ros::spinOnce in its Run method.
       This allows to piggy back on the existing thread/periodicity

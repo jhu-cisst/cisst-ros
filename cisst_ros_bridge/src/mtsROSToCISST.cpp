@@ -17,7 +17,10 @@ http://www.cisst.org/cisst/license.txt.
 
 */
 
+#include "cisstParameterTypes/prmPositionCartesianGet.h"
 #include <cisst_ros_bridge/mtsROSToCISST.h>
+#include <Eigen/Geometry>
+
 
 void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float32) & rosData,
                    double & cisstData)
@@ -56,18 +59,18 @@ void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, String) & rosData,
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
-                   vctDoubleVec & cisstData)
+                   Eigen::VectorXd & cisstData)
 {
     const size_t size = rosData.data.size();
     if (size != 0) {
-        cisstData.SetSize(size);
+        cisstData.resize(size);
         std::copy(rosData.data.begin(), rosData.data.end(),
                   cisstData.begin());
     }
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
-                   vctDoubleMat & cisstData)
+                   Eigen::MatrixXd & cisstData)
 {
     if (rosData.layout.dim.size() != 2) {
         cmnThrow("mtsROSToCISST(std::msgs::Float64MultiArray, vctDoubleMat): incoming array dimension is not 2");
@@ -91,13 +94,14 @@ void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
         cmnThrow("mtsROSToCISST(std::msgs::Float64MultiArray, vctDoubleMat): dim[1].stride must be equal to number of rows");
     }
     // now allocate and copy data
-    cisstData.SetSize(rows, cols);
+    cisstData.resize(rows, cols);
+    auto row_major_linear_view = cisstData.reshaped<Eigen::RowMajor>();
     std::copy(rosData.data.begin(), rosData.data.end(),
-              cisstData.begin());
+              row_major_linear_view.begin());
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Vector3) & rosData,
-                   vct3 & cisstData)
+                   Eigen::Vector3d& cisstData)
 {
     cisstData[0] = rosData.x;
     cisstData[1] = rosData.y;
@@ -105,196 +109,125 @@ void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Vector3) & rosData,
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Quaternion) & rosData,
-                   vctMatRot3 & cisstData)
+                   Eigen::Quaterniond& cisstData)
 {
-    vctQuatRot3 quat;
-    quat.X() = rosData.x;
-    quat.Y() = rosData.y;
-    quat.Z() = rosData.z;
-    quat.W() = rosData.w;
-    cisstData.FromNormalized(quat);
-}
-
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
-                   prmPositionCartesianGet & cisstData)
-{
-    mtsROSPoseToCISST(rosData, cisstData.Position());
+    cisstData.x() = rosData.x;
+    cisstData.y() = rosData.y;
+    cisstData.z() = rosData.z;
+    cisstData.w() = rosData.w;
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
-                   prmPositionCartesianSet & cisstData)
+                   prmPositionCartesianGet& cisstData)
 {
-    mtsROSPoseToCISST(rosData, cisstData.Goal());
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, PoseStamped) & rosData,
-                   prmPositionCartesianGet & cisstData)
-{
-    mtsROSToCISST(rosData.pose, cisstData);
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, PoseStamped) & rosData,
-                   prmPositionCartesianSet & cisstData)
-{
-    mtsROSToCISST(rosData.pose, cisstData);
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, TransformStamped) & rosData,
-                   prmPositionCartesianGet & cisstData)
-{
-    mtsROSToCISST(rosData.transform, cisstData.Position());
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, TransformStamped) & rosData,
-                   prmPositionCartesianSet & cisstData)
-{
-    mtsROSToCISST(rosData.transform, cisstData.Goal());
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, PoseStamped) & rosData,
-                   vctFrm3 & cisstData)
-{
-    mtsROSPoseToCISST(rosData.pose, cisstData);
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, PoseStamped) & rosData,
-                   vctFrm4x4 & cisstData)
-{
-    mtsROSPoseToCISST(rosData.pose, cisstData);
+    mtsROSToCISST(rosData, cisstData.Position());
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
-                   vctFrm3 & cisstData)
+                   prmPositionCartesianSet& cisstData)
 {
-    mtsROSPoseToCISST(rosData, cisstData);
+    mtsROSToCISST(rosData, cisstData.Goal());
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
-                   vctFrm4x4 & cisstData)
+                   Eigen::Isometry3d& cisstData)
 {
-    mtsROSPoseToCISST(rosData, cisstData);
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
-                   mtsFrm4x4 & cisstData)
-{
-    mtsROSPoseToCISST(rosData, cisstData);
+    cisstData.translation().x() = rosData.position.x;
+    cisstData.translation().y() = rosData.position.y;
+    cisstData.translation().z() = rosData.position.z;
+    Eigen::Quaterniond q(
+        rosData.orientation.w,
+        rosData.orientation.x,
+        rosData.orientation.y,
+        rosData.orientation.z
+    );
+    cisstData.linear() = q.toRotationMatrix();
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Transform) & rosData,
-                   prmPositionCartesianGet & cisstData)
+                   prmPositionCartesianGet& cisstData)
 {
-    mtsROSTransformToCISST(rosData, cisstData.Position());
+    mtsROSToCISST(rosData, cisstData.Position());
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Transform) & rosData,
-                   vctFrm3 & cisstData)
+                   prmPositionCartesianSet& cisstData)
 {
-    mtsROSTransformToCISST(rosData, cisstData);
+    mtsROSToCISST(rosData, cisstData.Goal());
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Transform) & rosData,
-                   vctFrm4x4 & cisstData)
+                   Eigen::Isometry3d& cisstData)
 {
-    mtsROSTransformToCISST(rosData, cisstData);
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Transform) & rosData,
-                   mtsFrm4x4 & cisstData)
-{
-    mtsROSTransformToCISST(rosData, cisstData);
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, TransformStamped) & rosData,
-                   mtsFrm4x4 & cisstData)
-{
-    mtsROSTransformToCISST(rosData.transform, cisstData);
+    cisstData.translation().x() = rosData.translation.x;
+    cisstData.translation().y() = rosData.translation.y;
+    cisstData.translation().z() = rosData.translation.z;
+    Eigen::Quaterniond q(
+        rosData.rotation.w,
+        rosData.rotation.x,
+        rosData.rotation.y,
+        rosData.rotation.z
+    );
+    cisstData.linear() = q.toRotationMatrix();
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Wrench) & rosData,
                    prmForceCartesianGet & cisstData)
 {
-    vctFixedSizeVector<double, 6>
-        vctFT(rosData.force.x, rosData.force.y, rosData.force.z,
-              rosData.torque.x, rosData.torque.y, rosData.torque.z);
-    cisstData.SetForce(vctFT);
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, WrenchStamped) & rosData,
-                   prmForceCartesianGet & cisstData)
-{
-    mtsROSToCISST(rosData.wrench, cisstData);
+    mtsROSToCISST(rosData, cisstData.Force());
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Wrench) & rosData,
                    prmForceCartesianSet & cisstData)
 {
-    vctFixedSizeVector<double, 6>
-        vctFT(rosData.force.x, rosData.force.y, rosData.force.z,
-              rosData.torque.x, rosData.torque.y, rosData.torque.z);
-    cisstData.SetForce(vctFT);
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, WrenchStamped) & rosData,
-                   prmForceCartesianSet & cisstData)
-{
-    mtsROSToCISST(rosData.wrench, cisstData);
+    mtsROSToCISST(rosData, cisstData.Force());
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Wrench) & rosData,
-                   mtsDoubleVec & cisstData)
+                   Eigen::Vector<double, 6>& cisstData)
 {
-    cisstData.SetSize(6);
-    cisstData.Element(0) = rosData.force.x;
-    cisstData.Element(1) = rosData.force.y;
-    cisstData.Element(2) = rosData.force.z;
-    cisstData.Element(3) = rosData.torque.x;
-    cisstData.Element(4) = rosData.torque.y;
-    cisstData.Element(5) = rosData.torque.z;
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, WrenchStamped) & rosData,
-                   mtsDoubleVec & cisstData)
-{
-    mtsROSToCISST(rosData.wrench, cisstData);
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Twist) & rosData,
-                   prmVelocityCartesianSet & cisstData)
-{
-    cisstData.SetVelocity(vct3(rosData.linear.x, rosData.linear.y, rosData.linear.z));
-    cisstData.SetAngularVelocity(vct3(rosData.angular.x, rosData.angular.y, rosData.angular.z));
-}
-
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, TwistStamped) & rosData,
-                   prmVelocityCartesianSet & cisstData)
-{
-    mtsROSToCISST(rosData.twist, cisstData);
+    cisstData[0] = rosData.force.x;
+    cisstData[1] = rosData.force.y;
+    cisstData[2] = rosData.force.z;
+    cisstData[3] = rosData.torque.x;
+    cisstData[4] = rosData.torque.y;
+    cisstData[5] = rosData.torque.z;
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Twist) & rosData,
                    prmVelocityCartesianGet & cisstData)
 {
-    cisstData.SetVelocityLinear(vct3(rosData.linear.x, rosData.linear.y, rosData.linear.z));
-    cisstData.SetVelocityAngular(vct3(rosData.angular.x, rosData.angular.y, rosData.angular.z));
+    cisstData.SetVelocityLinear(Eigen::Vector3d(rosData.linear.x, rosData.linear.y, rosData.linear.z));
+    cisstData.SetVelocityAngular((Eigen::Vector3d(rosData.angular.x, rosData.angular.y, rosData.angular.z)));
 }
 
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, TwistStamped) & rosData,
-                   prmVelocityCartesianGet & cisstData)
+void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Twist) & rosData,
+                   prmVelocityCartesianSet & cisstData)
 {
-    mtsROSToCISST(rosData.twist, cisstData);
+    cisstData.SetVelocity(Eigen::Vector3d(rosData.linear.x, rosData.linear.y, rosData.linear.z));
+    cisstData.SetAngularVelocity((Eigen::Vector3d(rosData.angular.x, rosData.angular.y, rosData.angular.z)));
+}
+
+void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Twist) & rosData,
+                   Eigen::Vector<double, 6>& cisstData)
+{
+    cisstData[0] = rosData.angular.x;
+    cisstData[1] = rosData.angular.y;
+    cisstData[2] = rosData.angular.z;
+    cisstData[3] = rosData.linear.x;
+    cisstData[4] = rosData.linear.y;
+    cisstData[5] = rosData.linear.z;
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
                    prmPositionJointSet & cisstData)
 {
-    cisstData.Goal().SetSize(rosData.position.size());
+    cisstData.Goal().resize(rosData.position.size());
     std::copy(rosData.position.begin(), rosData.position.end(),
               cisstData.Goal().begin());
     const auto velocitySize = rosData.velocity.size();
     if (velocitySize > 0) {
-        cisstData.Velocity().SetSize(velocitySize);
+        cisstData.Velocity().resize(velocitySize);
         std::copy(rosData.velocity.begin(), rosData.velocity.end(),
                   cisstData.Velocity().begin());
     }
@@ -303,7 +236,7 @@ void mtsROSToCISST(const CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
 void mtsROSToCISST(const CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
                    prmForceTorqueJointSet & cisstData)
 {
-    cisstData.ForceTorque().SetSize(rosData.effort.size());
+    cisstData.ForceTorque().resize(rosData.effort.size());
     std::copy(rosData.effort.begin(), rosData.effort.end(),
               cisstData.ForceTorque().begin());
 }
@@ -311,7 +244,7 @@ void mtsROSToCISST(const CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
 void mtsROSToCISST(const CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
                    prmVelocityJointSet & cisstData)
 {
-    cisstData.Goal().SetSize(rosData.velocity.size());
+    cisstData.Goal().resize(rosData.velocity.size());
     std::copy(rosData.velocity.begin(), rosData.velocity.end(),
               cisstData.Goal().begin());
 }
@@ -322,13 +255,13 @@ void mtsROSToCISST(const CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
     cisstData.Name().resize(rosData.name.size());
     std::copy(rosData.name.begin(), rosData.name.end(),
               cisstData.Name().begin());
-    cisstData.Position().SetSize(rosData.position.size());
+    cisstData.Position().resize(rosData.position.size());
     std::copy(rosData.position.begin(), rosData.position.end(),
               cisstData.Position().begin());
-    cisstData.Velocity().SetSize(rosData.velocity.size());
+    cisstData.Velocity().resize(rosData.velocity.size());
     std::copy(rosData.velocity.begin(), rosData.velocity.end(),
               cisstData.Velocity().begin());
-    cisstData.Effort().SetSize(rosData.effort.size());
+    cisstData.Effort().resize(rosData.effort.size());
     std::copy(rosData.effort.begin(), rosData.effort.end(),
               cisstData.Effort().begin());
 }
@@ -354,8 +287,8 @@ void mtsROSToCISST(const CISST_RAL_MSG(sensor_msgs, Joy) & rosData,
 void mtsROSToCISST(const CISST_RAL_MSG(sensor_msgs, Joy) & rosData,
                    prmInputData & cisstData)
 {
-    cisstData.AnalogInputs().SetSize(rosData.axes.size());
-    cisstData.DigitalInputs().SetSize(rosData.buttons.size());
+    cisstData.AnalogInputs().resize(rosData.axes.size());
+    cisstData.DigitalInputs().resize(rosData.buttons.size());
     std::copy(rosData.axes.begin(), rosData.axes.end(),
               cisstData.AnalogInputs().begin());
     std::copy(rosData.buttons.begin(), rosData.buttons.end(),
@@ -375,17 +308,17 @@ void mtsROSToCISST(const CISST_RAL_MSG(cisst_msgs, DoubleVec) & rosData,
     const size_t size = rosData.data.size();
     cisstData.Goal().resize(size);
     for (size_t i = 0; i < size; ++i) {
-        cisstData.Goal().Element(i) = rosData.data[i];
+        cisstData.Goal()(i) = rosData.data[i];
     }
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(cisst_msgs, DoubleVec) & rosData,
-                   vctDoubleVec & cisstData)
+                   Eigen::VectorXd& cisstData)
 {
     const size_t size = rosData.data.size();
     cisstData.resize(size);
     for (size_t i = 0; i < size; ++i) {
-        cisstData.Element(i) = rosData.data[i];
+        cisstData(i) = rosData.data[i];
     }
 }
 
@@ -406,9 +339,9 @@ void mtsROSToCISST(const CISST_RAL_MSG(cisst_msgs, IntervalStatistics) & rosData
 }
 
 void mtsROSToCISST(const CISST_RAL_SRV_REQ(cisst_msgs, ConvertFloat64Array) & rosData,
-                   vctDoubleVec & cisstData)
+                   Eigen::VectorXd& cisstData)
 {
-    cisstData.SetSize(rosData.input.size());
+    cisstData.resize(rosData.input.size());
     std::copy(rosData.input.begin(), rosData.input.end(),
               cisstData.begin());
 }

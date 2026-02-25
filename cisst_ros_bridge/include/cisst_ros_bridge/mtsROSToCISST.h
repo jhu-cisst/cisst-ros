@@ -22,9 +22,6 @@ http://www.cisst.org/cisst/license.txt.
 // cisst include
 #include <cisstMultiTask/mtsManagerLocal.h>
 
-#include <cisstVector/vctDynamicVectorTypes.h>
-#include <cisstVector/vctDynamicMatrixTypes.h>
-
 #include <cisstMultiTask/mtsVector.h>
 #include <cisstMultiTask/mtsTransformationTypes.h>
 #include <cisstMultiTask/mtsIntervalStatistics.h>
@@ -47,6 +44,8 @@ http://www.cisst.org/cisst/license.txt.
 
 #include <cisst_ros_bridge/cisst_ral.h>
 
+#include <Eigen/Dense>
+
 // ros includes
 #if ROS1
 
@@ -60,6 +59,8 @@ http://www.cisst.org/cisst/license.txt.
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/WrenchStamped.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <geometry_msgs/QuaternionStamped.h>
+#include <geometry_msgs/Vector3Stamped.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/Joy.h>
 #include <diagnostic_msgs/KeyValue.h>
@@ -81,6 +82,8 @@ http://www.cisst.org/cisst/license.txt.
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/wrench_stamped.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
+#include <geometry_msgs/msg/quaternion_stamped.hpp>
+#include <geometry_msgs/msg/vector3_stamped.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <sensor_msgs/msg/joy.hpp>
 #include <diagnostic_msgs/msg/key_value.hpp>
@@ -208,39 +211,6 @@ namespace mts_ros_to_cisst {
     }
 }
 
-
-// helper functions
-template <typename _cisstFrame>
-void mtsROSTransformToCISST(const CISST_RAL_MSG(geometry_msgs, Transform) & rosTransform, _cisstFrame & cisstFrame)
-{
-    cisstFrame.Translation().X() = rosTransform.translation.x;
-    cisstFrame.Translation().Y() = rosTransform.translation.y;
-    cisstFrame.Translation().Z() = rosTransform.translation.z;
-    vctQuatRot3 quat;
-    quat.X() = rosTransform.rotation.x;
-    quat.Y() = rosTransform.rotation.y;
-    quat.Z() = rosTransform.rotation.z;
-    quat.W() = rosTransform.rotation.w;
-    vctMatRot3 rotation(quat, VCT_NORMALIZE);
-    cisstFrame.Rotation().Assign(rotation);
-}
-
-template <typename _cisstFrame>
-void mtsROSPoseToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosPose, _cisstFrame & cisstFrame)
-{
-    cisstFrame.Translation().X() = rosPose.position.x;
-    cisstFrame.Translation().Y() = rosPose.position.y;
-    cisstFrame.Translation().Z() = rosPose.position.z;
-    vctQuatRot3 quat;
-    quat.X() = rosPose.orientation.x;
-    quat.Y() = rosPose.orientation.y;
-    quat.Z() = rosPose.orientation.z;
-    quat.W() = rosPose.orientation.w;
-    vctMatRot3 rotation(quat, VCT_NORMALIZE);
-    cisstFrame.Rotation().Assign(rotation);
-}
-
-
 // std_msgs
 void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float32) & rosData,
                    double & cisstData);
@@ -255,67 +225,83 @@ void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, String) & rosData,
 void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, String) & rosData,
                    mtsMessage & cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
-                   vctDoubleVec & cisstData);
+                   Eigen::VectorXd & cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
-                   vctDoubleMat & cisstData);
+                   Eigen::MatrixXd & cisstData);
 
 // geometry_msgs
+
+// helpers to factor out stamped vs. non-stamped conversions
+template <typename cisst_type>
+void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Vector3Stamped)& ros_data,
+                   cisst_type& cisst_data)
+{
+    mtsROSToCISST(ros_data.vector, cisst_data);
+}
+
+template <typename cisst_type>
+void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, QuaternionStamped)& ros_data,
+                   cisst_type& cisst_data)
+{
+    mtsROSToCISST(ros_data.quaternion, cisst_data);
+}
+
+template <typename cisst_type>
+void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, PoseStamped)& ros_data,
+                   cisst_type& cisst_data)
+{
+    mtsROSToCISST(ros_data.pose, cisst_data);
+}
+
+template <typename cisst_type>
+void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, TransformStamped)& ros_data,
+                   cisst_type& cisst_data)
+{
+    mtsROSToCISST(ros_data.transform, cisst_data);
+}
+
+template <typename cisst_type>
+void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, TwistStamped)& ros_data,
+                   cisst_type& cisst_data)
+{
+    mtsROSToCISST(ros_data.twist, cisst_data);
+}
+
+template <typename cisst_type>
+void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, WrenchStamped)& ros_data,
+                   cisst_type& cisst_data)
+{
+    mtsROSToCISST(ros_data.wrench, cisst_data);
+}
+
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Vector3) & rosData,
-                   vct3 & cisstData);
+                   Eigen::Vector3d& cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Quaternion) & rosData,
-                   vctMatRot3 & cisstData);
+                   Eigen::Quaterniond& cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
-                   prmPositionCartesianGet & cisstData);
+                   prmPositionCartesianGet& cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
-                   prmPositionCartesianSet & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, PoseStamped) & rosData,
-                   prmPositionCartesianGet & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, PoseStamped) & rosData,
-                   prmPositionCartesianSet & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, TransformStamped) & rosData,
-                   prmPositionCartesianGet & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, TransformStamped) & rosData,
-                   prmPositionCartesianSet & cisstData);
+                   prmPositionCartesianSet& cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
-                   vctFrm3 & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, PoseStamped) & rosData,
-                   vctFrm3 & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, PoseStamped) & rosData,
-                   vctFrm4x4 & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
-                   vctFrm4x4 & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
-                   mtsFrm4x4 & cisstData);
+                   Eigen::Isometry3d& cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Transform) & rosData,
-                   prmPositionCartesianGet & cisstData);
+                   prmPositionCartesianGet& cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Transform) & rosData,
-                   vctFrm3 & cisstData);
+                   prmPositionCartesianSet& cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Transform) & rosData,
-                   vctFrm4x4 & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Transform) & rosData,
-                   mtsFrm4x4 & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, TransformStamped) & rosData,
-                   mtsFrm4x4 & cisstData);
+                   Eigen::Isometry3d& cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Wrench) & rosData,
-                   prmForceCartesianGet & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, WrenchStamped) & rosData,
                    prmForceCartesianGet & cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Wrench) & rosData,
                    prmForceCartesianSet & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, WrenchStamped) & rosData,
-                   prmForceCartesianSet & cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Wrench) & rosData,
-                   mtsDoubleVec & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, WrenchStamped) & rosData,
-                   mtsDoubleVec & cisstData);
+                   Eigen::Vector<double, 6>& cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Twist) & rosData,
-                   prmVelocityCartesianGet & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, TwistStamped) & rosData,
                    prmVelocityCartesianGet & cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Twist) & rosData,
                    prmVelocityCartesianSet & cisstData);
-void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, TwistStamped) & rosData,
-                   prmVelocityCartesianSet & cisstData);
+void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Twist) & rosData,
+                   Eigen::Vector<double, 6>& cisstData);
 
 // sensor_msgs
 void mtsROSToCISST(const CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
@@ -339,10 +325,10 @@ void mtsROSToCISST(const CISST_RAL_MSG(diagnostic_msgs, KeyValue) & rosData,
 void mtsROSToCISST(const CISST_RAL_MSG(cisst_msgs, DoubleVec) & rosData,
                    prmPositionJointSet & cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(cisst_msgs, DoubleVec) & rosData,
-                   vctDoubleVec & cisstData);
+                   Eigen::VectorXd& cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(cisst_msgs, IntervalStatistics) & rosData,
                    mtsIntervalStatistics & cisstData);
 void mtsROSToCISST(const CISST_RAL_SRV_REQ(cisst_msgs, ConvertFloat64Array) & rosData,
-                   vctDoubleVec & cisstData);
+                   Eigen::VectorXd& cisstData);
 
 #endif // _mtsROSToCISST_h
