@@ -198,7 +198,7 @@ void mts_ros_crtk_bridge_required::populate_interface_provided(const std::string
             this->AddSubscriberToCommandRead<prmForceCartesianGet, CISST_RAL_MSG(geometry_msgs, WrenchStamped)>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "jacobian") {
-            this->AddSubscriberToCommandRead<vctDoubleMat, CISST_RAL_MSG(std_msgs, Float64MultiArray)>
+            this->AddSubscriberToCommandRead<Eigen::MatrixXd, CISST_RAL_MSG(std_msgs, Float64MultiArray)>
                 (_interface_name, _command, _ros_topic);
         } else if (_crtk_command == "operating_state") {
             this->AddSubscriberToCommandRead<prmOperatingState, CISST_RAL_MSG(crtk_msgs, OperatingState)>

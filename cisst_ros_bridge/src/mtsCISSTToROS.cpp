@@ -310,6 +310,15 @@ void mtsCISSTToROS(const Eigen::Vector<double, 6> & cisstData,
     rosData.angular.z = cisstData(5);
 }
 
+void mtsCISSTToROS(const prmPositionCartesianArrayGet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, PoseArray) & rosData,
+                   const std::string & debugInfo)
+{
+    rosData.poses.resize(cisstData.Positions().size());
+    for (size_t idx = 0; idx < cisstData.Positions().size(); idx++) {
+        mtsCISSTToROS(cisstData.Positions()[idx], rosData.poses[idx], debugInfo);
+    }
+}
 
 // ---------------------------------------------
 // sensor_msgs
@@ -320,21 +329,6 @@ void mtsCISSTToROSSetJointNames(CISST_RAL_MSG(sensor_msgs, JointState) & rosData
     rosData.name.resize(nb_joints);
     for (size_t i = 0; i < nb_joints; ++i) {
         rosData.name[i] = std::to_string(i);
-    }
-}
-
-void mtsCISSTToROS(const vctDoubleVec & cisstData,
-                   CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
-                   const std::string &)
-{
-    const size_t size = cisstData.size();
-    mtsCISSTToROSSetJointNames(rosData, size);
-    rosData.velocity.resize(0);
-    rosData.effort.resize(0);
-    if (size != 0) {
-        rosData.position.resize(size);
-        std::copy(cisstData.begin(), cisstData.end(),
-                  rosData.position.begin());
     }
 }
 
@@ -448,36 +442,6 @@ void mtsCISSTToROS(const prmStateJoint & cisstData,
             std::copy(cisstData.Effort().begin(), cisstData.Effort().end(),
                       rosData.effort.begin());
         }
-    }
-}
-
-void mtsCISSTToROS(const vctDoubleMat & cisstData,
-                   CISST_RAL_MSG(sensor_msgs, PointCloud) & rosData,
-                   const std::string &)
-{
-    rosData.points.resize(cisstData.rows());
-    for (size_t i = 0; i < cisstData.rows(); ++i) {
-        rosData.points[i].x = cisstData.at(i, 0);
-        rosData.points[i].y = cisstData.at(i, 1);
-        rosData.points[i].z = cisstData.at(i, 2);
-    }
-}
-
-void mtsCISSTToROS(const std::vector<vct3> & cisstData,
-                   CISST_RAL_MSG(sensor_msgs, PointCloud) & rosData,
-                   const std::string &)
-{
-    rosData.points.resize(cisstData.size());
-    typedef std::vector<vct3>::const_iterator IteratorType;
-    const IteratorType end = cisstData.end();
-    IteratorType iter;
-    size_t index = 0;
-    for (iter = cisstData.begin();
-         iter != end;
-         ++iter, ++index) {
-        rosData.points[index].x = iter->X();
-        rosData.points[index].y = iter->Y();
-        rosData.points[index].z = iter->Z();
     }
 }
 

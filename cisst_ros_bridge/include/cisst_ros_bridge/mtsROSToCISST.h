@@ -20,6 +20,7 @@ http://www.cisst.org/cisst/license.txt.
 #define _mtsROSToCISST_h
 
 // cisst include
+#include "geometry_msgs/msg/quaternion.hpp"
 #include <cisstMultiTask/mtsManagerLocal.h>
 
 #include <cisstMultiTask/mtsVector.h>
@@ -278,6 +279,8 @@ void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Vector3) & rosData,
                    Eigen::Vector3d& cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Quaternion) & rosData,
                    Eigen::Quaterniond& cisstData);
+void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Quaternion) & rosData,
+                   Eigen::Matrix3d& cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
                    prmPositionCartesianGet& cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosData,

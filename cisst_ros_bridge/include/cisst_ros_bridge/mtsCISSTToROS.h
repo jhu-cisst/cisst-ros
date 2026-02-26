@@ -332,16 +332,16 @@ void mtsCISSTToROS(const cisst_type& cisst_data,
 }
 
 template <typename cisst_type>
-void mtsCISSTToROS(const CISST_RAL_MSG(geometry_msgs, TwistStamped)& ros_data,
-                   cisst_type& cisst_data,
+void mtsCISSTToROS(const cisst_type& cisst_data,
+                   CISST_RAL_MSG(geometry_msgs, TwistStamped)& ros_data,
                    const std::string& debugInfo)
 {
     mtsCISSTToROS(cisst_data, ros_data.twist, debugInfo);
 }
 
 template <typename cisst_type>
-void mtsCISSTToROS(const CISST_RAL_MSG(geometry_msgs, WrenchStamped)& ros_data,
-                   cisst_type& cisst_data,
+void mtsCISSTToROS(const cisst_type& cisst_data,
+                   CISST_RAL_MSG(geometry_msgs, WrenchStamped)& ros_data,
                    const std::string& debugInfo)
 {
     mtsCISSTToROS(cisst_data, ros_data.wrench, debugInfo);
@@ -388,6 +388,9 @@ void mtsCISSTToROS(const prmVelocityCartesianSet & cisstData,
                    const std::string & debugInfo);
 void mtsCISSTToROS(const Eigen::Vector<double, 6> & cisstData,
                    CISST_RAL_MSG(geometry_msgs, Twist) & rosData,
+                   const std::string & debugInfo);
+void mtsCISSTToROS(const prmPositionCartesianArrayGet & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, PoseArray) & rosData,
                    const std::string & debugInfo);
 
 // sensor_msgs

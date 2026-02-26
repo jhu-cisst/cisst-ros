@@ -499,7 +499,7 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                 }
             } else if (_crtk_command == "jacobian") {
                 _pub_bridge_used = true;
-                _pub_bridge->AddPublisherFromCommandRead<vctDoubleMat,
+                _pub_bridge->AddPublisherFromCommandRead<Eigen::MatrixXd,
                                                          CISST_RAL_MSG(std_msgs, Float64MultiArray)>
                     (_interface_name, _command, _ros_topic);
             } else if (_crtk_command == "operating_state") {

@@ -73,7 +73,7 @@ void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
                    Eigen::MatrixXd & cisstData)
 {
     if (rosData.layout.dim.size() != 2) {
-        cmnThrow("mtsROSToCISST(std::msgs::Float64MultiArray, vctDoubleMat): incoming array dimension is not 2");
+        cmnThrow("mtsROSToCISST(std::msgs::Float64MultiArray, Eigen::MatrixXd): incoming array dimension is not 2");
     }
     // assuming rows/cols for data storage.  In mtsCISSTToROS we
     // labelled the dimensions using "rows" and "cols" so we're making
@@ -82,16 +82,16 @@ void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
     // check.  We could also add support for cols/rows storage order
     if ((rosData.layout.dim[0].label != "rows")
         || (rosData.layout.dim[1].label != "cols")) {
-        cmnThrow("mtsROSToCISST(std::msgs::Float64MultiArray, vctDoubleMat): dimensions must be labelled \"rows\" and \"cols\"");
+        cmnThrow("mtsROSToCISST(std::msgs::Float64MultiArray, Eigen::MatrixXd): dimensions must be labelled \"rows\" and \"cols\"");
     }
     // now check the strides and sizes
     const size_t rows = rosData.layout.dim[0].size;
     const size_t cols = rosData.layout.dim[1].size;
     if (rosData.layout.dim[0].stride != 1) {
-        cmnThrow("mtsROSToCISST(std::msgs::Float64MultiArray, vctDoubleMat): dim[0].stride must be equal to 1");
+        cmnThrow("mtsROSToCISST(std::msgs::Float64MultiArray, Eigen::MatrixXd): dim[0].stride must be equal to 1");
     }
     if (rosData.layout.dim[1].stride != rows) {
-        cmnThrow("mtsROSToCISST(std::msgs::Float64MultiArray, vctDoubleMat): dim[1].stride must be equal to number of rows");
+        cmnThrow("mtsROSToCISST(std::msgs::Float64MultiArray, Eigen::MatrixXd): dim[1].stride must be equal to number of rows");
     }
     // now allocate and copy data
     cisstData.resize(rows, cols);
@@ -115,6 +115,14 @@ void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Quaternion) & rosData,
     cisstData.y() = rosData.y;
     cisstData.z() = rosData.z;
     cisstData.w() = rosData.w;
+}
+
+void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Quaternion) & rosData,
+                   Eigen::Matrix3d& cisstData)
+{
+    Eigen::Quaterniond q;
+    mtsROSToCISST(rosData, q);
+    cisstData = Eigen::Matrix3d(q);
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
