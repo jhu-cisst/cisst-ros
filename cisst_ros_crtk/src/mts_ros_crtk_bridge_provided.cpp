@@ -69,6 +69,7 @@ void mts_ros_crtk_bridge_provided::init(void)
                     {"move_cr", "prmPositionCartesianSet"},
                     {"servo_cf", "prmForceCartesianSet"},
                     {"servo_cs", "prmStateCartesian"},
+                    {"set_base_frame", "prmPositionCartesianSet"},
                     {"state_command", "mtsStdString"},
                     {"measured_js", "prmStateJoint"},
                     {"setpoint_js", "prmStateJoint"},
@@ -365,7 +366,8 @@ void mts_ros_crtk_bridge_provided::bridge_interface_provided(const std::string &
                 } else if ((_crtk_command == "servo_cp")
                            || (_crtk_command == "servo_cr")
                            || (_crtk_command == "move_cp")
-                           || (_crtk_command == "move_cr")) {
+                           || (_crtk_command == "move_cr")
+                           || (_crtk_command == "set_base_frame")) {
                     if (argument_type_is_expected(_crtk_command,
                                                   _interface_provided->GetCommandWriteArgumentServices(_command)->GetName())) {
                         m_subscribers_bridge->AddSubscriberToCommandWrite<prmPositionCartesianSet,
