@@ -61,9 +61,8 @@ set(REQUIRED_CISST_LIBRARIES
 # find cisst and make sure the required libraries have been compiled
 find_package (cisst 1.4.0 REQUIRED ${REQUIRED_CISST_LIBRARIES})
 
-if (cisst_FOUND_AS_REQUIRED)
+if (cisst_FOUND)
 
-  include (${CISST_USE_FILE})
   include_directories (BEFORE include)
 
   # header
@@ -84,7 +83,7 @@ if (cisst_FOUND_AS_REQUIRED)
     src/mtsROSToCISST.cpp)
 
   add_library(cisst_ros_crtk ${HEADER_FILES} ${SOURCE_FILES})
-  cisst_target_link_libraries (cisst_ros_crtk ${REQUIRED_CISST_LIBRARIES})
+  target_link_libraries (cisst_ros_crtk ${cisst_LIBRARIES})
 
   if (ROS_VERSION EQUAL 1)
     target_link_libraries (cisst_ros_crtk ${catkin_LIBRARIES})
@@ -125,6 +124,6 @@ if (cisst_FOUND_AS_REQUIRED)
 
   endif (ROS_VERSION EQUAL 2)
 
-else (cisst_FOUND_AS_REQUIRED)
+else (cisst_FOUND)
   message ("Information: code in ${CMAKE_CURRENT_SOURCE_DIR} will not be compiled, it requires ${REQUIRED_CISST_LIBRARIES}")
-endif (cisst_FOUND_AS_REQUIRED)
+endif (cisst_FOUND)
