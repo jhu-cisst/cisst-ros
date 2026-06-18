@@ -59,71 +59,65 @@ set(REQUIRED_CISST_LIBRARIES
   )
 
 # find cisst and make sure the required libraries have been compiled
-find_package (cisst 1.4.0 REQUIRED ${REQUIRED_CISST_LIBRARIES})
+find_package (cisst 1.4.0 REQUIRED COMPONENTS ${REQUIRED_CISST_LIBRARIES})
 
-if (cisst_FOUND)
+include_directories (BEFORE include)
 
-  include_directories (BEFORE include)
+# header
+set(HEADER_FILES
+  include/cisst_ros_crtk/cisst_ros_crtk.h
+  include/cisst_ros_crtk/mts_ros_crtk_bridge.h # for backward compatibility
+  include/cisst_ros_crtk/mts_ros_crtk_bridge_provided.h
+  include/cisst_ros_crtk/mts_ros_crtk_bridge_required.h
+  include/cisst_ros_crtk/mtsCISSTToROS.h
+  include/cisst_ros_crtk/mtsROSToCISST.h)
 
-  # header
-  set(HEADER_FILES
-    include/cisst_ros_crtk/cisst_ros_crtk.h
-    include/cisst_ros_crtk/mts_ros_crtk_bridge.h # for backward compatibility
-    include/cisst_ros_crtk/mts_ros_crtk_bridge_provided.h
-    include/cisst_ros_crtk/mts_ros_crtk_bridge_required.h
-    include/cisst_ros_crtk/mtsCISSTToROS.h
-    include/cisst_ros_crtk/mtsROSToCISST.h)
+# source
+set(SOURCE_FILES
+  src/cisst_ros_crtk.cpp
+  src/mts_ros_crtk_bridge_provided.cpp
+  src/mts_ros_crtk_bridge_required.cpp
+  src/mtsCISSTToROS.cpp
+  src/mtsROSToCISST.cpp)
 
-  # source
-  set(SOURCE_FILES
-    src/cisst_ros_crtk.cpp
-    src/mts_ros_crtk_bridge_provided.cpp
-    src/mts_ros_crtk_bridge_required.cpp
-    src/mtsCISSTToROS.cpp
-    src/mtsROSToCISST.cpp)
+add_library(cisst_ros_crtk ${HEADER_FILES} ${SOURCE_FILES})
+target_link_libraries (cisst_ros_crtk ${cisst_LIBRARIES})
 
-  add_library(cisst_ros_crtk ${HEADER_FILES} ${SOURCE_FILES})
-  target_link_libraries (cisst_ros_crtk ${cisst_LIBRARIES})
+if (ROS_VERSION EQUAL 1)
+  target_link_libraries (cisst_ros_crtk ${catkin_LIBRARIES})
 
-  if (ROS_VERSION EQUAL 1)
-    target_link_libraries (cisst_ros_crtk ${catkin_LIBRARIES})
+  install (TARGETS cisst_ros_crtk
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    )
 
-    install (TARGETS cisst_ros_crtk
-      LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-      RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-      )
+  install (DIRECTORY include/${PROJECT_NAME}
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+    )
+endif (ROS_VERSION EQUAL 1)
 
-    install (DIRECTORY include/${PROJECT_NAME}
-      DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-      )
-  endif (ROS_VERSION EQUAL 1)
+if (ROS_VERSION EQUAL 2)
+  ament_target_dependencies (cisst_ros_crtk ${ROS2_depends})
 
-  if (ROS_VERSION EQUAL 2)
-    ament_target_dependencies (cisst_ros_crtk ${ROS2_depends})
+  install (TARGETS cisst_ros_crtk
+    DESTINATION lib/${PROJECT_NAME}
+    )
 
-    install (TARGETS cisst_ros_crtk
-      DESTINATION lib/${PROJECT_NAME}
-      )
+  install (DIRECTORY include/${PROJECT_NAME}
+    DESTINATION include
+    )
 
-    install (DIRECTORY include/${PROJECT_NAME}
-      DESTINATION include
-      )
+  install (
+    TARGETS cisst_ros_crtk
+    EXPORT cisst_ros_crtk
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+    )
 
-    install (
-      TARGETS cisst_ros_crtk
-      EXPORT cisst_ros_crtk
-      LIBRARY DESTINATION lib
-      ARCHIVE DESTINATION lib
-      RUNTIME DESTINATION bin
-      INCLUDES DESTINATION include
-      )
+  ament_export_targets (cisst_ros_crtk HAS_LIBRARY_TARGET)
 
-    ament_export_targets (cisst_ros_crtk HAS_LIBRARY_TARGET)
+  ament_package ()
 
-    ament_package ()
-
-  endif (ROS_VERSION EQUAL 2)
-
-else (cisst_FOUND)
-  message ("Information: code in ${CMAKE_CURRENT_SOURCE_DIR} will not be compiled, it requires ${REQUIRED_CISST_LIBRARIES}")
-endif (cisst_FOUND)
+endif (ROS_VERSION EQUAL 2)
