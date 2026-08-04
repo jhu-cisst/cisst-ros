@@ -33,7 +33,7 @@
   <exec_depend condition="$ROS_VERSION == 1">cisst_ros_bridge</exec_depend>
 
   <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
-  <depend condition="$ROS_VERSION == 2">cisst_ros2_bridge</depend>
+  <depend condition="$ROS_VERSION == 2">cisst_ros_bridge</depend>
   <depend condition="$ROS_VERSION == 2">crtk_msgs</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
