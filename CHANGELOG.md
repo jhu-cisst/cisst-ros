@@ -1,6 +1,18 @@
 Change log
 ==========
 
+4.1.0 (TBD)
+===========
+
+* API changes:
+  * cisst_ros_crtk bridge: added support for the CRTK `set_base_frame` command
+* Deprecated features:
+  * CMake: removed use of the legacy cisst CMake macros; use cisst's target-based dependency propagation instead
+* New features:
+  * cisst_ros_bridge and cisst_ros_crtk bridge components are tagged `ROS` for component-viewer filtering
+* Bug fixes:
+  * None
+
 4.0.0 (2026-01-07)
 ==================
 
