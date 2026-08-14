@@ -1,6 +1,17 @@
 Change log
 ==========
 
+4.1.0 (TBD)
+===========
+
+* New features:
+  * ROS bridge components are tagged `ROS` for component discovery and filtering.
+  * Added generic CRTK support for the `set_base_frame` command.
+* Build:
+  * Updated CMake configuration to use the current cisst CMake support.
+* Bug fixes:
+  * Corrected the ROS 2 dependency for `cisst_ros_crtk` to `cisst_ros_bridge`.
+
 4.0.0 (2026-01-07)
 ==================
 
