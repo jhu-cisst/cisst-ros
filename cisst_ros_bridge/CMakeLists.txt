@@ -62,7 +62,7 @@ set (REQUIRED_CISST_LIBRARIES
   )
 
 # find cisst and make sure the required libraries have been compiled
-find_package (cisst 1.4.0 REQUIRED COMPONENTS ${REQUIRED_CISST_LIBRARIES})
+find_package (cisst 1.5 REQUIRED COMPONENTS ${REQUIRED_CISST_LIBRARIES})
 
 # configure header file
 configure_file (${cisst_ros_bridge_SOURCE_DIR}/src/cisst_ral_config.h.in
