@@ -154,6 +154,16 @@ void mtsROSBridge::Cleanup(void)
 
 void mtsROSBridge::Run(void)
 {
+#if ROS1
+    if (!ros::ok()) {
+        return;
+    }
+#elif ROS2
+    if (!rclcpp::ok()) {
+        return;
+    }
+#endif
+
     ProcessQueuedCommands();
     ProcessQueuedEvents();
 
