@@ -1,8 +1,8 @@
 Change log
 ==========
 
-4.1.0 (TBD)
-===========
+4.1.0 (2026-08-22)
+==================
 
 * New features:
   * ROS bridge components are tagged `ROS` for component discovery and filtering.
