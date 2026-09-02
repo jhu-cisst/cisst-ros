@@ -111,11 +111,10 @@ if (ROS_VERSION EQUAL 1)
 endif (ROS_VERSION EQUAL 1)
 
 if (ROS_VERSION EQUAL 2)
-  ament_target_dependencies (cisst_ros_bridge
-    ${ROS2_depends})
-
-  ament_target_dependencies (example_bridge
-    ${ROS2_depends})
+  foreach (_dep ${ROS2_depends})
+    target_link_libraries (cisst_ros_bridge ${${_dep}_TARGETS})
+    target_link_libraries (example_bridge ${${_dep}_TARGETS})
+  endforeach ()
 
   target_link_libraries (example_bridge cisst_ros_bridge)
 

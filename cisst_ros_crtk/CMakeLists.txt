@@ -97,7 +97,9 @@ if (ROS_VERSION EQUAL 1)
 endif (ROS_VERSION EQUAL 1)
 
 if (ROS_VERSION EQUAL 2)
-  ament_target_dependencies (cisst_ros_crtk ${ROS2_depends})
+  foreach (_dep ${ROS2_depends})
+    target_link_libraries (cisst_ros_crtk ${${_dep}_TARGETS})
+  endforeach ()
 
   install (TARGETS cisst_ros_crtk
     DESTINATION lib/${PROJECT_NAME}
