@@ -24,6 +24,8 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstMultiTask/mtsInterfaceRequired.h>
 #include <cisstMultiTask/mtsInterfaceProvided.h>
 
+#include <memory>
+
 // ros include
 #include <cisst_ros_bridge/cisst_ral.h>
 
@@ -34,7 +36,7 @@ http://www.cisst.org/cisst/license.txt.
 #elif ROS2
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/utilities.hpp>
-#include <tf2_ros/transform_broadcaster.h>
+#include <tf2_ros/transform_broadcaster.hpp>
 #include <std_msgs/msg/empty.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #endif
@@ -786,9 +788,7 @@ public:
       loop (i.e. Qt with QApplication.exec()).  If you use multiple
       mtsROSBridge, make sure there's only one bridge with spin turned
       on. */
-    inline void PerformsSpin(const bool spin) {
-        m_spin = spin;
-    }
+    void PerformsSpin(const bool spin);
 
     // --------- Required interface
 
@@ -1000,6 +1000,11 @@ protected:
 
     //! spin flag, if set call spinOnce() in run
     bool m_spin;
+
+#if ROS2
+    //! executor used when this bridge processes ROS callbacks in Run
+    std::unique_ptr<rclcpp::executors::SingleThreadedExecutor> m_executor;
+#endif
 
     //! signal flag, if set use default signal handler from ros nodehandle
     bool m_signal;

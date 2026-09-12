@@ -146,7 +146,10 @@ namespace cisst_ral {
     }
 
     inline void spin(node_ptr_t node) {
-        rclcpp::spin(node);
+        rclcpp::executors::SingleThreadedExecutor executor;
+        executor.add_node(node);
+        executor.spin();
+        executor.remove_node(node);
     }
 
     inline void shutdown(void) {
