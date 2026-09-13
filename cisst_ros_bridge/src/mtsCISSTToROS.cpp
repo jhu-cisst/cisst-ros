@@ -366,6 +366,13 @@ void mtsCISSTToROS(const mtsDoubleVec & cisstData,
     mtsCISSTToROSWrench(cisstData, rosData.wrench);
 }
 
+void mtsCISSTToROS(const vct3 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Vector3Stamped) & rosData,
+                   const std::string & debugInfo)
+{
+    mtsCISSTToROS(cisstData, rosData.vector, debugInfo);
+}
+
 void mtsCISSTToROS(const mtsDoubleVec & cisstData,
                    CISST_RAL_MSG(geometry_msgs, Vector3Stamped) & rosData,
                    const std::string & debugInfo)

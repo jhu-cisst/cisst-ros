@@ -398,6 +398,9 @@ void mtsCISSTToROS(const vctFrm3 & cisstData,
 void mtsCISSTToROS(const vct3 & cisstData,
                    CISST_RAL_MSG(geometry_msgs, Vector3) & rosData,
                    const std::string & debugInfo);
+void mtsCISSTToROS(const vct3 & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Vector3Stamped) & rosData,
+                   const std::string & debugInfo);
 void mtsCISSTToROS(const vctMatRot3 & cisstData,
                    CISST_RAL_MSG(geometry_msgs, Quaternion) & rosData,
                    const std::string & debugInfo);
