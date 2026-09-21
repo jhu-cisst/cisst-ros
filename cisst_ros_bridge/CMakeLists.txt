@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.16)
-project (cisst_ros_bridge VERSION 4.0.0)
+project (cisst_ros_bridge VERSION 4.1.0)
 
 # first test for ROS1
 set (ROS1_depends
@@ -62,94 +62,85 @@ set (REQUIRED_CISST_LIBRARIES
   )
 
 # find cisst and make sure the required libraries have been compiled
-find_package (cisst 1.4.0 REQUIRED ${REQUIRED_CISST_LIBRARIES})
+find_package (cisst 1.5 REQUIRED COMPONENTS ${REQUIRED_CISST_LIBRARIES})
 
-if (cisst_FOUND_AS_REQUIRED)
+# configure header file
+configure_file (${cisst_ros_bridge_SOURCE_DIR}/src/cisst_ral_config.h.in
+  ${GENERATED_INCLUDE_DIR}/cisst_ros_bridge/cisst_ral_config.h)
 
-  include (${CISST_USE_FILE})
+include_directories (BEFORE include ${GENERATED_INCLUDE_DIR})
 
-  # configure header file
-  configure_file (${cisst_ros_bridge_SOURCE_DIR}/src/cisst_ral_config.h.in
-    ${GENERATED_INCLUDE_DIR}/cisst_ros_bridge/cisst_ral_config.h)
+# header
+set (HEADER_FILES
+  include/cisst_ros_bridge/cisst_ral.h
+  include/cisst_ros_bridge/mtsROSBridge.h
+  include/cisst_ros_bridge/mtsCISSTToROS.h
+  include/cisst_ros_bridge/mtsROSToCISST.h)
 
-  include_directories (BEFORE include ${GENERATED_INCLUDE_DIR})
+# source
+set (SOURCE_FILES
+  src/cisst_ral.cpp
+  src/mtsROSBridge.cpp
+  src/mtsCISSTToROS.cpp
+  src/mtsROSToCISST.cpp)
 
-  # header
-  set (HEADER_FILES
-    include/cisst_ros_bridge/cisst_ral.h
-    include/cisst_ros_bridge/mtsROSBridge.h
-    include/cisst_ros_bridge/mtsCISSTToROS.h
-    include/cisst_ros_bridge/mtsROSToCISST.h)
+# library
+add_library (cisst_ros_bridge ${HEADER_FILES} ${SOURCE_FILES})
+target_link_libraries (cisst_ros_bridge ${cisst_LIBRARIES})
 
-  # source
-  set (SOURCE_FILES
-    src/cisst_ral.cpp
-    src/mtsROSBridge.cpp
-    src/mtsCISSTToROS.cpp
-    src/mtsROSToCISST.cpp)
+# example
+add_executable (example_bridge example/main.cpp)
+target_link_libraries (example_bridge ${cisst_LIBRARIES})
 
-  # library
-  add_library (cisst_ros_bridge ${HEADER_FILES} ${SOURCE_FILES})
-  cisst_target_link_libraries (cisst_ros_bridge ${REQUIRED_CISST_LIBRARIES})
+if (ROS_VERSION EQUAL 1)
+  target_link_libraries (cisst_ros_bridge ${catkin_LIBRARIES})
+  target_link_libraries (example_bridge cisst_ros_bridge ${catkin_LIBRARIES})
 
-  # example
-  add_executable (example_bridge example/main.cpp)
-  cisst_target_link_libraries (example_bridge ${REQUIRED_CISST_LIBRARIES})
+  install (TARGETS cisst_ros_bridge example_bridge
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    )
 
-  if (ROS_VERSION EQUAL 1)
-    target_link_libraries (cisst_ros_bridge ${catkin_LIBRARIES})
-    target_link_libraries (example_bridge cisst_ros_bridge ${catkin_LIBRARIES})
+  install (DIRECTORY include/${PROJECT_NAME}
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+    )
 
-    install (TARGETS cisst_ros_bridge example_bridge
-      LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-      RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-      )
+  install (DIRECTORY ${cisst_ros_bridge_BINARY_DIR}/include/${PROJECT_NAME}
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+    )
+endif (ROS_VERSION EQUAL 1)
 
-    install (DIRECTORY include/${PROJECT_NAME}
-      DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-      )
+if (ROS_VERSION EQUAL 2)
+  foreach (_dep ${ROS2_depends})
+    target_link_libraries (cisst_ros_bridge ${${_dep}_TARGETS})
+    target_link_libraries (example_bridge ${${_dep}_TARGETS})
+  endforeach ()
 
-    install (DIRECTORY ${cisst_ros_bridge_BINARY_DIR}/include/${PROJECT_NAME}
-      DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-      )
-  endif (ROS_VERSION EQUAL 1)
+  target_link_libraries (example_bridge cisst_ros_bridge)
 
-  if (ROS_VERSION EQUAL 2)
-    ament_target_dependencies (cisst_ros_bridge
-      ${ROS2_depends})
+  install (TARGETS cisst_ros_bridge example_bridge
+    DESTINATION lib/${PROJECT_NAME}
+    )
 
-    ament_target_dependencies (example_bridge
-      ${ROS2_depends})
+  install (DIRECTORY include/${PROJECT_NAME}
+    DESTINATION include
+    )
 
-    target_link_libraries (example_bridge cisst_ros_bridge)
+  install (DIRECTORY ${GENERATED_INCLUDE_DIR}/${PROJECT_NAME}
+    DESTINATION include
+    )
 
-    install (TARGETS cisst_ros_bridge example_bridge
-      DESTINATION lib/${PROJECT_NAME}
-      )
+  install (
+    TARGETS cisst_ros_bridge
+    EXPORT cisst_ros_bridge
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+    )
 
-    install (DIRECTORY include/${PROJECT_NAME}
-      DESTINATION include
-      )
+  ament_export_targets (cisst_ros_bridge HAS_LIBRARY_TARGET)
 
-    install (DIRECTORY ${GENERATED_INCLUDE_DIR}/${PROJECT_NAME}
-      DESTINATION include
-      )
+  ament_package ()
 
-    install (
-      TARGETS cisst_ros_bridge
-      EXPORT cisst_ros_bridge
-      LIBRARY DESTINATION lib
-      ARCHIVE DESTINATION lib
-      RUNTIME DESTINATION bin
-      INCLUDES DESTINATION include
-      )
-
-    ament_export_targets (cisst_ros_bridge HAS_LIBRARY_TARGET)
-
-    ament_package ()
-
-  endif (ROS_VERSION EQUAL 2)
-
-else (cisst_FOUND_AS_REQUIRED)
-  message ("Information: code in ${CMAKE_CURRENT_SOURCE_DIR} will not be compiled, it requires ${REQUIRED_CISST_LIBRARIES}")
-endif (cisst_FOUND_AS_REQUIRED)
+endif (ROS_VERSION EQUAL 2)

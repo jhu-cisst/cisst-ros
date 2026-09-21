@@ -30,7 +30,7 @@ mtsROSBridge::mtsROSBridge(const std::string & name,
                            const bool signal,
                            cisst_ral::node_ptr_t node):
     mtsTaskPeriodic(name, period_in_seconds),
-    m_spin(spin),
+    m_spin(false),
     m_signal(signal)
 {
     this->mTags.clear();
@@ -61,6 +61,7 @@ mtsROSBridge::mtsROSBridge(const std::string & name,
         m_node = std::make_shared<rclcpp::Node>(name);
 #endif
     }
+    PerformsSpin(spin);
 }
 
 mtsROSBridge::mtsROSBridge(const mtsTaskPeriodicConstructorArg &arg):
@@ -103,6 +104,7 @@ void mtsROSBridge::Configure(const std::string & CMN_UNUSED(filename))
 
 mtsROSBridge::~mtsROSBridge()
 {
+    PerformsSpin(false);
     for (auto pub : m_periodic_publishers) {
         delete(pub);
     }
@@ -152,8 +154,42 @@ void mtsROSBridge::Cleanup(void)
     }
 }
 
+void mtsROSBridge::PerformsSpin(const bool spin)
+{
+#if ROS1
+    m_spin = spin;
+#elif ROS2
+    if (spin == m_spin) {
+        return;
+    }
+
+    if (spin) {
+        rclcpp::ExecutorOptions executor_options;
+        executor_options.context = m_node->get_node_base_interface()->get_context();
+        auto executor =
+            std::make_unique<rclcpp::executors::SingleThreadedExecutor>(executor_options);
+        executor->add_node(m_node);
+        m_executor = std::move(executor);
+    } else if (m_executor) {
+        m_executor->remove_node(m_node);
+        m_executor.reset();
+    }
+    m_spin = spin;
+#endif
+}
+
 void mtsROSBridge::Run(void)
 {
+#if ROS1
+    if (!ros::ok()) {
+        return;
+    }
+#elif ROS2
+    if (!rclcpp::ok()) {
+        return;
+    }
+#endif
+
     ProcessQueuedCommands();
     ProcessQueuedEvents();
 
@@ -165,7 +201,7 @@ void mtsROSBridge::Run(void)
 #if ROS1
         ros::spinOnce();
 #elif ROS2
-        rclcpp::spin_some(m_node);
+        m_executor->spin_some();
 #endif
     }
 }

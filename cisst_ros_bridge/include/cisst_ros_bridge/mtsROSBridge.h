@@ -24,6 +24,8 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstMultiTask/mtsInterfaceRequired.h>
 #include <cisstMultiTask/mtsInterfaceProvided.h>
 
+#include <memory>
+
 // ros include
 #include <cisst_ros_bridge/cisst_ral.h>
 
@@ -34,7 +36,7 @@ http://www.cisst.org/cisst/license.txt.
 #elif ROS2
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/utilities.hpp>
-#include <tf2_ros/transform_broadcaster.h>
+#include <tf2_ros/transform_broadcaster.hpp>
 #include <std_msgs/msg/empty.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #endif
@@ -83,8 +85,10 @@ public:
     mtsROSPublisher(const std::string & name,
                     cisst_ral::node_ptr_t node,
                     const uint32_t queue_size = 5,
-                    const bool latched = false):
-        mtsROSPublisherBase(name, node, latched)
+                    const bool latched = false,
+                    const _ros_t & initial_data = _ros_t()):
+        mtsROSPublisherBase(name, node, latched),
+        m_ros_data(initial_data)
     {
         cisst_ral::create_publisher<_ros_t>(m_publisher, m_node, m_name, queue_size, m_latched);
         if (!m_publisher) {
@@ -786,9 +790,7 @@ public:
       loop (i.e. Qt with QApplication.exec()).  If you use multiple
       mtsROSBridge, make sure there's only one bridge with spin turned
       on. */
-    inline void PerformsSpin(const bool spin) {
-        m_spin = spin;
-    }
+    void PerformsSpin(const bool spin);
 
     // --------- Required interface
 
@@ -804,13 +806,16 @@ public:
       \param interface_required Name of the required interface to be created
       \param function Name of the read function added to the interface
       \param name Name of the topic used to publish
+      \param initial_data Initial message fields, e.g. a fixed frame_id for
+      cisst types without frame metadata. Converted fields are overwritten.
     */
     template <typename _cisst_t, typename _ros_t>
     bool AddPublisherFromCommandRead(const std::string & interface_required,
                                      const std::string & function,
                                      const std::string & name,
                                      const uint32_t queue_size = 100,
-                                     const bool latched = false);
+                                     const bool latched = false,
+                                     const _ros_t & initial_data = _ros_t());
 
     /*! Add an event handler (void) to a cisstMultiTask required
       interface.  When connected to an existing provided interface,
@@ -1001,6 +1006,11 @@ protected:
     //! spin flag, if set call spinOnce() in run
     bool m_spin;
 
+#if ROS2
+    //! executor used when this bridge processes ROS callbacks in Run
+    std::unique_ptr<rclcpp::executors::SingleThreadedExecutor> m_executor;
+#endif
+
     //! signal flag, if set use default signal handler from ros nodehandle
     bool m_signal;
 };
@@ -1010,7 +1020,8 @@ bool mtsROSBridge::AddPublisherFromCommandRead(const std::string & interface_req
                                                const std::string & function,
                                                const std::string & name,
                                                const uint32_t queue_size,
-                                               const bool latched)
+                                               const bool latched,
+                                               const _ros_t & initial_data)
 {
     // check if the interface exists of try to create one
     mtsInterfaceRequired * interfaceRequired
@@ -1025,7 +1036,7 @@ bool mtsROSBridge::AddPublisherFromCommandRead(const std::string & interface_req
         return false;
     }
     mtsROSPublisherBase * new_pub =
-        new mtsROSPublisher<_cisst_t, _ros_t>(name, m_node, queue_size, latched);
+        new mtsROSPublisher<_cisst_t, _ros_t>(name, m_node, queue_size, latched, initial_data);
     if (!interfaceRequired->AddFunction(function, new_pub->m_function)) {
         CISST_RAL_ERROR("mtsROSBridge::AddPublisherFromCommandRead: failed to create function.");
         CMN_LOG_CLASS_INIT_ERROR << "AddPublisherFromCommandRead: failed to add function \""
