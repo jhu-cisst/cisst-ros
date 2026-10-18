@@ -194,6 +194,17 @@ void mtsCISSTToROS(const Eigen::Quaterniond & cisstData,
     rosData.w = cisstData.w();
 }
 
+void mtsCISSTToROS(const Eigen::Matrix3d & cisstData,
+                   CISST_RAL_MSG(geometry_msgs, Quaternion) & rosData,
+                   const std::string &)
+{
+    Eigen::Quaterniond q(cisstData);
+    rosData.x = q.x();
+    rosData.y = q.y();
+    rosData.z = q.z();
+    rosData.w = q.w();
+}
+
 void mtsCISSTToROS(const prmPositionCartesianGet & cisstData,
                    CISST_RAL_MSG(geometry_msgs, Pose) & rosData,
                    const std::string & debugInfo)
@@ -329,6 +340,21 @@ void mtsCISSTToROSSetJointNames(CISST_RAL_MSG(sensor_msgs, JointState) & rosData
     rosData.name.resize(nb_joints);
     for (size_t i = 0; i < nb_joints; ++i) {
         rosData.name[i] = std::to_string(i);
+    }
+}
+
+void mtsCISSTToROS(const Eigen::VectorXd & cisstData,
+                   CISST_RAL_MSG(sensor_msgs, JointState) & rosData,
+                   const std::string &)
+{
+    const size_t size = cisstData.size();
+    mtsCISSTToROSSetJointNames(rosData, size);
+    rosData.velocity.resize(0);
+    rosData.effort.resize(0);
+    if (size != 0) {
+        rosData.position.resize(size);
+        std::copy(cisstData.begin(), cisstData.end(),
+                  rosData.position.begin());
     }
 }
 
