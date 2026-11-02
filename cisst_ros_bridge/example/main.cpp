@@ -41,11 +41,16 @@ class TestComponent: public mtsTaskPeriodic
 public:
     TestComponent(void):
         mtsTaskPeriodic("testComponent", 5.0 * cmn_ms, 256),
-        Value1(4, 0.0),
-        Value2(4, 0.0),
-        Value3(4, 0.0),
-        OldValue3(4, 0.0)
+        Value1(4),
+        Value2(4),
+        Value3(4),
+        OldValue3(4)
     {
+        Value1.fill(0.0);
+        Value2.fill(0.0);
+        Value3.fill(0.0);
+        OldValue3.fill(0.0);
+
         StateTable.AddData(Value1, "value1");
         StateTable.AddData(Value2, "value2");
         StateTable.AddData(Value3, "value3");
@@ -78,9 +83,9 @@ public:
 
         GetValue3(Value3);
         Value3.resize(4);
-        if (Value3.NotEqual(OldValue3)) {
+        if (Value3 != OldValue3) {
             std::cout << "Value3 " << Value3 << std::endl;
-            OldValue3.ForceAssign(Value3);
+            OldValue3 = Value3;
         }
     }
 
@@ -88,26 +93,26 @@ public:
     }
 
 protected:
-    void SetValue1(const vctDoubleVec & newValue) {
-        Value1.ForceAssign(newValue);
-        SumOfElements1(Value1.SumOfElements());
+    void SetValue1(const Eigen::VectorXd& newValue) {
+        Value1 = newValue;
+        SumOfElements1(Value1.sum());
     }
 
-    void SetValue2(const vctDoubleVec & newValue) {
-        Value2.ForceAssign(newValue);
+    void SetValue2(const Eigen::VectorXd& newValue) {
+        Value2 = newValue;
         ValueChanged2();
     }
 
     void Reset(void) {
-        Value1.Zeros();
-        Value2.Zeros();
+        Value1.fill(0.0);
+        Value2.fill(0.0);
         ValueChanged2();
     }
 
-    vctDoubleVec Value1;
-    vctDoubleVec Value2;
-    vctDoubleVec Value3;
-    vctDoubleVec OldValue3;
+    Eigen::VectorXd Value1;
+    Eigen::VectorXd Value2;
+    Eigen::VectorXd Value3;
+    Eigen::VectorXd OldValue3;
 
     mtsFunctionRead GetValue3;
     mtsFunctionWrite SumOfElements1;
@@ -127,16 +132,16 @@ int main(int argc, char **argv)
     mtsROSBridge bridge("publisher", 5.0 * cmn_ms, node);
     bridge.PerformsSpin(true);
 
-    bridge.AddPublisherFromCommandRead<vctDoubleVec, CISST_RAL_MSG(cisst_msgs, DoubleVec)>
+    bridge.AddPublisherFromCommandRead<Eigen::VectorXd, CISST_RAL_MSG(cisst_msgs, DoubleVec)>
         ("required", "GetValue1", "sawROSExample/get_value_1");
 
-    bridge.AddPublisherFromCommandRead<vctDoubleVec, CISST_RAL_MSG(cisst_msgs, DoubleVec)>
+    bridge.AddPublisherFromCommandRead<Eigen::VectorXd, CISST_RAL_MSG(cisst_msgs, DoubleVec)>
         ("required", "GetValue2", "sawROSExample/get_value_2");
 
-    bridge.AddSubscriberToCommandWrite<vctDoubleVec, CISST_RAL_MSG(cisst_msgs, DoubleVec)>
+    bridge.AddSubscriberToCommandWrite<Eigen::VectorXd, CISST_RAL_MSG(cisst_msgs, DoubleVec)>
         ("required", "SetValue1", "sawROSExample/set_value_1");
 
-    bridge.AddSubscriberToCommandWrite<vctDoubleVec, CISST_RAL_MSG(cisst_msgs, DoubleVec)>
+    bridge.AddSubscriberToCommandWrite<Eigen::VectorXd, CISST_RAL_MSG(cisst_msgs, DoubleVec)>
         ("required", "SetValue2", "sawROSExample/set_value_2");
 
     bridge.AddPublisherFromCommandWrite<double, CISST_RAL_MSG(std_msgs, Float32)>
@@ -145,13 +150,13 @@ int main(int argc, char **argv)
     bridge.AddPublisherFromCommandVoid
         ("provided", "ValueChanged2", "sawROSExample/value_changed_2");
 
-    bridge.AddSubscriberToEventWrite<vctDoubleVec, CISST_RAL_MSG(cisst_msgs, DoubleVec)>
+    bridge.AddSubscriberToEventWrite<Eigen::VectorXd, CISST_RAL_MSG(cisst_msgs, DoubleVec)>
         ("provided", "EventValue1", "sawROSExample/set_value_1_event");
 
     bridge.AddSubscriberToEventVoid
         ("provided", "EventReset", "sawROSExample/reset_event");
 
-    bridge.AddSubscriberToCommandRead<vctDoubleVec, CISST_RAL_MSG(cisst_msgs, DoubleVec)>
+    bridge.AddSubscriberToCommandRead<Eigen::VectorXd, CISST_RAL_MSG(cisst_msgs, DoubleVec)>
         ("provided", "GetValue3", "sawROSExample/set_value_3");
 
     manager->AddComponent(&bridge);

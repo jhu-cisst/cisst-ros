@@ -49,27 +49,27 @@ void mtsCISSTToROS(const std::string & cisstData,
 
 void mtsCISSTToROS(const prmStateCartesian & cisstData,
                    CISST_RAL_MSG(crtk_msgs, CartesianState) & rosData,
-                   const std::string &)
+                   const std::string & debugInfo)
 {
-    mtsCISSTToROSPose(cisstData.Position(), rosData.pose);
+    mtsCISSTToROS(cisstData.Position(), rosData.pose, debugInfo);
     rosData.pose_is_valid.data = cisstData.PositionIsValid();
 
-    mtsCISSTToROSTwist(cisstData.Velocity(), rosData.twist);
+    mtsCISSTToROS(cisstData.Velocity(), rosData.twist, debugInfo);
     rosData.twist_is_valid.data = cisstData.VelocityIsValid();
 
-    mtsCISSTToROSWrench(cisstData.Force(), rosData.wrench);
+    mtsCISSTToROS(cisstData.Force(), rosData.wrench, debugInfo);
     rosData.wrench_is_valid.data = cisstData.ForceIsValid();
 }
 
 void mtsCISSTToROS(const prmServoCartesian & cisstData,
     CISST_RAL_MSG(crtk_msgs, CartesianServo) & rosData,
-    const std::string &)
+    const std::string & debugInfo)
 {
-    mtsCISSTToROSTransform(cisstData.TaskFrame(), rosData.task_frame);
+    mtsCISSTToROS(cisstData.TaskFrame(), rosData.task_frame, debugInfo);
 
-    mtsCISSTToROSPose(cisstData.Position(), rosData.pose);
-    mtsCISSTToROSTwist(cisstData.Velocity(), rosData.twist);
-    mtsCISSTToROSWrench(cisstData.Force(), rosData.wrench);
+    mtsCISSTToROS(cisstData.Position(), rosData.pose, debugInfo);
+    mtsCISSTToROS(cisstData.Velocity(), rosData.twist, debugInfo);
+    mtsCISSTToROS(cisstData.Force(), rosData.wrench, debugInfo);
 
     for (size_t i = 0; i < 6; i++) {
         rosData.axis_mode[i] = CISST_RAL_MSG(crtk_msgs, SetpointMode)();
@@ -134,9 +134,9 @@ void mtsCISSTToROS(const prmOperatingState & cisstData,
 
 void mtsCISSTToROS(const prmForwardKinematicsResponse & cisstData,
                    CISST_RAL_SRV_RES(crtk_msgs, QueryForwardKinematics) & rosData,
-                   const std::string &)
+                   const std::string & debugInfo)
 {
-    mtsCISSTToROSPose(cisstData.cp(), rosData.cp);
+    mtsCISSTToROS(cisstData.cp(), rosData.cp, debugInfo);
     rosData.result = cisstData.result();
     rosData.message = cisstData.message();
 }
