@@ -21,6 +21,7 @@ http://www.cisst.org/cisst/license.txt.
 
 // cisst include
 #include "geometry_msgs/msg/quaternion.hpp"
+#include <chrono>
 #include <cisstMultiTask/mtsManagerLocal.h>
 
 #include <cisstMultiTask/mtsIntervalStatistics.h>
@@ -108,7 +109,7 @@ namespace mts_ros_to_cisst {
                                     _cisstType & cisstData,
                                     cisst_ral::node_ptr_t node)
     {
-        const double cisstNow = mtsManagerLocal::GetInstance()->GetTimeServer().GetRelativeTime();
+        const double cisstNow = getTimestamp(std::chrono::steady_clock::now());
         // first check that header.stamp is not zero
         if (cisst_ral::time_is_zero(rosData.header.stamp)) {
             cisstData.SetTimestamp(cisstNow);
@@ -190,8 +191,7 @@ namespace mts_ros_to_cisst {
                     cisstData.SetValid(true),
                     void())
     {
-        const double cisstNow = mtsManagerLocal::GetInstance()->GetTimeServer().GetRelativeTime();
-        cisstData.SetTimestamp(cisstNow);
+        cisstData.SetTimestamp(getTimestamp(std::chrono::steady_clock::now()));
         // always set as valid for now
         cisstData.SetValid(true);
     }

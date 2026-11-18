@@ -333,6 +333,7 @@ void mtsROSToCISST(const CISST_RAL_MSG(cisst_msgs, DoubleVec) & rosData,
 void mtsROSToCISST(const CISST_RAL_MSG(cisst_msgs, IntervalStatistics) & rosData,
                    mtsIntervalStatistics & cisstData)
 {
+    const auto interval = durationFromSeconds<std::chrono::steady_clock>(rosData.statistics_interval);
     cisstData.SetFromExisting(rosData.period_avg,
                               rosData.period_std_dev,
                               rosData.period_min,
@@ -343,7 +344,7 @@ void mtsROSToCISST(const CISST_RAL_MSG(cisst_msgs, IntervalStatistics) & rosData
                               rosData.compute_time_max,
                               rosData.number_of_samples,
                               rosData.number_of_overruns,
-                              rosData.statistics_interval);
+                              interval);
 }
 
 void mtsROSToCISST(const CISST_RAL_SRV_REQ(cisst_msgs, ConvertFloat64Array) & rosData,

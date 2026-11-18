@@ -24,6 +24,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cisstMultiTask/mtsManagerLocal.h>
 #include <cisstMultiTask/mtsIntervalStatistics.h>
 
+#include <cisstOSAbstraction/osaTime.h>
 #include <cisstParameterTypes/prmPositionJointGet.h>
 #include <cisstParameterTypes/prmPositionJointSet.h>
 #include <cisstParameterTypes/prmVelocityJointGet.h>
@@ -135,9 +136,7 @@ namespace mts_cisst_to_ros {
         try {
             const double cisstDataTime = cisstData.Timestamp();
             if (cisstDataTime > 0.0) {
-                const double age =
-                    mtsManagerLocal::GetInstance()->GetTimeServer().GetRelativeTime()
-                    - cisstDataTime;
+                const double age = getTimestamp(std::chrono::steady_clock::now()) - cisstDataTime;
                 if (age > 0.0) {
                     rosData.header.stamp = cisst_ral::now(node) - cisst_ral::duration_from_seconds(age);
                 } else {
