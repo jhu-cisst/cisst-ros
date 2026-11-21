@@ -59,6 +59,12 @@ void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, String) & rosData,
 }
 
 void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
+                   std::vector<double> & cisstData)
+{
+    cisstData.assign(rosData.data.begin(), rosData.data.end());
+}
+
+void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
                    Eigen::VectorXd & cisstData)
 {
     const size_t size = rosData.data.size();

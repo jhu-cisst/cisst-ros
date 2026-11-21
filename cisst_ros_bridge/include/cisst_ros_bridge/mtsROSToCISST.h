@@ -224,6 +224,8 @@ void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, String) & rosData,
 void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, String) & rosData,
                    mtsMessage & cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
+                   std::vector<double> & cisstData);
+void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
                    Eigen::VectorXd & cisstData);
 void mtsROSToCISST(const CISST_RAL_MSG(std_msgs, Float64MultiArray) & rosData,
                    Eigen::MatrixXd & cisstData);
